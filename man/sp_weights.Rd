@@ -10,10 +10,10 @@ sp_weights(x, y, phi, preprocessed = FALSE, doPlot = FALSE, bw = c("ucv",
   exact = FALSE)
 }
 \arguments{
-\item{x}{a matrix of size \code{n x p} containing the model covariates from 
+\item{x}{a matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
 
-\item{y}{a matrix of size \code{n x G} containing the raw RNAseq counts or 
+\item{y}{a matrix of size \code{n x G} containing the raw RNAseq counts or
 preprocessed expression from \code{n} samples for \code{G} genes.}
 
 \item{phi}{a design matrix of size \code{n x K} containing the K basis of time.}
@@ -26,19 +26,19 @@ log(counts) per million.}
 \item{doPlot}{a logical flag indicating wether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
-\item{bw}{a character string indicating the smoothing bandwidth selection method to use. See 
-\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"}, 
+\item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
+\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
 \code{"bcv"}, \code{"nrd"} or \code{"nrd0"}}
 
-\item{kernel}{a character string indicating which kernel should be used. 
-Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"}, 
-\code{"triangular"}, \code{"biweight"}, \code{"tricube"}, \code{"cosine"}, 
-\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel 
+\item{kernel}{a character string indicating which kernel should be used.
+Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"},
+\code{"triangular"}, \code{"biweight"}, \code{"tricube"}, \code{"cosine"},
+\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 corresponds to the loess method).}
 
-\item{exact}{a logical flag indicating wether the non-parametric weights accounting 
-for the mean-variance relationship should be computed exactly or extrapolated 
-from the interpolation of local regression of the mean against the 
+\item{exact}{a logical flag indicating wether the non-parametric weights accounting
+for the mean-variance relationship should be computed exactly or extrapolated
+from the interpolation of local regression of the mean against the
 variance. Default is \code{FALSE}, which uses interporlation (faster).}
 }
 \value{

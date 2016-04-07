@@ -13,29 +13,29 @@ tcgsa_seq(y, x, phi, genesets, indiv = 1:nrow(x),
   "hommel", "bonferroni"))
 }
 \arguments{
-\item{y}{a matrix of size \code{n x G} containing the raw RNA-seq counts or 
+\item{y}{a matrix of size \code{n x G} containing the raw RNA-seq counts or
 preprocessed expressions from \code{n} samples for \code{G} genes.}
 
-\item{x}{a matrix of size \code{n x p} containing the model covariates from 
+\item{x}{a matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
 
-\item{phi}{a design matrix of size \code{n x K} containing the \code{K} variables 
+\item{phi}{a design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
 
 \item{genesets}{either a vector or a list of index or subscript that define}
 
-\item{indiv}{a vector of length \code{n} containing the information for 
-attributing each sample to one of the studied individuals. Coerced 
+\item{indiv}{a vector of length \code{n} containing the information for
+attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}.}
 
-\item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix 
+\item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects.}
 
-\item{which_test}{a character string indicating which method to use to approximate 
-the variance component score test, either \code{"permutation"} or \code{"asymptotic"}. 
+\item{which_test}{a character string indicating which method to use to approximate
+the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 Default is \code{"permutation"}.}
 
-\item{which_weights}{a character string indicating which method to use to estimate 
+\item{which_weights}{a character string indicating which method to use to estimate
 the mean-variance relationship wheights. Possibilities are "loclin" or "voom".
 Default is "loclin".
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
@@ -50,31 +50,31 @@ log(counts) per million.}
 \item{doPlot}{a logical flag indicating wether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
-\item{bw}{a character string indicating the smoothing bandwidth selection method to use. See 
-\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"}, 
+\item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
+\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
 \code{"bcv"}, \code{"nrd"} or \code{"nrd0"}}
 
-\item{kernel}{a character string indicating which kernel should be used. 
-Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"}, 
-\code{"triangular"}, \code{"biweight"}, \code{"tricube"}, \code{"cosine"}, 
-\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel 
+\item{kernel}{a character string indicating which kernel should be used.
+Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"},
+\code{"triangular"}, \code{"biweight"}, \code{"tricube"}, \code{"cosine"},
+\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 corresponds to the loess method).}
 
-\item{exact}{a logical flag indicating wether the non-parametric weights accounting 
-for the mean-variance relationship should be computed exactly or extrapolated 
-from the interpolation of local regression of the mean against the 
+\item{exact}{a logical flag indicating wether the non-parametric weights accounting
+for the mean-variance relationship should be computed exactly or extrapolated
+from the interpolation of local regression of the mean against the
 variance. Default is \code{FALSE}, which uses interporlation (faster).}
 
-\item{padjust_methods}{multiple testing correction method used if \code{genesets} 
+\item{padjust_methods}{multiple testing correction method used if \code{genesets}
 is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
 Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).}
 }
 \value{
 A list with the following elements:\itemize{
-  \item \code{which_test}: 
-  \item \code{preprocessed}: 
-  \item \code{n_perm}: 
+  \item \code{which_test}:
+  \item \code{preprocessed}:
+  \item \code{n_perm}:
   \item \code{pval}: associated p-value
 }
 }
@@ -82,11 +82,11 @@ A list with the following elements:\itemize{
 Wrapper function for performing gene set analysis of longitudinal RNA-seq data
 }
 \references{
-Agniel D, Hejblum BP, Variance component score test for 
+Agniel D, Hejblum BP, Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{submitted}, 2016.
 
-Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision 
-weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome 
+Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision
+weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome
 Biology}, 15(2), R29.
 }
 \seealso{

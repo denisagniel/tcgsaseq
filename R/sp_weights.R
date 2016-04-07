@@ -3,10 +3,10 @@
 #'Computes precision weights that account for heteroscedasticity in RNAseq count data
 #'based on non-parametric local linear regression estimates.
 #'
-#'@param y a matrix of size \code{n x G} containing the raw RNAseq counts or 
+#'@param y a matrix of size \code{n x G} containing the raw RNAseq counts or
 #'preprocessed expression from \code{n} samples for \code{G} genes.
 #'
-#'@param x a matrix of size \code{n x p} containing the model covariates from 
+#'@param x a matrix of size \code{n x p} containing the model covariates from
 #'\code{n} samples (design matrix).
 #'
 #'@param phi a design matrix of size \code{n x K} containing the K basis of time.
@@ -18,20 +18,20 @@
 #'
 #'@param doPlot a logical flag indicating wether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
-#' 
-#'@param bw a character string indicating the smoothing bandwidth selection method to use. See 
-#'\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"}, 
+#'
+#'@param bw a character string indicating the smoothing bandwidth selection method to use. See
+#'\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
 #'\code{"bcv"}, \code{"nrd"} or \code{"nrd0"}
-#' 
-#'@param kernel a character string indicating which kernel should be used. 
-#'Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"}, 
-#'\code{"triangular"}, \code{"biweight"}, \code{"tricube"}, \code{"cosine"}, 
-#'\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel 
+#'
+#'@param kernel a character string indicating which kernel should be used.
+#'Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"},
+#'\code{"triangular"}, \code{"biweight"}, \code{"tricube"}, \code{"cosine"},
+#'\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 #'corresponds to the loess method).
 #'
-#'@param exact a logical flag indicating wether the non-parametric weights accounting 
-#'for the mean-variance relationship should be computed exactly or extrapolated 
-#'from the interpolation of local regression of the mean against the 
+#'@param exact a logical flag indicating wether the non-parametric weights accounting
+#'for the mean-variance relationship should be computed exactly or extrapolated
+#'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interporlation (faster).
 #'
 #'@return a vector of length \code{n} containing the computed precision weights.
@@ -59,13 +59,13 @@
 #'@export
 
 
-sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE, 
-                       bw = c("ucv", "SJ", "bcv", "nrd", "nrd0"), 
+sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
+                       bw = c("ucv", "SJ", "bcv", "nrd", "nrd0"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                        exact=FALSE
 ){
-  
-  
+
+
   ## dimensions & validity checks
   g <- ncol(y) # the number of genes measured
   n <- nrow(y) # the number of samples measured
@@ -73,18 +73,18 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
   n.t <- ncol(phi) # the number of time bases
   stopifnot(nrow(x) == n)
   stopifnot(nrow(phi) == n)
-  
-  
-  
-  
+
+
+
+
   if(exact){
-    cat("'exact' is TRUE: the computation may take up to a couple minutes...", "\n", 
+    cat("'exact' is TRUE: the computation may take up to a couple minutes...", "\n",
         "Set 'exact = FALSE' for quicker computation of the weights\n")
   }
-  
+
   # lowess fit for predicted square root sd
   observed <- which(colSums(y) != 0) #remving genes never observed
-  
+
   kernel <- match.arg(kernel)
   if(preprocessed){
     y_lcpm <- y
@@ -92,60 +92,58 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
     # transforming rna raw counts to log-counts per million (lcpm)
     y_lcpm <- t(apply(y, MARGIN=1,function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
   }
+  rm(y)
   N <- length(y_lcpm)
   p <- ncol(y_lcpm)
   n <- nrow(y_lcpm)
-  
-  
-  
-  
-  
+
+
   # fitting OLS to the lcpm
   #mu <- apply(y_lcpm, MARGIN=2, function(y){lm(y~x + phi)$fitted.values})
   xphi <- cbind(x,phi)
   B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm
   mu <- xphi%*%B_ols
-  
+
   sq_err <- (y_lcpm - mu)^2
   v <- colMeans(sq_err)
-  
+
   mu_avg <- colMeans(mu)
-  
-  
-  
+
+
+
   if(is.character(bw)){
     if(length(bw>1)){
       bw <- bw[1]
     }
     if (N < 2){stop("need at least 2 points to select a bandwidth automatically")}
     if(!exact){
-      bw <- switch(bw, 
-                   nrd0 = bw.nrd0(as.vector(mu_avg)), 
-                   nrd = bw.nrd(as.vector(mu_avg)), 
-                   ucv = bw.ucv(as.vector(mu_avg)), 
-                   bcv = bw.bcv(as.vector(mu_avg)), 
-                   SJ = bw.SJ(as.vector(mu_avg), method = "ste"), 
+      bw <- switch(bw,
+                   nrd0 = bw.nrd0(as.vector(mu_avg)),
+                   nrd = bw.nrd(as.vector(mu_avg)),
+                   ucv = bw.ucv(as.vector(mu_avg)),
+                   bcv = bw.bcv(as.vector(mu_avg)),
+                   SJ = bw.SJ(as.vector(mu_avg), method = "ste"),
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }else{
-      bw <- switch(bw, 
-                   nrd0 = bw.nrd0(as.vector(mu)), 
-                   nrd = bw.nrd(as.vector(mu)), 
-                   ucv = bw.ucv(as.vector(mu)), 
-                   bcv = bw.bcv(as.vector(mu)), 
-                   SJ = bw.SJ(as.vector(mu), method = "ste"), 
+      bw <- switch(bw,
+                   nrd0 = bw.nrd0(as.vector(mu)),
+                   nrd = bw.nrd(as.vector(mu)),
+                   ucv = bw.ucv(as.vector(mu)),
+                   bcv = bw.bcv(as.vector(mu)),
+                   SJ = bw.SJ(as.vector(mu), method = "ste"),
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }
     cat("\nBandwith computed.\n")
   }
-  
+
   if(!is.finite(bw)){
     stop("non-finite 'bw'")
   }
   if(bw <= 0){
     stop("'bw' is not positive")
   }
-  
-  
+
+
   if(kernel=="gaussian"){
     kern_func <- function(x, bw){
       dnorm(x, sd = bw)
@@ -154,7 +152,7 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
     kern_func2 <- function(x, bw){
       a <- bw * sqrt(3)
       (abs(x) < a)*0.5/a#ifelse(abs(x) < a, 0.5/a, 0)
-      
+
     }
   }else if(kernel=="triangular"){
     kern_func <- function(x, bw){
@@ -193,7 +191,7 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
   }else{
     stop("unknown kernel: 'kernel' argument must be among 'gaussian', 'rectangular', 'triangular', 'epanechnikov', 'biweight', 'cosine', 'optcosine'")
   }
-  
+
   w <- function(x){
     x_ctr <- (mu_avg-x)
     kernx <- kern_func(x_ctr, bw)
@@ -202,7 +200,7 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
     l <- b/sum(b)
     sum(l*v)
   }
-  
+
   kern_fit <- NULL
   if(exact){
     weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol=n, nrow=p, byrow = FALSE))
@@ -214,10 +212,10 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
     weights <- 1/matrix(kern_fit, nrow=n, ncol=p, byrow=TRUE)
     #f_interp <- approxfun(x=mu_avg, kern_fit, rule = 2)
     #weights <- 1/apply(mu, 2, f_interp)
-  }    
+  }
   #kern_fit <- sapply(mu_avg,w)
   #weights <- matrix(rep(1/kern_fit), ncol=ncol(y_lcpm), nrow=nrow(y_lcpm), byrow = TRUE)
-  
+
   if(doPlot){
     o <- order(mu_avg, na.last = NA)
     plot_df <- data.frame("m_o"=mu_avg[o], "v_o"=v[o])
@@ -239,7 +237,10 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
     )
     print(ggp)
   }
-  
-  return(weights)
+
+  colnames(weights) <- colnames(y_lcpm)
+  rownames(weights) <- rownames(y_lcpm)
+
+  return(t(weights))
 }
 
