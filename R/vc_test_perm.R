@@ -58,7 +58,7 @@
 #'
 #'#run test
 #'permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            indiv=rep(1:4, each=3))
+#'                            indiv=rep(1:4, each=3), n_perm=200)
 #'permTestRes$pval
 #'
 #'@importFrom CompQuadForm davies
