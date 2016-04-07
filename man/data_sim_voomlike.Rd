@@ -11,7 +11,7 @@ Adapted from the supplementary material from Law \emph{et al}.
 }
 \examples{
 \dontrun{
-setseed(123)
+set.seed(123)
 data_sims <- data_sim_voomlike(maxGSsize=300)
 }
 }
