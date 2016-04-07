@@ -4,6 +4,8 @@ cache: packages
 r_packages:
 - CompQuadForm
 - GSA
+bioc_packages:
+- limma
 r_github_packages:
 - hadley/ggplot2
 r_build_args: "--html"
