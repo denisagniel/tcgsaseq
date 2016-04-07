@@ -9,7 +9,7 @@
 #'
 #'@examples
 #'\dontrun{
-#'setseed(123)
+#'set.seed(123)
 #'data_sims <- data_sim_voomlike(maxGSsize=300)
 #'}
 #'@keywords internal
@@ -21,8 +21,8 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30){
   ############################################################################
   # Get distribution function of abundance proportions
   # This distribution was generated from a real dataset
-  data(qAbundanceDist, envir = environment())
-  qAbundanceDist <- get(qAbundanceDist)
+  data("qAbundanceDist", envir = environment())
+  qAbundanceDist <- get("qAbundanceDist")
   
   # Generate baseline proportions for desired number of genes -----
   ngenes <- 10000
