@@ -81,7 +81,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     res <- numeric(length(fact))
     for(l in levels(fact)){
       original_index <- which(fact==l)
-      res[original_index] <- sample(original_index)
+      res[original_index] <- as.numeric(sample(as.character(original_index)))
     }
     return(res)
   }
