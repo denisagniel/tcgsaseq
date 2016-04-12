@@ -4,15 +4,15 @@
 \alias{voom_weights}
 \title{Precision weights accounting for heteroscedasticity in RNA-seq count data}
 \usage{
-voom_weights(x, y, preprocessed = FALSE, doPlot = FALSE,
+voom_weights(y, x, preprocessed = FALSE, doPlot = FALSE,
   lowess_span = 0.5)
 }
 \arguments{
+\item{y}{a matrix of size \code{G x n} containing the raw RNA-seq counts or
+preprocessed expressions from \code{n} samples for \code{G} genes.}
+
 \item{x}{a matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
-
-\item{y}{a matrix of size \code{n x G} containing the raw RNA-seq counts or
-preprocessed expressions from \code{n} samples for \code{G} genes.}
 
 \item{preprocessed}{a logical flag indicating wether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -40,12 +40,12 @@ set.seed(123)
 G <- 10000
 n <- 12
 p <- 2
-y <- sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)})
+y <- t(sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)}))
 
 x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 
-my_w <-  voom_weights(x, y, doPlot=TRUE)
-w_voom <- limma::voom(counts=t(y), design=x, plot=TRUE) #slightly faster than us. Same results
+my_w <-  voom_weights(y, x, doPlot=TRUE)
+w_voom <- limma::voom(counts=y, design=x, plot=TRUE) #slightly faster than us. Same results
 all.equal(my_w, t(w_voom$weights))
 
 \dontrun{

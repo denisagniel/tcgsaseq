@@ -65,7 +65,7 @@ x <- matrix(1, ncol=1, nrow=r)
 
 #run test
 permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                           indiv=rep(1:4, each=3), n_perm=200)
+                           indiv=rep(1:4, each=3), n_perm=100)
 permTestRes$pval
 
 }

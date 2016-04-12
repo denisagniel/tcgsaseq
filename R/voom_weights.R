@@ -3,7 +3,7 @@
 #'Implementation of the procedure descibed in Law \emph{et al} for estimating precision
 #'weights from RNA-seq data.
 #'
-#'@param y a matrix of size \code{n x G} containing the raw RNA-seq counts or
+#'@param y a matrix of size \code{G x n} containing the raw RNA-seq counts or
 #'preprocessed expressions from \code{n} samples for \code{G} genes.
 #'
 #'@param x a matrix of size \code{n x p} containing the model covariates from
@@ -36,12 +36,12 @@
 #'G <- 10000
 #'n <- 12
 #'p <- 2
-#'y <- sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)})
+#'y <- t(sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)}))
 #'
 #'x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 #'
-#'my_w <-  voom_weights(x, y, doPlot=TRUE)
-#'w_voom <- limma::voom(counts=t(y), design=x, plot=TRUE) #slightly faster than us. Same results
+#'my_w <-  voom_weights(y, x, doPlot=TRUE)
+#'w_voom <- limma::voom(counts=y, design=x, plot=TRUE) #slightly faster than us. Same results
 #'all.equal(my_w, t(w_voom$weights))
 #'
 #'\dontrun{
@@ -53,27 +53,27 @@
 #'@export
 
 
-voom_weights <- function(x, y, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5){
+voom_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5){
 
   ## dimensions check------
 
   stopifnot(is.matrix(y))
   stopifnot(is.matrix(x))
 
-  g <- ncol(y) # the number of genes measured
-  n <- nrow(y) # the number of samples measured
+  n <- ncol(y) # the number of genes measured
+  g <- nrow(y) # the number of samples measured
   qq <- ncol(x) # the number of covariates
   stopifnot(nrow(x) == n)
 
   # transforming rna to log-counts per million (lcpm)
   if(preprocessed){
-    y_lcpm <- y
+    y_lcpm <- t(y)
   }else{
-    y_lcpm <- t(apply(y, MARGIN=1,function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
+    y_lcpm <- t(apply(y, MARGIN=2,function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
   }
 
   # library size
-  R <- rowSums(y, na.rm = TRUE)
+  R <- colSums(y, na.rm = TRUE)
 
   # fitting OLS to the lcpm
   B_ols <- solve(t(x)%*%x)%*%t(x)%*%y_lcpm
@@ -94,7 +94,7 @@ voom_weights <- function(x, y, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5
 
 
   # lowess fit for predicted square root sd
-  observed <- which(colSums(y) != 0) #remving genes never observed
+  observed <- which(rowSums(y) != 0) #removing genes never observed
 
   lowess_fit <- lowess(x=r_tilde[observed], y=s_rs[observed], f=lowess_span)
   f_interp <- approxfun(lowess_fit, rule = 2)
@@ -104,18 +104,20 @@ voom_weights <- function(x, y, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5
     plot_df <- data.frame("r_tilde_o"=r_tilde[o], "s_rs_o"=s_rs[o])
     plot_df_lo <- data.frame("lo.x"=lowess_fit$x, "lo.y"=lowess_fit$y)
     p <- (ggplot(data=plot_df)
-          + geom_point(aes_string(x="r_tilde_o", y="s_rs_o"), alpha=0.6, color="grey20")
+          + geom_point(aes_string(x="r_tilde_o", y="s_rs_o"), alpha=0.45, color="grey25", size=0.5)
           + theme_bw()
           + xlab("Gene average: log2(count size + 0.5)")
           + ylab("sqrt(sd)")
           + ggtitle("Mean-variance")
-          + geom_line(data=plot_df_lo, aes_string(x="lo.x", y="lo.y"), color="blue", lwd=2, lty=1)
+          + geom_line(data=plot_df_lo, aes_string(x="lo.x", y="lo.y"), color="blue", lwd=1.4, lty="solid", alpha=0.8)
     )
     print(p)
   }
 
   # weights
-  wg <- apply(lambda, MARGIN=2, f_interp)^(-4)
+  wg <- t(apply(lambda, MARGIN=2, f_interp)^(-4))
+
+  colnames(wg) <- rownames(y_lcpm)
 
   return(wg)
 }
