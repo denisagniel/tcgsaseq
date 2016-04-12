@@ -79,7 +79,7 @@
 #'
 #'@export
 tcgsa_seq <- function(y, x, phi, genesets,
-                      indiv = 1:nrow(x), Sigma_xi = diag(ncol(phi)),
+                      indiv = rep(1, nrow(x)), Sigma_xi = diag(ncol(phi)),
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom"),
                       n_perm = 500,

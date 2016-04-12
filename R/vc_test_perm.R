@@ -64,7 +64,7 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_test_perm <- function(y, x, indiv=1:nrow(x), phi, w, Sigma_xi = diag(ncol(phi)),
+vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
                          n_perm=500){
 
   score_obs <- vc_score(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi)$score

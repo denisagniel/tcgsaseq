@@ -62,7 +62,7 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_test_asym <- function(y, x, indiv=1:nrow(x), phi, w, Sigma_xi = diag(ncol(phi))){
+vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi))){
 
   score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
                          Sigma_xi = Sigma_xi)
