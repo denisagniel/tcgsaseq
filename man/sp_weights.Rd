@@ -4,8 +4,8 @@
 \alias{sp_weights}
 \title{Non parametric local heteroscedasticity weights}
 \usage{
-sp_weights(x, y, phi, preprocessed = FALSE, doPlot = FALSE, bw = c("ucv",
-  "SJ", "bcv", "nrd", "nrd0"), kernel = c("gaussian", "epanechnikov",
+sp_weights(x, y, phi, preprocessed = FALSE, doPlot = FALSE, bw = c("nrd",
+  "ucv", "SJ", "nrd0", "bcv"), kernel = c("gaussian", "epanechnikov",
   "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
   exact = FALSE)
 }
@@ -28,7 +28,7 @@ Default is \code{FALSE}.}
 
 \item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
 \code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
-\code{"bcv"}, \code{"nrd"} or \code{"nrd0"}}
+\code{"bcv"}, \code{"nrd"} or \code{"nrd0"}. Default is \code{"nrd"}.}
 
 \item{kernel}{a character string indicating which kernel should be used.
 Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"},

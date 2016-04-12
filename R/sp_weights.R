@@ -21,7 +21,7 @@
 #'
 #'@param bw a character string indicating the smoothing bandwidth selection method to use. See
 #'\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
-#'\code{"bcv"}, \code{"nrd"} or \code{"nrd0"}
+#'\code{"bcv"}, \code{"nrd"} or \code{"nrd0"}. Default is \code{"nrd"}.
 #'
 #'@param kernel a character string indicating which kernel should be used.
 #'Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"},
@@ -60,7 +60,7 @@
 
 
 sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
-                       bw = c("ucv", "SJ", "bcv", "nrd", "nrd0"),
+                       bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                        exact=FALSE
 ){
@@ -118,7 +118,7 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
 
   if(is.character(bw)){
     if(length(bw>1)){
-      bw <- bw[1]
+        bw <- bw[1]
     }
     if (N < 2){stop("need at least 2 points to select a bandwidth automatically")}
     if(!exact){
