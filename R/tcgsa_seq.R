@@ -132,6 +132,16 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
 
   if(is.list(genesets)){
+
+    if(class(genesets[[1]])=="character"){
+      gene_names_measured <- rownames(y_lcpm)
+      prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
+      if(sum(prop_meas)!=length(prop_meas)){
+        warning("Some genes in the investigated genesets were not measured:\nremoving those genes form the geneset definition...")
+        genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
+      }
+    }
+
     if(which_test == "asymptotic"){
       rawPvals <- sapply(genesets, FUN = function(gs){
         vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
@@ -152,6 +162,15 @@ tcgsa_seq <- function(y, x, phi, genesets,
     }
 
   }else{
+
+    if(class(genesets)=="character"){
+      gene_names_measured <- rownames(y_lcpm)
+      if((length(intersect(genesets, gene_names_measured))/length(x)) != 1){
+        warning("Some genes in the investigated genesets were not measured:\n removing those genes form the geneset definition...")
+        genesets <- genesets[which(genesets %in% gene_names_measured)]
+      }
+    }
+
     res_test <- switch(which_test,
                        asymptotic = vc_test_asym(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
                                                  w = w[genesets, ], Sigma_xi = Sigma_xi),
