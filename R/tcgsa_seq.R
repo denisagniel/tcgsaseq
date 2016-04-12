@@ -89,6 +89,11 @@ tcgsa_seq <- function(y, x, phi, genesets,
                       exact = FALSE,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni")){
 
+
+
+
+  stopifnot(is.matrix(y))
+
   if(!preprocessed){
     y_lcpm <- apply(y, MARGIN=2,function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
     preprocessed <- TRUE
@@ -97,8 +102,16 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
   rm(y)
 
+  if(is.data.frame(x)){
+    phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
+  }
+
   if(is.data.frame(phi)){
     phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
+  }
+
+  if(det(crossprod(cbind(x, phi)))==0){
+    stop("crossprod(x, phi) cannot be inversed. x and phi are likely colinear...")
   }
 
   if(length(padjust_methods)>1){

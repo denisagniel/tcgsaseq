@@ -67,6 +67,11 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
 
 
   ## dimensions & validity checks
+
+  stopifnot(is.matrix(y))
+  stopifnot(is.matrix(x))
+  stopifnot(is.matrix(phi))
+
   g <- ncol(y) # the number of genes measured
   n <- nrow(y) # the number of samples measured
   qq <- ncol(x) # the number of covariates

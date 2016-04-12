@@ -69,6 +69,11 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   }
 
   ## dimensions check------
+
+  stopifnot(is.matrix(y))
+  stopifnot(is.matrix(x))
+  stopifnot(is.matrix(phi))
+
   g <- nrow(y) # the number of genes measured
   n <- ncol(y) # the number of samples measured
   qq <- ncol(x) # the number of covariates
