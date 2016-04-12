@@ -7,23 +7,23 @@
 vc_test_asym(y, x, indiv = 1:nrow(x), phi, w, Sigma_xi = diag(ncol(phi)))
 }
 \arguments{
-\item{y}{a matrix of dim \code{g x n} containing the raw RNAseq counts for g 
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
 genes from \code{n} samples.}
 
-\item{x}{a design matrix of dim \code{n x p} containing the \code{p} covariates
+\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
 to be adjusted for}
 
-\item{indiv}{a vector of length \code{n} containing the information for 
-attributing each sample to one of the studied individuals. Coerced 
+\item{indiv}{a vector of length \code{n} containing the information for
+attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}.}
 
-\item{phi}{a design matrix of size \code{n x K} containing the \code{K} variables 
+\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}
 samples.}
 
-\item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix 
+\item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects.}
 }
 \value{
@@ -36,11 +36,11 @@ A list with the following elements:\itemize{
 }
 }
 \description{
-This function computes an approximation of the Variance Component test for a 
+This function computes an approximation of the Variance Component test for a
 mixture of \eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
 }
 \examples{
-#rm(list=ls()) 
+#rm(list=ls())
 set.seed(123)
 
 ##generate some fake data
@@ -56,12 +56,12 @@ b1 <- 0
 #under the alternative:
 b1 <- 0.7
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
-y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) + 
+y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 x <- matrix(1, ncol=1, nrow=r)
 
 #run test
-asymTestRes <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)), 
+asymTestRes <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
 asymTestRes$pval
 

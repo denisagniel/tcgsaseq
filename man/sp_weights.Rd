@@ -10,13 +10,13 @@ sp_weights(x, y, phi, preprocessed = FALSE, doPlot = FALSE, bw = c("ucv",
   exact = FALSE)
 }
 \arguments{
-\item{x}{a matrix of size \code{n x p} containing the model covariates from
+\item{x}{a numeric matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
 
-\item{y}{a matrix of size \code{n x G} containing the raw RNAseq counts or
+\item{y}{anumeric matrix of size \code{n x G} containing the raw RNAseq counts or
 preprocessed expression from \code{n} samples for \code{G} genes.}
 
-\item{phi}{a design matrix of size \code{n x K} containing the K basis of time.}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the K basis of time.}
 
 \item{preprocessed}{a logical flag indicating wether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in

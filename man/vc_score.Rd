@@ -7,17 +7,17 @@
 vc_score(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)))
 }
 \arguments{
-\item{y}{a matrix of dim \code{g x n} containing the raw RNAseq counts for g
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
 genes from \code{n} samples}
 
-\item{x}{a design matrix of dim \code{n x p} containing the \code{p} covariates
+\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
 to be adjusted for}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}}
 
-\item{phi}{a design matrix of size \code{n x K} containing the \code{K} variables
+\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}

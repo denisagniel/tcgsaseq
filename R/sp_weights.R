@@ -3,13 +3,13 @@
 #'Computes precision weights that account for heteroscedasticity in RNAseq count data
 #'based on non-parametric local linear regression estimates.
 #'
-#'@param y a matrix of size \code{n x G} containing the raw RNAseq counts or
+#'@param y anumeric matrix of size \code{n x G} containing the raw RNAseq counts or
 #'preprocessed expression from \code{n} samples for \code{G} genes.
 #'
-#'@param x a matrix of size \code{n x p} containing the model covariates from
+#'@param x a numeric matrix of size \code{n x p} containing the model covariates from
 #'\code{n} samples (design matrix).
 #'
-#'@param phi a design matrix of size \code{n x K} containing the K basis of time.
+#'@param phi a numeric design matrix of size \code{n x K} containing the K basis of time.
 #'
 #'@param preprocessed a logical flag indicating wether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in

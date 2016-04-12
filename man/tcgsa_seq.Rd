@@ -13,13 +13,13 @@ tcgsa_seq(y, x, phi, genesets, indiv = 1:nrow(x),
   "hommel", "bonferroni"))
 }
 \arguments{
-\item{y}{a matrix of size \code{n x G} containing the raw RNA-seq counts or
+\item{y}{a numeric matrix of size \code{n x G} containing the raw RNA-seq counts or
 preprocessed expressions from \code{n} samples for \code{G} genes.}
 
-\item{x}{a matrix of size \code{n x p} containing the model covariates from
+\item{x}{a numeric matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
 
-\item{phi}{a design matrix of size \code{n x K} containing the \code{K} variables
+\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
 
 \item{genesets}{either a vector or a list of index or subscript that define}
@@ -36,8 +36,9 @@ the variance component score test, either \code{"permutation"} or \code{"asympto
 Default is \code{"permutation"}.}
 
 \item{which_weights}{a character string indicating which method to use to estimate
-the mean-variance relationship wheights. Possibilities are "loclin" or "voom".
-Default is "loclin".
+the mean-variance relationship wheights. Possibilities are \code{"loclin"},
+\code{"voom"} or \code{NULL} (in which case no weighting is performed).
+Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
 \item{n_perm}{the number of perturbations}

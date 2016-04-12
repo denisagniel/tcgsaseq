@@ -2,13 +2,13 @@
 #'
 #' Wrapper function for performing gene set analysis of longitudinal RNA-seq data
 #'
-#'@param y a matrix of size \code{n x G} containing the raw RNA-seq counts or
+#'@param y a numeric matrix of size \code{n x G} containing the raw RNA-seq counts or
 #'preprocessed expressions from \code{n} samples for \code{G} genes.
 #'
-#'@param x a matrix of size \code{n x p} containing the model covariates from
+#'@param x a numeric matrix of size \code{n x p} containing the model covariates from
 #'\code{n} samples (design matrix).
 #'
-#'@param phi a design matrix of size \code{n x K} containing the \code{K} variables
+#'@param phi a numeric design matrix of size \code{n x K} containing the \code{K} variables
 #'to be tested
 #'
 #'@param genesets either a vector or a list of index or subscript that define
@@ -21,8 +21,9 @@
 #'of the \code{K} random effects.
 #'
 #'@param which_weights a character string indicating which method to use to estimate
-#'the mean-variance relationship wheights. Possibilities are "loclin" or "voom".
-#'Default is "loclin".
+#'the mean-variance relationship wheights. Possibilities are \code{"loclin"},
+#'\code{"voom"} or \code{NULL} (in which case no weighting is performed).
+#'Default is \code{"loclin"}.
 #'See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.
 #'
 #'@param which_test a character string indicating which method to use to approximate
@@ -105,13 +106,24 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
   stopifnot(padjust_methods %in% c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"))
 
+  if(length(which_weights)>1){
+    which_weights <- which_weights[1]
+  }
+  stopifnot(is.null(which_weights) || which_weights %in% c("loclin", "voom"))
+
+  if(length(which_test)>1){
+    which_test <- which_test[1]
+  }
+  stopifnot(which_test %in% c("asymptotic", "permutation"))
+
 
   w <-  switch(which_weights,
                loclin = sp_weights(x = x, y = t(y_lcpm), phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    bw = bw, kernel = kernel,
                                    exact = exact),
-               voom = voom_weights(x, t(y_lcpm), preprocessed = preprocessed, doPlot = doPlot)
+               voom = voom_weights(x, t(y_lcpm), preprocessed = preprocessed, doPlot = doPlot),
+               NULL = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
 
 

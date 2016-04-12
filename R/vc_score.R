@@ -5,17 +5,17 @@
 #'
 #'@keywords internal
 #'
-#'@param y a matrix of dim \code{g x n} containing the raw RNAseq counts for g
+#'@param y a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
 #'genes from \code{n} samples
 #'
-#'@param x a design matrix of dim \code{n x p} containing the \code{p} covariates
+#'@param x a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
 #' to be adjusted for
 #'
 #'@param indiv a vector of length \code{n} containing the information for
 #'attributing each sample to one of the studied individuals. Coerced
 #'to be a \code{factor}
 #'
-#'@param phi a design matrix of size \code{n x K} containing the \code{K} variables
+#'@param phi a numeric design matrix of size \code{n x K} containing the \code{K} variables
 #'to be tested
 #'
 #'@param w a vector of length \code{n} containing the weights for the \code{n}
