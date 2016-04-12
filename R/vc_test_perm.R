@@ -58,7 +58,7 @@
 #'
 #'#run test
 #'permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            indiv=rep(1:4, each=3), n_perm=200)
+#'                            indiv=rep(1:4, each=3), n_perm=100)
 #'permTestRes$pval
 #'
 #'@importFrom CompQuadForm davies
@@ -89,7 +89,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   for(b in 1:n_perm){
     ## permute samples within indiv
     perm_index <- strat_sampling(indiv_fact)
-    scores_perm[b] <- vc_score(y[, perm_index], x[perm_index, ], indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
+    scores_perm[b] <- vc_score(y[, perm_index], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
   }
 
   pval <- 1-sum(scores_perm < score_obs)/n_perm
