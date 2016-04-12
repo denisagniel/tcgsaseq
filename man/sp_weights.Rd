@@ -59,9 +59,6 @@ y <- sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)})
 
 x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 
-my_w <-  voom_weights(x=x, y=y, doPlot=FALSE)
-w_voom <- limma::voom(counts=t(y), design=x, plot=FALSE) #slightly faster than us. Same results
-all.equal(my_w, t(w_voom$weights))
 
 
 }

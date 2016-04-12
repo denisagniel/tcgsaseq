@@ -46,7 +46,7 @@ x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 
 my_w <-  voom_weights(y, x, doPlot=TRUE)
 w_voom <- limma::voom(counts=y, design=x, plot=TRUE) #slightly faster than us. Same results
-all.equal(my_w, t(w_voom$weights))
+all.equal(my_w, w_voom$weights)
 
 \dontrun{
 microbenchmark::microbenchmark(limma::voom(counts=t(y), design=x, plot=FALSE),
