@@ -195,6 +195,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
   }
 
+  print(pvals)
+
   return(list("which_test" = which_test, "preprocessed" = preprocessed, "n_perm" = n_perm,
               "genesets" = genesets, "pvals" = pvals))
 

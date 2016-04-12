@@ -8,10 +8,10 @@ voom_weights(x, y, preprocessed = FALSE, doPlot = FALSE,
   lowess_span = 0.5)
 }
 \arguments{
-\item{x}{a matrix of size \code{n x p} containing the model covariates from 
+\item{x}{a matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
 
-\item{y}{a matrix of size \code{n x G} containing the raw RNA-seq counts or 
+\item{y}{a matrix of size \code{n x G} containing the raw RNA-seq counts or
 preprocessed expressions from \code{n} samples for \code{G} genes.}
 
 \item{preprocessed}{a logical flag indicating wether the expression data have
@@ -22,15 +22,15 @@ log(counts) per million.}
 \item{doPlot}{a logical flag indicating wether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
-\item{lowess_span}{smoother span for the lowess function, between 0 and 1. This gives 
-the proportion of points in the plot which influence the smooth at each value. 
+\item{lowess_span}{smoother span for the lowess function, between 0 and 1. This gives
+the proportion of points in the plot which influence the smooth at each value.
 Larger values give more smoothness.}
 }
 \value{
 a vector of length \code{n} containing the computed precision weights
 }
 \description{
-Implementation of the procedure descibed in Law \emph{et al} for estimating precision 
+Implementation of the procedure descibed in Law \emph{et al} for estimating precision
 weights from RNA-seq data.
 }
 \examples{
@@ -49,13 +49,13 @@ w_voom <- limma::voom(counts=t(y), design=x, plot=TRUE) #slightly faster than us
 all.equal(my_w, t(w_voom$weights))
 
 \dontrun{
-microbenchmark::microbenchmark(limma::voom(counts=t(y), design=x, plot=FALSE), 
+microbenchmark::microbenchmark(limma::voom(counts=t(y), design=x, plot=FALSE),
                               voom_weights(x, y, doPlot=FALSE), times=30)}
 
 }
 \references{
-Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision 
-weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome 
+Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision
+weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome
 Biology}, 15(2), R29.
 }
 \seealso{

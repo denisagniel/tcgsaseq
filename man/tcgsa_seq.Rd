@@ -4,7 +4,7 @@
 \alias{tcgsa_seq}
 \title{Time-course Gene Set Analyis}
 \usage{
-tcgsa_seq(y, x, phi, genesets, indiv = 1:nrow(x),
+tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
   which_weights = c("loclin", "voom"), n_perm = 500, preprocessed = FALSE,
   doPlot = TRUE, bw = "ucv", kernel = c("gaussian", "epanechnikov",
