@@ -6,11 +6,11 @@
 \usage{
 tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom"), n_perm = 500, preprocessed = FALSE,
-  doPlot = TRUE, bw = "ucv", kernel = c("gaussian", "epanechnikov",
-  "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-  exact = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
-  "hommel", "bonferroni"))
+  which_weights = c("loclin", "voom"), n_perm = 1000,
+  preprocessed = FALSE, doPlot = TRUE, bw = "nrd",
+  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
+  "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"))
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{n x G} containing the raw RNA-seq counts or

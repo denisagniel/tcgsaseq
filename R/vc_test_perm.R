@@ -65,7 +65,7 @@
 #'
 #'@export
 vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         n_perm=500){
+                         n_perm=1000){
 
   score_obs <- vc_score(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi)$score
   n_samples <- ncol(y)

@@ -5,7 +5,7 @@
 \title{Permutation-based variance component test statistic for longitudinal RNA-seq data}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = 500)
+  Sigma_xi = diag(ncol(phi)), n_perm = 1000)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
