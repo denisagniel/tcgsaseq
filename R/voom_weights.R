@@ -49,7 +49,7 @@
 #'                               voom_weights(x, y, doPlot=FALSE), times=30)}
 #'
 #'@import ggplot2
-#'
+#'@importFrom stats approxfun lowess
 #'@export
 
 
@@ -96,8 +96,8 @@ voom_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5
   # lowess fit for predicted square root sd
   observed <- which(rowSums(y) != 0) #removing genes never observed
 
-  lowess_fit <- lowess(x=r_tilde[observed], y=s_rs[observed], f=lowess_span)
-  f_interp <- approxfun(lowess_fit, rule = 2)
+  lowess_fit <- stats::lowess(x=r_tilde[observed], y=s_rs[observed], f=lowess_span)
+  f_interp <- stats::approxfun(lowess_fit, rule = 2)
   if(doPlot){
     o <- order(r_tilde, na.last = NA)
 

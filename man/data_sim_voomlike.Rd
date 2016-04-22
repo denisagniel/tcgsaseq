@@ -16,8 +16,8 @@ data_sims <- data_sim_voomlike(maxGSsize=300)
 }
 }
 \references{
-Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision 
-weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome 
+Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision
+weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome
 Biology}, 15(2), R29.
 }
 \keyword{internal}

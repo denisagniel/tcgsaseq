@@ -52,7 +52,7 @@
 #'
 #'
 #'@import ggplot2
-#'
+#'@importFrom stats bw.bcv bw.nrd0 bw.nrd bw.SJ bw.ucv dnorm
 #'@export
 
 
@@ -120,19 +120,19 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
     if (N < 2){stop("need at least 2 points to select a bandwidth automatically")}
     if(!exact){
       bw <- switch(bw,
-                   nrd0 = bw.nrd0(as.vector(mu_avg)),
-                   nrd = bw.nrd(as.vector(mu_avg)),
-                   ucv = bw.ucv(as.vector(mu_avg)),
-                   bcv = bw.bcv(as.vector(mu_avg)),
-                   SJ = bw.SJ(as.vector(mu_avg), method = "ste"),
+                   nrd0 = stats::bw.nrd0(as.vector(mu_avg)),
+                   nrd = stats::bw.nrd(as.vector(mu_avg)),
+                   ucv = stats::bw.ucv(as.vector(mu_avg)),
+                   bcv = stats::bw.bcv(as.vector(mu_avg)),
+                   SJ = stats::bw.SJ(as.vector(mu_avg), method = "ste"),
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }else{
       bw <- switch(bw,
-                   nrd0 = bw.nrd0(as.vector(mu)),
-                   nrd = bw.nrd(as.vector(mu)),
-                   ucv = bw.ucv(as.vector(mu)),
-                   bcv = bw.bcv(as.vector(mu)),
-                   SJ = bw.SJ(as.vector(mu), method = "ste"),
+                   nrd0 = stats::bw.nrd0(as.vector(mu)),
+                   nrd = stats::bw.nrd(as.vector(mu)),
+                   ucv = stats::bw.ucv(as.vector(mu)),
+                   bcv = stats::bw.bcv(as.vector(mu)),
+                   SJ = stats::bw.SJ(as.vector(mu), method = "ste"),
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }
     cat("\nBandwith computed.\n")
@@ -148,7 +148,7 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
 
   if(kernel=="gaussian"){
     kern_func <- function(x, bw){
-      dnorm(x, sd = bw)
+      stats::dnorm(x, sd = bw)
     }
   }else if(kernel=="rectangular"){
     kern_func2 <- function(x, bw){

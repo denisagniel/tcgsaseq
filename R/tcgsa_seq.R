@@ -76,7 +76,7 @@
 #'weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome
 #'Biology}, 15(2), R29.
 #'
-#'
+#'@importFrom stats p.adjust
 #'@export
 tcgsa_seq <- function(y, x, phi, genesets,
                       indiv = rep(1, nrow(x)), Sigma_xi = diag(ncol(phi)),
@@ -169,7 +169,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
       )
     }
 
-    pvals <- data.frame("rawPval" = rawPvals, "adjPval" = p.adjust(rawPvals, padjust_methods))
+    pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
     if(!is.null(names(genesets))){
       rownames(pvals) <- names(genesets)
     }

@@ -15,14 +15,14 @@ Computing simulations results
 
 \dontrun{
 data_sims <- data_sim_voomlike(maxGSsize=300, minGSsize=30)
-res <- compute_sim_voomlike(counts = data_sims$counts, 
-                           design = data_sims$design, 
+res <- compute_sim_voomlike(counts = data_sims$counts,
+                           design = data_sims$design,
                            gs_keep = data_sims$gs_keep,
                            indiv = data_sims$indiv,
                            alternative=FALSE,
                            RE_indiv_sd=0.1)
 res_all <- cbind(res$res_voom, res$res_perso, res$res_noweights)
-colnames(res_all) <- paste0(rep(c("asym", "perm", "camera"), 3), 
+colnames(res_all) <- paste0(rep(c("asym", "perm", "camera"), 3),
                            rep(c("_voom", "_perso", "_noweights"), each=3))
 }
 

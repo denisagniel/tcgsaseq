@@ -12,7 +12,9 @@ Depends:
 Imports:
     CompQuadForm,
     ggplot2,
-    GSA
+    GSA,
+    stats,
+    utils
 Suggests:
     limma
 Description: Gene set analysis of longitudinal RNA-seq data with variance component
