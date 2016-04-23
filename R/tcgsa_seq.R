@@ -129,8 +129,6 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
-
-  browser()
   w <-  switch(which_weights,
                loclin = sp_weights(x = x, y = t(y_lcpm), phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
