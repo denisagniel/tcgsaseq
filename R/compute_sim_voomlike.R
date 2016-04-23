@@ -57,7 +57,7 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
   #png(width=5.5, height=4.5, units="in", file="voom_ex.png", res=300)
   #w_voom <- voom_weights(x=design, y=t(counts2), doPlot = TRUE, preprocessed = FALSE)
   #dev.off()
-  w_voom <- voom_weights(x=design, y=t(logcoutspm_alt), doPlot = FALSE, preprocessed = TRUE)
+  w_voom <- voom_weights(x=design, y=logcoutspm_alt, doPlot = FALSE, preprocessed = TRUE)
 
   w_perso <- sp_weights(x=design[,-which(colnames(design)=="time")],
                         y=t(logcoutspm_alt),
@@ -79,8 +79,8 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
     gs_test <- gs_keep[[gs]]
     y_test <- logcoutspm_alt[gs_test,]
     x_test <- design[,-which(colnames(design)=="time")]
-    w_test_perso <- t(w_perso[,as.numeric(gs_test)])
-    w_test_voom <- t(w_voom[,as.numeric(gs_test)])
+    w_test_perso <- w_perso[as.numeric(gs_test), ]
+    w_test_voom <- w_voom[as.numeric(gs_test), ]
     phi_test <- cbind(design[, "time"])
 
     ## Fitting the null model
@@ -100,11 +100,11 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                                               w = w_test_voom)[["pval"]],
                                       "camera" = limma::camera(y=logcoutspm_alt, index=gs_ind_list[[gs]],
                                                                design=design, contrast=3,
-                                                               weights = t(w_voom))$PValue,
+                                                               weights = w_voom)$PValue,
                                       "roast" = limma::roast(y=logcoutspm_alt, index=gs_ind_list[[gs]],
                                                              design=design, contrast=3,
                                                              block = indiv, correlation = cor_limma$consensus.correlation,
-                                                             weights = t(w_voom))$p.value["Mixed", "P.Value"])
+                                                             weights = w_voom)$p.value["Mixed", "P.Value"])
     )
     res_perso <- rbind(res_perso, cbind("asym" = vc_test_asym(y = y_test, x=x_test, indiv=indiv, phi=phi_test,
                                                               Sigma_xi = as.matrix(diag(ncol(phi_test))),
@@ -114,11 +114,11 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                                                 w = w_test_perso)[["pval"]],
                                         "camera" = limma::camera(y=logcoutspm_alt, index=gs_ind_list[[gs]],
                                                                  design=design, contrast=3,
-                                                                 weights = t(w_perso))$PValue,
+                                                                 weights = w_perso)$PValue,
                                         "roast" = limma::roast(y=logcoutspm_alt, index=gs_ind_list[[gs]],
                                                                design=design, contrast=3,
                                                                block = indiv, correlation = cor_limma$consensus.correlation,
-                                                               weights = t(w_perso))$p.value["Mixed", "P.Value"])
+                                                               weights = w_perso)$p.value["Mixed", "P.Value"])
     )
     res_noweights <- rbind(res_noweights, cbind("asym" = vc_test_asym(y = y_test, x=x_test, indiv=indiv, phi=phi_test,
                                                                       Sigma_xi = as.matrix(diag(ncol(phi_test))),

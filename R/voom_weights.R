@@ -60,8 +60,8 @@ voom_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5
   stopifnot(is.matrix(y))
   stopifnot(is.matrix(x))
 
-  n <- ncol(y) # the number of genes measured
-  g <- nrow(y) # the number of samples measured
+  n <- ncol(y) # the number of samples measured
+  g <- nrow(y) # the number of genes measured
   qq <- ncol(x) # the number of covariates
   stopifnot(nrow(x) == n)
 

@@ -130,12 +130,13 @@ tcgsa_seq <- function(y, x, phi, genesets,
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
 
+  browser()
   w <-  switch(which_weights,
                loclin = sp_weights(x = x, y = t(y_lcpm), phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    bw = bw, kernel = kernel,
                                    exact = exact),
-               voom = voom_weights(x, t(y_lcpm), preprocessed = preprocessed, doPlot = doPlot),
+               voom = voom_weights(x, y_lcpm, preprocessed = preprocessed, doPlot = doPlot),
                NULL = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
 
