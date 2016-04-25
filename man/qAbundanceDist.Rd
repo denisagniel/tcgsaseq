@@ -21,6 +21,7 @@ generated from a real dataset. See supplmenetary material of Law \emph{et al}.
 # This distribution was generated from a real dataset
 #load(url("http://bioinf.wehi.edu.au/voom/qAbundanceDist.RData"))
 data("qAbundanceDist")
+curve(qAbundanceDist, from=0, to =0.99)
 
 # Generate baseline proportions for desired number of genes
 ngenes <- 10000
@@ -31,9 +32,9 @@ baselineprop <- baselineprop/sum(baselineprop)
 
 }
 \references{
-Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision 
-weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome 
-Biology}, 15(2), R29.
+Law CW, Chen Y, Shi W & Smyth GK, voom: Precision
+weights unlock linear model analysis tools for RNA-seq read counts, \emph{Genome
+Biology}, 15(2), R29, 2014.
 }
 \keyword{datasets}
 
