@@ -22,14 +22,14 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                  fixed_eff = 0.5, fixed_eff_sd = 0.2,
                                  rand_eff_sd = 0.25, RE_indiv_sd=NULL, eps_sd=0.05){
 
-  logcoutspm <- apply(counts, MARGIN=2,function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
+  logcoutspm <- apply(counts, MARGIN=2, function(v){log2((v + 0.5)/(sum(v) + 1)*10^6)})
 
   if(alternative){
     n <- ncol(counts)
     nb_g <- nrow(counts)
     beta_time <- stats::rnorm(1, mean=fixed_eff, sd=fixed_eff_sd)
     gamma_genes_time <- matrix(stats::rnorm(nb_g, mean=0, sd=rand_eff_sd), ncol=1)
-    logcoutspm_alt <- logcoutspm + (gamma_genes_time+beta_time)%*%design[, "time"]
+    logcoutspm_alt <- logcoutspm + (gamma_genes_time + beta_time)%*%design[, "time"]
 
     # for(gs in gs_keep){
     #   nb_g_gs <- length(gs)
