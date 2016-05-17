@@ -19,7 +19,7 @@
 #'@importFrom stats rnorm
 #'@export
 compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FALSE,
-                                 fixed_eff = 0.5, fixed_eff_sd = 0.2,
+                                 fixed_eff = 0.5, fixed_eff_sd = 0, #0.2,
                                  rand_eff_sd = 0.25, RE_indiv_sd=NULL, eps_sd=0.05){
 
   logcoutspm <- apply(counts, MARGIN=2, function(v){log2((v + 0.5)/(sum(v) + 1)*10^6)})
