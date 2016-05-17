@@ -22,7 +22,9 @@ preprocessed expressions from \code{n} samples for \code{G} genes.}
 \item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
 
-\item{genesets}{either a vector or a list of index or subscript that define}
+\item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
+constitute the invesigated geneset. Can also be a \code{\link[GSA:GSA.read.gmt]{gmt}} \code{list}
+when several genesets are tested at once.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
