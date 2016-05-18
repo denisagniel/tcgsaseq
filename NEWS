@@ -1,6 +1,9 @@
 News about the R package tcgsaseq:
 --------------------------------
 
+Main changes in Version 1.0.2 (2016-05-18) - this is only a minor release:
+* Documentation and CITATION updated
+
 Main changes in Version 1.0.1 (2016-05-14) - this is only a minor release:
 * Help file improvements
 

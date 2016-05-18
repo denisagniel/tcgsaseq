@@ -9,6 +9,7 @@ Documentation
 
 tcgsaseq is a package which performs Time-course Gene Set Analysis of RNA-seq data.
 On top of the CRAN help pdf-file, the following article explains what tcgsaseq is about:
-D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data,2016, submitted.
+D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of
+longitudinal RNA-seq data, 2016, submitted, arXiv:1605.02351.
 
    -- Denis Agniel & Boris Hejblum
