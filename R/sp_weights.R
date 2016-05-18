@@ -3,7 +3,7 @@
 #'Computes precision weights that account for heteroscedasticity in RNAseq count data
 #'based on non-parametric local linear regression estimates.
 #'
-#'@param y anumeric matrix of size \code{n x G} containing the raw RNAseq counts or
+#'@param y a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
 #'preprocessed expression from \code{n} samples for \code{G} genes.
 #'
 #'@param x a numeric matrix of size \code{n x p} containing the model covariates from
@@ -56,7 +56,7 @@
 #'@export
 
 
-sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
+sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
                        bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                        exact=FALSE
@@ -69,8 +69,8 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
   stopifnot(is.matrix(x))
   stopifnot(is.matrix(phi))
 
-  g <- ncol(y) # the number of genes measured
-  n <- nrow(y) # the number of samples measured
+  g <- nrow(y) # the number of genes measured
+  n <- ncol(y) # the number of samples measured
   qq <- ncol(x) # the number of covariates
   n.t <- ncol(phi) # the number of time bases
   stopifnot(nrow(x) == n)
@@ -89,15 +89,14 @@ sp_weights <- function(x, y, phi, preprocessed=FALSE, doPlot=FALSE,
 
   kernel <- match.arg(kernel)
   if(preprocessed){
-    y_lcpm <- y
+    y_lcpm <- t(y)
   }else{
     # transforming rna raw counts to log-counts per million (lcpm)
-    y_lcpm <- t(apply(y, MARGIN=1,function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
+    y_lcpm <- apply(y, MARGIN=1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }
   rm(y)
   N <- length(y_lcpm)
   p <- ncol(y_lcpm)
-  n <- nrow(y_lcpm)
 
 
   # fitting OLS to the lcpm

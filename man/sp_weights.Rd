@@ -4,17 +4,17 @@
 \alias{sp_weights}
 \title{Non parametric local heteroscedasticity weights}
 \usage{
-sp_weights(x, y, phi, preprocessed = FALSE, doPlot = FALSE, bw = c("nrd",
+sp_weights(y, x, phi, preprocessed = FALSE, doPlot = FALSE, bw = c("nrd",
   "ucv", "SJ", "nrd0", "bcv"), kernel = c("gaussian", "epanechnikov",
   "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
   exact = FALSE)
 }
 \arguments{
+\item{y}{a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
+preprocessed expression from \code{n} samples for \code{G} genes.}
+
 \item{x}{a numeric matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
-
-\item{y}{anumeric matrix of size \code{n x G} containing the raw RNAseq counts or
-preprocessed expression from \code{n} samples for \code{G} genes.}
 
 \item{phi}{a numeric design matrix of size \code{n x K} containing the K basis of time.}
 

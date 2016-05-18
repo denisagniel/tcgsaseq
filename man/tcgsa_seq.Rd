@@ -13,7 +13,7 @@ tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"))
 }
 \arguments{
-\item{y}{a numeric matrix of size \code{n x G} containing the raw RNA-seq counts or
+\item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
 preprocessed expressions from \code{n} samples for \code{G} genes.}
 
 \item{x}{a numeric matrix of size \code{n x p} containing the model covariates from

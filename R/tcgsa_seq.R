@@ -2,7 +2,7 @@
 #'
 #' Wrapper function for performing gene set analysis of longitudinal RNA-seq data
 #'
-#'@param y a numeric matrix of size \code{n x G} containing the raw RNA-seq counts or
+#'@param y a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
 #'preprocessed expressions from \code{n} samples for \code{G} genes.
 #'
 #'@param x a numeric matrix of size \code{n x p} containing the model covariates from
@@ -97,7 +97,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
   stopifnot(is.matrix(y))
 
   if(!preprocessed){
-    y_lcpm <- apply(y, MARGIN=2,function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
+    y_lcpm <- t(apply(y, MARGIN=1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
     preprocessed <- TRUE
   }else{
     y_lcpm <- y
@@ -132,11 +132,11 @@ tcgsa_seq <- function(y, x, phi, genesets,
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
   w <-  switch(which_weights,
-               loclin = sp_weights(x = x, y = t(y_lcpm), phi=phi,
+               loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    bw = bw, kernel = kernel,
                                    exact = exact),
-               voom = voom_weights(x, y_lcpm, preprocessed = preprocessed, doPlot = doPlot),
+               voom = voom_weights(y = y_lcpm, x = x, preprocessed = preprocessed, doPlot = doPlot),
                NULL = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
 
