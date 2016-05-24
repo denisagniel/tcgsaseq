@@ -6,7 +6,7 @@
 \usage{
 compute_sim_voomlike(counts, design, gs_keep, indiv, alternative = FALSE,
   fixed_eff = 0.5, fixed_eff_sd = 0, rand_eff_sd = 0.25,
-  RE_indiv_sd = NULL, eps_sd = 0.05)
+  RE_indiv_sd = NULL, eps_sd = 0.05, alpha_DEseq = 0.05)
 }
 \description{
 Computing simulations results

@@ -17,10 +17,12 @@
 #'
 #'@keywords internal
 #'@importFrom stats rnorm
+#'@importFrom DESeq2 DESeqDataSetFromMatrix DESeq
+#'@importFrom limma roast camera
 #'@export
 compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FALSE,
                                  fixed_eff = 0.5, fixed_eff_sd = 0, #0.2,
-                                 rand_eff_sd = 0.25, RE_indiv_sd=NULL, eps_sd=0.05){
+                                 rand_eff_sd = 0.25, RE_indiv_sd=NULL, eps_sd=0.05, alpha_DEseq=0.05){
 
   logcoutspm <- apply(counts, MARGIN=2, function(v){log2((v + 0.5)/(sum(v) + 1)*10^6)})
 
@@ -60,18 +62,39 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
   w_voom <- voom_weights(x=design, y=logcoutspm_alt, doPlot = FALSE, preprocessed = TRUE)
 
   w_perso <- sp_weights(x=design[,-which(colnames(design)=="time")],
-                        y=t(logcoutspm_alt),
+                        y=logcoutspm_alt,
                         phi = cbind(design[, "time"]),
                         doPlot = FALSE,
                         exact=FALSE,
                         preprocessed = TRUE
   )
 
+  # DESeq ----
+  ############
+  DESeq_datas <- DESeq2::DESeqDataSetFromMatrix(countData = floor(exp(logcoutspm_alt)),
+                                                colData = cbind.data.frame("indiv"=as.factor(indiv),
+                                                                           "time"=as.numeric(design[, "time"]),
+                                                                           "group"=as.factor(design[, "group2"])),
+                                                design = ~ group + time)
+  DEseq_res <- DESeq2::DESeq(DESeq_datas, test="LRT", reduced = ~ group)
+  DEseq_univ_res_pvals <- results(DEseq_res)$pvalue
+  names(DEseq_univ_res_pvals) <- rownames(logcoutspm_alt)
+
+  Kappa_j <- function(r, alpha_DEseq){
+    sig <- qnorm(1-alpha_DEseq/2)
+    temp_int <- integrate(function(x){exp(-x^2/2)*pnorm((r*x-sig)/sqrt(1-r^2))},
+                          lower=-sig,
+                          upper=sig)
+    1/log(1-alpha_DEseq)*log(1-(1/(1-alpha_DEseq)*sqrt(2/pi)*temp_int$value))
+  }
+
+
   # Testing ----
   ##############
   res_voom <- NULL
   res_perso <- NULL
   res_noweights <- NULL
+  res_DEseq <- NULL
   gs_ind_list <- limma::ids2indices(gs_keep, identifier=rownames(logcoutspm_alt))
   cor_limma <- limma::duplicateCorrelation(logcoutspm_alt, design, block = indiv)
 
@@ -83,7 +106,6 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
     w_test_voom <- w_voom[as.numeric(gs_test), ]
     phi_test <- cbind(design[, "time"])
 
-    ## Fitting the null model
     n <- ncol(y_test)
     g <- length(gs_test)
     y_T_vect <- as.vector(y_test)
@@ -91,6 +113,23 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
     g_vect <- as.factor(rep(1:g, n))
     x_vect <-do.call(rbind, replicate(g, x_test, simplify=FALSE))
     phi_vect <- do.call(rbind, replicate(g, phi_test, simplify=FALSE))
+
+    y_deseq <- floor(exp(y_test))
+    DEseq_pmin <- min(DEseq_univ_res_pvals[gs_test], na.rm = TRUE)
+    Rij <- cor(t(y_deseq))
+    Rj <- sapply(1:g, function(j){max(abs(Rij[1:(j-1),j]), na.rm = TRUE)})
+    if(length(which(is.infinite(Rj)))>0){
+      Rj[which(is.infinite(Rj))] <- 0
+    }
+
+    Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
+    Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(alpha_DEseq))))
+    Meff <- 1 + sum(1-cor(t(y_deseq))^2, na.rm = TRUE)/g #Cheverud–Nyholt
+    res_DEseq <- rbind(res_DEseq, cbind("minTest_exact" = 1-(1-DEseq_pmin)^Keff,
+                                        "minTest_approx" = 1-(1-DEseq_pmin)^Keff_approx,
+                                        "minTest_CN" = 1-(1-DEseq_pmin)^Meff)
+    )
+
 
     res_voom <- rbind(res_voom, cbind("asym" = vc_test_asym(y = y_test, x=x_test, indiv=indiv, phi=phi_test,
                                                             Sigma_xi = as.matrix(diag(ncol(phi_test))),
@@ -135,5 +174,5 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
 
   }
 
-  return(list("res_voom"=res_voom, "res_perso"=res_perso, "res_noweights"=res_noweights))
+  return(list("res_voom"=res_voom, "res_perso"=res_perso, "res_noweights"=res_noweights, "res_DEseq"=res_DEseq))
 }

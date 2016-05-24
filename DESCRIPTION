@@ -16,7 +16,9 @@ Imports:
     stats,
     utils
 Suggests:
-    limma
+    limma,
+    edgeR,
+    DESeq2
 Description: Gene set analysis of longitudinal RNA-seq data with variance component
     score test accounting for data heteroscedasticity through precision weights.
 LazyData: true
