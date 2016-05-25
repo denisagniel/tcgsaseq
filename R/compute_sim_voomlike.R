@@ -18,6 +18,7 @@
 #'@keywords internal
 #'@importFrom stats rnorm
 #@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
+#@importFrom edgeR DGEList estimateDisp calcNormFactors roast.DGEList
 #@importFrom limma roast camera
 #'@export
 compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FALSE,
@@ -75,14 +76,15 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                           preprocessed = TRUE
     )
 
+
     # DESeq ----
     ############
-    DESeq_datas <- DESeq2::DESeqDataSetFromMatrix(countData = floor(exp(logcoutspm_alt)),
-                                                  colData = cbind.data.frame("indiv"=as.factor(indiv),
-                                                                             "time"=as.numeric(design[, "time"]),
-                                                                             "group"=as.factor(design[, "group2"])),
-                                                  design = ~ group + time)
-    DEseq_res <- DESeq2::DESeq(DESeq_datas, test="LRT", reduced = ~ group)
+    DESeq_data <- DESeq2::DESeqDataSetFromMatrix(countData = floor(exp(logcoutspm_alt)),
+                                                 colData = cbind.data.frame("indiv"=as.factor(indiv),
+                                                                            "time"=as.numeric(design[, "time"]),
+                                                                            "group"=as.factor(design[, "group2"])),
+                                                 design = ~ group + time)
+    DEseq_res <- DESeq2::DESeq(DESeq_data, test="LRT", reduced = ~ group)
     DEseq_univ_res_pvals <- DESeq2::results(DEseq_res)$pvalue
     names(DEseq_univ_res_pvals) <- rownames(logcoutspm_alt)
 
@@ -95,12 +97,24 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
     }
 
 
+
+    # edgeR ----
+    ############
+    edgeR_data <- edgeR::DGEList(counts=floor(exp(logcoutspm_alt)), genes = rownames(logcoutspm_alt))
+    edgeR_data <- edgeR::calcNormFactors(edgeR_data)
+    edgeR_data <- edgeR::estimateDisp(edgeR_data,
+                                      design=cbind("time"=as.numeric(design[, "time"]),
+                                                   "group"=as.numeric(design[, "group2"])),
+                                      robust=TRUE)
+
+
     # Testing ----
     ##############
     res_voom <- NULL
     res_perso <- NULL
     res_noweights <- NULL
     res_DEseq <- NULL
+    res_edgeR <- NULL
     gs_ind_list <- limma::ids2indices(gs_keep, identifier=rownames(logcoutspm_alt))
     cor_limma <- limma::duplicateCorrelation(logcoutspm_alt, design, block = indiv)
 
@@ -136,6 +150,8 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                           "minTest_CN" = 1-(1-DEseq_pmin)^Meff)
       )
 
+      res_edgeR <- rbind(res_edgeR, edgeR::roast.DGEList(y=edgeR_data, index = gs_ind_list[[gs]], design = design, contrast = 3)$p.value["Mixed", "P.Value"])
+      #fry(y=edgeR_data, index = gs_ind_list[[gs]], design = design, contrast = 3, sort="mixed")
 
       res_voom <- rbind(res_voom, cbind("asym" = vc_test_asym(y = y_test, x=x_test, indiv=indiv, phi=phi_test,
                                                               Sigma_xi = as.matrix(diag(ncol(phi_test))),
@@ -180,6 +196,6 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
 
     }
 
-    return(list("res_voom"=res_voom, "res_perso"=res_perso, "res_noweights"=res_noweights, "res_DEseq"=res_DEseq))
+    return(list("res_voom"=res_voom, "res_perso"=res_perso, "res_noweights"=res_noweights, "res_DEseq"=res_DEseq, "res_edgeR"=res_edgeR))
   }
 }
