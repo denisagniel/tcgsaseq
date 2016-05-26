@@ -10,13 +10,14 @@
 #'                            indiv = data_sims$indiv,
 #'                            alternative=FALSE,
 #'                            RE_indiv_sd=0.1)
-#'res_all <- cbind(res$res_voom, res$res_perso, res$res_noweights)
-#'colnames(res_all) <- paste0(rep(c("asym", "perm", "camera"), 3),
-#'                            rep(c("_voom", "_perso", "_noweights"), each=3))
+#'res_all <- cbind(res$res_voom, res$res_perso, res$res_noweights, res$res_DEseq, res$res_edgeR)
+#'colnames(res_all) <- c(paste0(rep(c("asym", "perm", "camera", "roast"), 3),
+#'                              rep(c("_voom", "_perso", "_noweights"), each=4)),
+#'                       paste0("DESeq2_minTest_", c("exact", "approx", "CN")), "roast_edgeR")
 #'}
 #'
 #'@keywords internal
-#'@importFrom stats rnorm
+#'@importFrom stats rnorm qnorm pnorm integrate
 #@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
 #@importFrom edgeR DGEList estimateDisp calcNormFactors roast.DGEList
 #@importFrom limma roast camera
@@ -29,6 +30,8 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
     stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
   }else if(!requireNamespace("limma", quietly=TRUE)){
     stop("Package 'limma' is not available.\n  -> Try running 'install.packages(\"limma\")'\n")
+  }else if(!requireNamespace("edgeR", quietly=TRUE)){
+    stop("Package 'edgeR' is not available.\n  -> Try running 'install.packages(\"edgeR\")'\n")
   }else{
 
     logcoutspm <- apply(counts, MARGIN=2, function(v){log2((v + 0.5)/(sum(v) + 1)*10^6)})
@@ -76,7 +79,6 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                           preprocessed = TRUE
     )
 
-
     # DESeq ----
     ############
     DESeq_data <- DESeq2::DESeqDataSetFromMatrix(countData = floor(exp(logcoutspm_alt)),
@@ -89,8 +91,8 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
     names(DEseq_univ_res_pvals) <- rownames(logcoutspm_alt)
 
     Kappa_j <- function(r, alpha_DEseq){
-      sig <- qnorm(1-alpha_DEseq/2)
-      temp_int <- integrate(function(x){exp(-x^2/2)*pnorm((r*x-sig)/sqrt(1-r^2))},
+      sig <- stats::qnorm(1-alpha_DEseq/2)
+      temp_int <- stats::integrate(function(x){exp(-x^2/2)*stats::pnorm((r*x-sig)/sqrt(1-r^2))},
                             lower=-sig,
                             upper=sig)
       1/log(1-alpha_DEseq)*log(1-(1/(1-alpha_DEseq)*sqrt(2/pi)*temp_int$value))
@@ -106,7 +108,7 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                       design=cbind("time"=as.numeric(design[, "time"]),
                                                    "group"=as.numeric(design[, "group2"])),
                                       robust=TRUE)
-
+    roast <- limma::roast
 
     # Testing ----
     ##############
@@ -150,7 +152,10 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                           "minTest_CN" = 1-(1-DEseq_pmin)^Meff)
       )
 
-      res_edgeR <- rbind(res_edgeR, edgeR::roast.DGEList(y=edgeR_data, index = gs_ind_list[[gs]], design = design, contrast = 3)$p.value["Mixed", "P.Value"])
+      res_edgeR <- rbind(res_edgeR,
+                         edgeR::roast.DGEList(y=edgeR_data, index = gs_ind_list[[gs]],
+                                              design = design, contrast = 3)$p.value["Mixed", "P.Value"]
+      )
       #fry(y=edgeR_data, index = gs_ind_list[[gs]], design = design, contrast = 3, sort="mixed")
 
       res_voom <- rbind(res_voom, cbind("asym" = vc_test_asym(y = y_test, x=x_test, indiv=indiv, phi=phi_test,
@@ -196,6 +201,7 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
 
     }
 
-    return(list("res_voom"=res_voom, "res_perso"=res_perso, "res_noweights"=res_noweights, "res_DEseq"=res_DEseq, "res_edgeR"=res_edgeR))
+    return(list("res_voom"=res_voom, "res_perso"=res_perso, "res_noweights"=res_noweights,
+                "res_DEseq"=res_DEseq, "res_edgeR"=res_edgeR))
   }
 }

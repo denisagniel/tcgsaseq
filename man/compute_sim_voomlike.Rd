@@ -21,9 +21,10 @@ res <- compute_sim_voomlike(counts = data_sims$counts,
                            indiv = data_sims$indiv,
                            alternative=FALSE,
                            RE_indiv_sd=0.1)
-res_all <- cbind(res$res_voom, res$res_perso, res$res_noweights)
-colnames(res_all) <- paste0(rep(c("asym", "perm", "camera"), 3),
-                           rep(c("_voom", "_perso", "_noweights"), each=3))
+res_all <- cbind(res$res_voom, res$res_perso, res$res_noweights, res$res_DEseq, res$res_edgeR)
+colnames(res_all) <- c(paste0(rep(c("asym", "perm", "camera", "roast"), 3),
+                             rep(c("_voom", "_perso", "_noweights"), each=4)),
+                      paste0("DESeq2_minTest_", c("exact", "approx", "CN")), "roast_edgeR")
 }
 
 }
