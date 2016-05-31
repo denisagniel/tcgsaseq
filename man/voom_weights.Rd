@@ -24,7 +24,7 @@ Default is \code{FALSE}.}
 
 \item{lowess_span}{smoother span for the lowess function, between 0 and 1. This gives
 the proportion of points in the plot which influence the smooth at each value.
-Larger values give more smoothness.}
+Larger values give more smoothness. Default is \code{0.5}.}
 }
 \value{
 a vector of length \code{n} containing the computed precision weights

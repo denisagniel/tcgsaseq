@@ -19,7 +19,7 @@
 #'
 #'@param lowess_span smoother span for the lowess function, between 0 and 1. This gives
 #'the proportion of points in the plot which influence the smooth at each value.
-#'Larger values give more smoothness.
+#'Larger values give more smoothness. Default is \code{0.5}.
 #'
 #'@return a vector of length \code{n} containing the computed precision weights
 #'
@@ -106,7 +106,7 @@ voom_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5
     p <- (ggplot(data=plot_df)
           + geom_point(aes_string(x="r_tilde_o", y="s_rs_o"), alpha=0.45, color="grey25", size=0.5)
           + theme_bw()
-          + xlab("Gene average: log2(count size + 0.5)")
+          + xlab("Gene average")
           + ylab("sqrt(sd)")
           + ggtitle("Mean-variance")
           + geom_line(data=plot_df_lo, aes_string(x="lo.x", y="lo.y"), color="blue", lwd=1.4, lty="solid", alpha=0.8)

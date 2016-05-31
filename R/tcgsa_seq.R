@@ -55,12 +55,17 @@
 #'@param exact a logical flag indicating wether the non-parametric weights accounting
 #'for the mean-variance relationship should be computed exactly or extrapolated
 #'from the interpolation of local regression of the mean against the
-#'variance. Default is \code{FALSE}, which uses interporlation (faster).
+#'variance. Default is \code{FALSE}, which uses interporlation (faster computation).
 #'
 #'@param padjust_methods multiple testing correction method used if \code{genesets}
 #'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
 #'Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 #'\code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).
+#'
+#'@param lowess_span smoother span for the lowess function, between 0 and 1. This gives
+#'the proportion of points in the plot which influence the smooth at each value.
+#'Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
+#'Default is \code{0.5}.
 #'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{which_test}:
@@ -89,7 +94,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
                       bw = "nrd",
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                       exact = FALSE,
-                      padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni")){
+                      padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+                      lowess_span = 0.5){
 
 
 
@@ -136,7 +142,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    bw = bw, kernel = kernel,
                                    exact = exact),
-               voom = voom_weights(y = y_lcpm, x = x, preprocessed = preprocessed, doPlot = doPlot),
+               voom = voom_weights(y = y_lcpm, x = x, preprocessed = preprocessed, doPlot = doPlot,
+                                   lowess_span = lowess_span),
                NULL = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
 
@@ -151,7 +158,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
       gene_names_measured <- rownames(y_lcpm)
       prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
       if(sum(prop_meas)!=length(prop_meas)){
-        warning("Some genes in the investigated genesets were not measured:\nremoving those genes form the geneset definition...")
+        warning("Some genes in the investigated genesets were not measured:\nremoving those genes from the geneset definition...")
         genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
       }
     }
@@ -180,7 +187,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
     if(class(genesets)=="character"){
       gene_names_measured <- rownames(y_lcpm)
       if((length(intersect(genesets, gene_names_measured))/length(x)) != 1){
-        warning("Some genes in the investigated genesets were not measured:\n removing those genes form the geneset definition...")
+        warning("Some genes in the investigated genesets were not measured:\n removing those genes from the geneset definition...")
         genesets <- genesets[which(genesets %in% gene_names_measured)]
       }
     }

@@ -10,7 +10,8 @@ tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   preprocessed = FALSE, doPlot = TRUE, bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"))
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+  lowess_span = 0.5)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -66,12 +67,17 @@ corresponds to the loess method).}
 \item{exact}{a logical flag indicating wether the non-parametric weights accounting
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
-variance. Default is \code{FALSE}, which uses interporlation (faster).}
+variance. Default is \code{FALSE}, which uses interporlation (faster computation).}
 
 \item{padjust_methods}{multiple testing correction method used if \code{genesets}
 is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
 Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).}
+
+\item{lowess_span}{smoother span for the lowess function, between 0 and 1. This gives
+the proportion of points in the plot which influence the smooth at each value.
+Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
+Default is \code{0.5}.}
 }
 \value{
 A list with the following elements:\itemize{
