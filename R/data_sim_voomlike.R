@@ -11,12 +11,13 @@
 #'\dontrun{
 #'set.seed(123)
 #'data_sims <- data_sim_voomlike(maxGSsize=300)
+#'data_sims <- data_sim_voomlike(maxGSsize=300, beta=200)
 #'}
 #'@keywords internal
 #'@importFrom utils data
 #'@importFrom stats cor rchisq rgamma rnorm rpois model.matrix runif
 #'@export
-data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30){
+data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
 
 
   ############################################################################
@@ -68,11 +69,9 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30){
   mu0.1 <- matrix(baselineprop1,ngenes,1) %*% matrix(expected.lib.size[1:n1],1,n1)
   mu0.2 <- matrix(baselineprop2,ngenes,1) %*% matrix(expected.lib.size[(n1+1):(n1+n2)],1,n2)
   mu0 <- cbind(mu0.1,mu0.2)
-  status <- rep(0,ngenes)
-  status[i1] <- -1
-  status[i2] <- 1
 
   # Biological variation ----
+  mu0 <- mu0*matrix(exp(beta*time), ncol=n, nrow=ngenes)
   BCV0 <- 0.2+1/sqrt(mu0)
 
   # Use inverse chi-square or log-normal dispersion
@@ -80,17 +79,21 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30){
 
   if(invChisq){
     df.BCV <- 40
-    BCV <- BCV0*sqrt(df.BCV/stats::rchisq(ngenes ,df=df.BCV))
+    BCV <- BCV0*sqrt(df.BCV/stats::rchisq(ngenes, df=df.BCV))
   } else {
-    BCV <- BCV0*exp(stats::rnorm(ngenes,mean=0,sd=0.25)/2 )
+    BCV <- BCV0*exp(stats::rnorm(ngenes, mean=0, sd=0.25)/2)
   }
   if(NCOL(BCV)==1) BCV <- matrix(BCV, ngenes, nlibs)
   shape <- 1/BCV^2
   scale <- mu0/shape
-  mu <- matrix(stats::rgamma(ngenes*nlibs, shape=shape,scale=scale), ngenes, nlibs)
+  mu <- matrix(stats::rgamma(ngenes*nlibs, shape=shape, scale=scale), ngenes, nlibs)
+  if(length(which(mu>10E8))>0){
+    mu[which(mu>10E8)] <- 10E8
+  }
 
   # Technical variation
   counts <- matrix(stats::rpois(ngenes*nlibs, lambda=mu), ngenes, nlibs)
+
 
   # Filter
   keep <- rowSums(counts)>=10
@@ -98,6 +101,7 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30){
   counts2 <- counts[keep,]
 
   S_temp <- stats::cor(t(counts2))
+  browser()
   rownames(S_temp) <- as.character(1:nrow(S_temp))
   colnames(S_temp) <- as.character(1:ncol(S_temp))
   rownames(counts2) <- rownames(S_temp)

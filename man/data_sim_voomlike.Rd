@@ -4,7 +4,8 @@
 \alias{data_sim_voomlike}
 \title{Data simulation function}
 \usage{
-data_sim_voomlike(seed = NULL, maxGSsize = 400, minGSsize = 30)
+data_sim_voomlike(seed = NULL, maxGSsize = 400, minGSsize = 30,
+  beta = 0)
 }
 \description{
 Adapted from the supplementary material from Law \emph{et al}.
@@ -13,6 +14,7 @@ Adapted from the supplementary material from Law \emph{et al}.
 \dontrun{
 set.seed(123)
 data_sims <- data_sim_voomlike(maxGSsize=300)
+data_sims <- data_sim_voomlike(maxGSsize=300, beta=200)
 }
 }
 \references{

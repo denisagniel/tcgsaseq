@@ -18,9 +18,9 @@
 #'
 #'@keywords internal
 #'@importFrom stats rnorm qnorm pnorm integrate
-#@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
-#@importFrom edgeR DGEList estimateDisp calcNormFactors roast.DGEList
-#@importFrom limma roast camera
+#'@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
+#'@importFrom edgeR DGEList estimateDisp calcNormFactors roast.DGEList
+#'@importFrom limma roast camera
 #'@export
 compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FALSE,
                                  fixed_eff = 0.5, fixed_eff_sd = 0, #0.2,
