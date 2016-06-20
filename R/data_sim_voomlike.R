@@ -71,27 +71,37 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   mu0 <- cbind(mu0.1,mu0.2)
 
   # Biological variation ----
-  mu0 <- mu0*matrix(exp(beta*time), ncol=n, nrow=ngenes)
+  mu0_null <- mu0
+  mu0 <- exp(log(mu0) + matrix(beta*time, ncol=n, nrow=ngenes))
   BCV0 <- 0.2+1/sqrt(mu0)
+  BCV0_null <- 0.2+1/sqrt(mu0_null)
+
 
   # Use inverse chi-square or log-normal dispersion
   invChisq <- TRUE
 
   if(invChisq){
     df.BCV <- 40
+    BCV_null <- BCV0_null*sqrt(df.BCV/stats::rchisq(ngenes, df=df.BCV))
     BCV <- BCV0*sqrt(df.BCV/stats::rchisq(ngenes, df=df.BCV))
   } else {
     BCV <- BCV0*exp(stats::rnorm(ngenes, mean=0, sd=0.25)/2)
   }
-  if(NCOL(BCV)==1) BCV <- matrix(BCV, ngenes, nlibs)
+  if(NCOL(BCV)==1){
+    BCV <- matrix(BCV, ngenes, nlibs)
+  }
+  shape_null <- 1/BCV_null^2
   shape <- 1/BCV^2
+  scale_null <- mu0_null/shape_null
   scale <- mu0/shape
+  mu_null <- matrix(stats::rgamma(ngenes*nlibs, shape=shape_null, scale=scale_null), ngenes, nlibs)
   mu <- matrix(stats::rgamma(ngenes*nlibs, shape=shape, scale=scale), ngenes, nlibs)
   if(length(which(mu>10E8))>0){
     mu[which(mu>10E8)] <- 10E8
   }
 
   # Technical variation
+  counts_null <- matrix(stats::rpois(ngenes*nlibs, lambda=mu_null), ngenes, nlibs)
   counts <- matrix(stats::rpois(ngenes*nlibs, lambda=mu), ngenes, nlibs)
 
 
@@ -100,14 +110,17 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   nkeep <- sum(keep)
   counts2 <- counts[keep,]
 
-  S_temp <- stats::cor(t(counts2))
-  browser()
+
+  counts2_null <- counts_null[keep,]
+
+  S_temp <- stats::cor(t(counts2_null))
   rownames(S_temp) <- as.character(1:nrow(S_temp))
   colnames(S_temp) <- as.character(1:ncol(S_temp))
+  rownames(counts2_null) <- rownames(S_temp)
   rownames(counts2) <- rownames(S_temp)
   GS <- list()
   for(i in 1:ncol(S_temp)){
-    GS[[i]] <-which(abs(S_temp[,1])>0.8)
+    GS[[i]] <- which(abs(S_temp[,1])>0.8)
     #if(inherits(GS[[i]], "try-error")){browser()}
     S_temp <- S_temp[-GS[[i]], -GS[[i]]]
     if(is.null(dim(S_temp)) || nrow(S_temp)==0){
