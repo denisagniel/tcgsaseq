@@ -5,13 +5,36 @@
 #'
 #'\dontrun{
 #'
-#'all_sim_pvals <- replicate(1000, nb_sim_fn(type = 'standard_null'))
+#'for (n in c(50,100, 150)) {
+#'standard.l <- list()
+#'betas <- seq(-2, 2, length = 11)
+#'stdl.l <- list()
+#'ind <- 0
+#'for (i in 1:11) {
+#'  ind <- ind + 1
+#'  if (betas[i] == 0) {
+#'    gsd <- rsd <- 0
+#'  } else gsd <- rsd <- 1
+#'  
+#'  standard.sim <- nb_sim_fn(type = 'standard',
+#'                            nGenes = 100,
+#'                            n = n,
+#'                            beta = betas[i],
+#'                            re_sd = rsd,
+#'                            gene_sd = gsd,
+#'                            n_t = 5)
+#'  
+#'  
+#'  stdl.l[[ind]] <- c(standard.sim, beta = betas[i])
+#'}
+#'standard.l <- do.call(rbind, stdl.l)
 #'}
 #'
+#'
 #'@keywords internal
-#'@importFrom stats rnorm qnorm pnorm integrate
+#'@importFrom stats rnorm rexp rnbinom qnorm integrate pnorm
 #@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
-#@importFrom edgeR DGEList estimateDisp calcNormFactors
+#@importFrom edgeR DGEList estimateDisp calcNormFactors results DESeq
 #@importFrom limma roast
 #'@export
 
@@ -20,9 +43,12 @@ nb_sim_fn <- function(n = 250,
                       n_t = 5,
                       beta = 2,
                       nGenes = 1000,
+                      re_sd = 1,
+                      gene_sd = 1,
                       type) {
-  sim_data <- sim_nb_data(n = n, n_t = n_t,
-                          beta = beta, nGenes = nGenes, type = type)
+  sim_data <- sim_nb_data(n = n, n_t = n_t, re_sd = re_sd,
+                          beta = beta, nGenes = nGenes, type = type,
+                          gene_sd = gene_sd)
 
   set_size <- 10
   set_ind <- 1:set_size
@@ -36,7 +62,7 @@ nb_sim_fn <- function(n = 250,
   design_r <- cbind(x, tt)
   
   w <- sp_weights(x = x, 
-                            y = y, 
+                            y = t(y), 
                             phi = matrix(tt, ncol = 1), 
                             preprocessed = TRUE, 
                             doPlot = FALSE)
@@ -53,7 +79,7 @@ nb_sim_fn <- function(n = 250,
   ydge <- edgeR::estimateDisp(ydge, design_r, robust=TRUE)
   
   y_set <- y[,set_ind]
-  w_set <- w[set_ind,]
+  w_set <- w[set_ind,] %>% abs
   voomw_set <- voom_w[set_ind,]
   
   
@@ -64,9 +90,22 @@ nb_sim_fn <- function(n = 250,
                                 phi = matrix(tt), 
                                 Sigma_xi = 1, 
                                 w = w_set)
+  tcgp <- vc_test_perm(y = t(y_set), 
+                      x = x, 
+                      indiv = indiv, 
+                      phi = matrix(tt), 
+                      Sigma_xi = 1, 
+                      w = w_set)
   
+  roast_tcg <- limma::roast(y=t(y_set), 
+                             # set.statistic = 'msq',
+                             design=design_r, 
+                             contrast=3, 
+                             block = indiv, 
+                             correlation = 0,
+                             weights = w_set)
   roast_voom <- limma::roast(y=t(y_set), 
-                             set.statistic = 'msq',
+                             # set.statistic = 'msq',
                              design=design_r, 
                              contrast=3, 
                              block = indiv, 
@@ -74,14 +113,16 @@ nb_sim_fn <- function(n = 250,
                              weights = voomw_set)
   roast_edger <- limma::roast(y=ydge, 
                               index = index, 
-                              set.statistic = 'msq',
-                              design=design.r, 
+                              # set.statistic = 'msq',
+                              design=design_r, 
                               contrast=3, 
                               block = indiv, 
                               correlation = 0)
-  deseq <- deseq_fn(y_set)
-  pvals <- data.frame(
+  deseq <- deseq_fn(y, x, tt, indiv, set_ind)
+  pvals <- c(
     'tcgsaseq'=tcg$pval,
+    'tcgsaseq_perm'=tcgp$pval,
+    'roast_tcg'=roast_tcg$p.value["Mixed", "P.Value"],
     'roast_voom'=roast_voom$p.value["Mixed", "P.Value"],
     'roast_edger'=roast_edger$PValue.Mixed,
     'deseq'=deseq
@@ -93,24 +134,33 @@ sim_nb_data <- function(n = 250,
                         n_t = 5,
                         beta = 2,
                         nGenes = 1000,
+                        re_sd = 1,
+                        gene_sd = 1,
                         type) {
-  stopifnot(type %in% c('standard_null', 'alternative', 'td_variance')) 
+  stopifnot(type %in% c('standard' , 'td_variance')) 
   mu_x <- rexp(n)*10
+  # mu_x <- rnorm(n)
   x <- cbind(1, rep(rnorm(n, mean = mu_x), each = n_t))
   tt <- c(replicate(n, sample(1:10, size = n_t)))
+  # tt <- c(replicate(n, 1:n_t))
   b_0 <- replicate(nGenes, rep(rnorm(n), each = n_t))
-  if (type == 'standard_null') {
-    y <- replicate(nGenes, rnbinom(n*n_t, mu = 100 + b_0 + rowSums(x), size = 1)) + 1
-  } else if (type == 'td_variance') {
-    y <- replicate(nGenes, rnbinom(n*n_t, mu = 100 + b_0 + rowSums(x), size = 1/tt)) + 1
-  } else if (type == 'alternative') {
-    y <- cbind(replicate(2, rnbinom(n*n_t, mu = tt*beta + 100 + b_0 + rowSums(x), size = 1)),
-               replicate(nGenes-2, rnbinom(n*n_t, mu = 100 + b_0 + rowSums(x), size = 1))) + 1
+  b_1 <- replicate(nGenes, rep(rnorm(n, sd = re_sd), each = n_t))
+  gene_f <- rnorm(nGenes)*gene_sd
+  mu <- y <- b_0
+  int <- 1000
+    # browser()
+  for (ii in 1:ncol(b_0)) {
+    mu[,ii] <- int + b_0[,ii] + rowSums(x) + (b_1[,ii] + beta + gene_f[ii])*(tt*x[,2])
+    mu[,ii] <- ifelse(mu[,ii] < 0, 0, mu[,ii])
+    if (type == 'standard') {
+      y[,ii] <- rnbinom(n*n_t, mu = mu[,ii], size = 1) + 1
+    } else if (type == 'td_variance') {
+      y[,ii] <- rnbinom(n*n_t, mu = mu[,ii], size = 1) + 1
+    }
   }
-  
   indiv <- rep(1:n, each = n_t)
-  
-  list(x = x, tt = tt, y = y, indiv = indiv)
+  browser()
+  list(x = x, tt = tt, y = y, y.0 = y[mu != 0], indiv = indiv)
 }
 
 
@@ -122,7 +172,7 @@ Kappa_j <- function(r, alpha_DEseq){
   1/log(1-alpha_DEseq)*log(1-(1/(1-alpha_DEseq)*sqrt(2/pi)*temp_int$value))
 }
 
-deseq_fn <- function(y) {
+deseq_fn <- function(y, x, tt, indiv, ind) {
   # browser()
   y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = t(y),
                                           colData = cbind.data.frame("indiv"=as.factor(indiv),
@@ -132,8 +182,8 @@ deseq_fn <- function(y) {
   res_dsq <- DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x)
   pvals <- DESeq2::results(res_dsq)$pvalue
   
-  pmin <- min(pvals, na.rm = TRUE)
-  Rij <- cor(y)
+  pmin <- min(pvals[ind], na.rm = TRUE)
+  Rij <- cor(y[,ind])
   Rj <- sapply(1:ncol(Rij), function(j){max(abs(Rij[1:(j-1),j]), na.rm = TRUE)})
   if(length(which(is.infinite(Rj)))>0){
     Rj[which(is.infinite(Rj))] <- 0
@@ -141,7 +191,7 @@ deseq_fn <- function(y) {
   
   Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
   Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(0.05))))
-  Meff <- 1 + sum(1-cor(y)^2, na.rm = TRUE)/ncol(Rij) #Cheverud–Nyholt
+  Meff <- 1 + sum(1-cor(y[,ind])^2, na.rm = TRUE)/ncol(Rij) #Cheverud–Nyholt
   cbind("minTest_exact" = 1-(1-pmin)^Keff,
         "minTest_approx" = 1-(1-pmin)^Keff_approx,
         "minTest_CN" = 1-(1-pmin)^Meff)
