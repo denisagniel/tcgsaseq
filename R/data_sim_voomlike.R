@@ -11,7 +11,7 @@
 #'\dontrun{
 #'set.seed(123)
 #'data_sims <- data_sim_voomlike(maxGSsize=300)
-#'data_sims <- data_sim_voomlike(maxGSsize=300, beta=200)
+#'data_sims <- data_sim_voomlike(maxGSsize=300, beta=1.8)
 #'}
 #'@keywords internal
 #'@importFrom utils data
@@ -32,12 +32,12 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   baselineprop <- baselineprop/sum(baselineprop)
 
   # Design ----
-  n <- 18
+  n <- 18#128
   n1 <- n/2
   n2 <- n1
-  nindiv <- 6
+  nindiv <- 6#32
   ngroup <- 2
-  ntime <- 3
+  ntime <- 3#4
   group <- factor(rep(1:2, each=n/ngroup))
   indiv <- factor(rep(1:nindiv, each=n/nindiv))
   time <- rep(1:ntime, nindiv)
@@ -73,6 +73,7 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   # Biological variation ----
   mu0_null <- mu0
   mu0 <- exp(log(mu0) + matrix(beta*time, ncol=n, nrow=ngenes))
+
   BCV0 <- 0.2+1/sqrt(mu0)
   BCV0_null <- 0.2+1/sqrt(mu0_null)
 
@@ -109,8 +110,6 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   keep <- rowSums(counts)>=10
   nkeep <- sum(keep)
   counts2 <- counts[keep,]
-
-
   counts2_null <- counts_null[keep,]
 
   S_temp <- stats::cor(t(counts2_null))
@@ -118,6 +117,7 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   colnames(S_temp) <- as.character(1:ncol(S_temp))
   rownames(counts2_null) <- rownames(S_temp)
   rownames(counts2) <- rownames(S_temp)
+  browser()
   GS <- list()
   for(i in 1:ncol(S_temp)){
     GS[[i]] <- which(abs(S_temp[,1])>0.8)

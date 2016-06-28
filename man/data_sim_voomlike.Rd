@@ -14,7 +14,7 @@ Adapted from the supplementary material from Law \emph{et al}.
 \dontrun{
 set.seed(123)
 data_sims <- data_sim_voomlike(maxGSsize=300)
-data_sims <- data_sim_voomlike(maxGSsize=300, beta=200)
+data_sims <- data_sim_voomlike(maxGSsize=300, beta=1.8)
 }
 }
 \references{

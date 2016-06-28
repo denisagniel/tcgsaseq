@@ -1,140 +1,145 @@
-
 #' Computing nonlinear simulations results
 #'
 #'@examples
-#'
 #'\dontrun{
-#'
 #'for (n in c(50,100,150)) {
-#'betas <- seq(-2, 2, length = 11)
-#'standard.l <- list()
-#'for (i in 1:11) {
-#'  standard.sim <- nonlin_sim_fn(type = 'standard',
-#'                                nGenes = 100,
-#'                                n = n,
-#'                                beta = betas[i],
-#'                                n_t = 5,
-#'                                re_sd = 1)
-#'  #       
-#
-#'  standard.l[[as.character(betas[i])]] <- standard.sim
+#'  betas <- seq(-2, 2, length = 11)
+#'  standard.l <- list()
+#'  for (i in 1:11) {
+#'    standard.sim <- nonlin_sim_fn(type = 'standard',
+#'                                  nGenes = 100,
+#'                                  n = n,
+#'                                  beta = betas[i],
+#'                                  n_t = 5,
+#'                                  re_sd = 1)
+#'    standard.l[[as.character(betas[i])]] <- standard.sim
+#'  }
 #'}
 #'}
 #'
 #'@keywords internal
-#'@importFrom 
-#'@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
-#'@importFrom edgeR DGEList calcNormFactors estimateDispersionsGeneEst nbinomLRT results
-#'@importFrom limma roast duplicateCorrelation
+#@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
+#@importFrom edgeR DGEList calcNormFactors estimateDispersionsGeneEst nbinomLRT results
+#@importFrom limma roast duplicateCorrelation
 #'@export
 
 
 nonlin_sim_fn <- function(n = 250,
-                        n_t = 5,
-                        beta = 2,
-                        nGenes = 1000,
-                        rho = 0.5,
-                        re_sd = 1,
-                        type) {
-  y <- -1
-  while(any(y < 0)) {
-    sim_data <- sim_nonlin_data(n = n, n_t = n_t,
-                              beta = beta, nGenes = nGenes, 
-                              type = type,
-                              rho = rho, re_sd = re_sd)
-    
-    set_size <- 10
-    set_ind <- 1:set_size
-    groups <- nGenes/set_size %>% floor
-    
-    x <- sim_data$x
-    y <- sim_data$y
-    tt <- sim_data$tt
-    indiv <- sim_data$indiv
-    
-    design_r <- cbind(x, tt)
-  }
-  
-  w <- sp_weights(x = x, 
-                  y = t(y), 
-                  phi = matrix(tt, ncol = 1), 
-                  preprocessed = TRUE, 
-                  doPlot = FALSE)
-  voom_w <- voom_weights(x = design_r, 
-                         y = t(y), 
-                         preprocessed = TRUE, 
-                         doPlot = FALSE)
-  
-  cor_limma <- limma::duplicateCorrelation(t(y), design_r, block = indiv)
-  
-  genesets <- data.frame(Symbol = rep(1:groups, each = set_size),
-                         Chr = rep(1:groups, each = set_size))
-  # browser()
-  ydge <- edgeR::DGEList(counts=t(y), genes=genesets)
-  ydge <- edgeR::estimateDisp(ydge, design_r, robust=TRUE)
-  
-  y_set <- y[,set_ind]
-  w_set <- w[set_ind,]
-  voomw_set <- voom_w[set_ind,]
-  
-  
-  index <- list(X=(1:nGenes %in% set_ind))
-  tcg <- vc_test_asym(y = t(y_set), 
-                      x = x, 
-                      indiv = indiv, 
-                      phi = matrix(tt), 
-                      Sigma_xi = 1, 
-                      w = w_set)
-  tcgp <- vc_test_perm(y = t(y_set), 
-                      x = x, 
-                      indiv = indiv, 
-                      phi = matrix(tt), 
-                      Sigma_xi = 1, 
-                      w = w_set)
-  roast <- limma::roast
-  roast_tcg <- limma::roast(y=t(y_set), 
-                             # set.statistic = 'msq',
-                             design=design_r, 
-                             contrast=3, 
-                             block = indiv, 
-                             correlation = cor_limma$consensus.correlation,
-                             weights = w_set)
-  roast_voom <- limma::roast(y=t(y_set), 
-                             # set.statistic = 'msq',
-                             design=design_r, 
-                             contrast=3, 
-                             block = indiv, 
-                             correlation = cor_limma$consensus.correlation,
-                             weights = voomw_set)
-  
-  roast_edger <- limma::roast(y=ydge, 
-                                      index = index, 
-                                      # set.statistic = 'msq',
-                                      design=design_r, 
-                                      contrast=3, 
-                              correlation = cor_limma$consensus.correlation,
-                                      block = indiv)
-  deseq <- deseq_fn(y, x, tt, indiv, set_ind)
-  pvals <- c(
-    'tcgsaseq'=tcg$pval,
-    'tcgsaseq_perm'=tcgp$pval,
-    'roast_tcg'=roast_tcg$p.value["Mixed", "P.Value"],
-    'roast_voom'=roast_voom$p.value["Mixed", "P.Value"],
-    'roast_edger'=roast_edger$PValue.Mixed,
-    'deseq'=deseq
-  )
-  pvals
-}
-
-sim_nonlin_data <- function(n = 250,
                           n_t = 5,
                           beta = 2,
                           nGenes = 1000,
                           rho = 0.5,
                           re_sd = 1,
-                          gene_sd = 1,
                           type) {
-  # browser()
+
+  if(!requireNamespace("DESeq2", quietly=TRUE)){
+    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
+  }else if(!requireNamespace("limma", quietly=TRUE)){
+    stop("Package 'limma' is not available.\n  -> Try running 'install.packages(\"limma\")'\n")
+  }else if(!requireNamespace("edgeR", quietly=TRUE)){
+    stop("Package 'edgeR' is not available.\n  -> Try running 'install.packages(\"edgeR\")'\n")
+  }else{
+    y <- -1
+
+    while(any(y < 0)) {
+      sim_data <- sim_nonlin_data(n = n, n_t = n_t,
+                                  beta = beta, nGenes = nGenes,
+                                  type = type,
+                                  rho = rho, re_sd = re_sd)
+
+      set_size <- 10
+      set_ind <- 1:set_size
+      groups <- nGenes/set_size %>% floor
+
+      x <- sim_data$x
+      y <- sim_data$y
+      tt <- sim_data$tt
+      indiv <- sim_data$indiv
+
+      design_r <- cbind(x, tt)
+    }
+
+    w <- sp_weights(x = x,
+                    y = t(y),
+                    phi = matrix(tt, ncol = 1),
+                    preprocessed = TRUE,
+                    doPlot = FALSE)
+    voom_w <- voom_weights(x = design_r,
+                           y = t(y),
+                           preprocessed = TRUE,
+                           doPlot = FALSE)
+
+    cor_limma <- limma::duplicateCorrelation(t(y), design_r, block = indiv)
+
+    genesets <- data.frame(Symbol = rep(1:groups, each = set_size),
+                           Chr = rep(1:groups, each = set_size))
+    # browser()
+    ydge <- edgeR::DGEList(counts=t(y), genes=genesets)
+    ydge <- edgeR::estimateDisp(ydge, design_r, robust=TRUE)
+
+    y_set <- y[,set_ind]
+    w_set <- w[set_ind,]
+    voomw_set <- voom_w[set_ind,]
+
+
+    index <- list(X=(1:nGenes %in% set_ind))
+    tcg <- vc_test_asym(y = t(y_set),
+                        x = x,
+                        indiv = indiv,
+                        phi = matrix(tt),
+                        Sigma_xi = 1,
+                        w = w_set)
+    tcgp <- vc_test_perm(y = t(y_set),
+                         x = x,
+                         indiv = indiv,
+                         phi = matrix(tt),
+                         Sigma_xi = 1,
+                         w = w_set)
+
+    roast_tcg <- limma::roast(y=t(y_set),
+                              # set.statistic = 'msq',
+                              design=design_r,
+                              contrast=3,
+                              block = indiv,
+                              correlation = cor_limma$consensus.correlation,
+                              weights = w_set)
+    roast_voom <- limma::roast(y=t(y_set),
+                               # set.statistic = 'msq',
+                               design=design_r,
+                               contrast=3,
+                               block = indiv,
+                               correlation = cor_limma$consensus.correlation,
+                               weights = voomw_set)
+
+    roast_edger <- limma::roast(y=ydge,
+                                index = index,
+                                # set.statistic = 'msq',
+                                design=design_r,
+                                contrast=3,
+                                correlation = cor_limma$consensus.correlation,
+                                block = indiv)
+    deseq <- deseq_fn(y, x, tt, indiv, set_ind)
+    pvals <- c(
+      'tcgsaseq'=tcg$pval,
+      'tcgsaseq_perm'=tcgp$pval,
+      'roast_tcg'=roast_tcg$p.value["Mixed", "P.Value"],
+      'roast_voom'=roast_voom$p.value["Mixed", "P.Value"],
+      'roast_edger'=roast_edger$PValue.Mixed,
+      'deseq'=deseq
+    )
+    pvals
+  }
+}
+
+#'@keywords internal
+sim_nonlin_data <- function(n = 250,
+                            n_t = 5,
+                            beta = 2,
+                            nGenes = 1000,
+                            rho = 0.5,
+                            re_sd = 1,
+                            gene_sd = 1,
+                            type) {
   x <- cbind(1, matrix(rnorm(n*n_t, mean = 100, sd = 50), n*n_t, 1))
   u <- rexp(nGenes, rate = 1/100)
   e <- t(replicate(nGenes, rnorm(n*n_t)))*u + u
@@ -143,59 +148,16 @@ sim_nonlin_data <- function(n = 250,
   y <- t(e + b.0) + rowMeans(x)
   y <- y*rowMeans(y)/1000
   tt <- matrix(runif(n*n_t), ncol = 1)
-  
+
   b.1 <- matrix(rep(rnorm(n, sd = re_sd), each = n_t), n*n_t, 1)
   bb.1 <- t(t(b.1) + beta)
   y <- y + rowSums(tt * bb.1)
   y <- ifelse(y <= 0, 1e-7, y)
   indiv <- rep(1:n, each = n_t)
-  
+
   # lcpm <- apply(y, MARGIN=2,function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   lcpm <- log2((y+0.5)/(colSums(y) + 1)*10^6)
   lcpm <- pmax(ceiling(lcpm), 1)
-  
+
   list(x = x, tt = tt, y = lcpm, indiv = indiv)
-}
-
-
-Kappa_j <- function(r, alpha_DEseq){
-  sig <- stats::qnorm(1-alpha_DEseq/2)
-  temp_int <- stats::integrate(function(x){exp(-x^2/2)*stats::pnorm((r*x-sig)/sqrt(1-r^2))},
-                               lower=-sig,
-                               upper=sig)
-  1/log(1-alpha_DEseq)*log(1-(1/(1-alpha_DEseq)*sqrt(2/pi)*temp_int$value))
-}
-
-deseq_fn <- function(y, x, tt, indiv, ind) {
-  # browser()
-  y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = t(y),
-                                          colData = cbind.data.frame("indiv"=as.factor(indiv),
-                                                                     "time"=as.numeric(tt),
-                                                                     "x"=as.numeric(x[,2])),
-                                          design = ~ x + time)
-  # res_dsq <- DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean')
-#   pvals <- DESeq2::results(res_dsq)$pvalue
-  library(DESeq2)
-  y_dsq <- DESeq2::estimateSizeFactors(y_dsq)
-  y_dsq <- DESeq2::estimateDispersionsGeneEst(y_dsq)
-  dispersions(y_dsq) <- mcols(y_dsq)$dispGeneEst
-  # res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x))
-  res_dsq <- DESeq2::nbinomLRT(y_dsq, reduced = ~ x)
-  # if (class(res_dsq) == 'try-error') res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean'))
-  pvals <- DESeq2::results(res_dsq)$pvalue
-  
-  pmin <- min(pvals[ind], na.rm = TRUE)
-  Rij <- cor(y[,ind])
-  Rj <- sapply(1:ncol(Rij), function(j){max(abs(Rij[1:(j-1),j]), na.rm = TRUE)})
-  if(length(which(is.infinite(Rj)))>0){
-    Rj[which(is.infinite(Rj))] <- 0
-  }
-  
-  Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
-  Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(0.05))))
-  Meff <- 1 + sum(1-cor(y[,ind])^2, na.rm = TRUE)/ncol(Rij) #Cheverud–Nyholt
-  cbind("minTest_exact" = 1-(1-pmin)^Keff,
-        "minTest_approx" = 1-(1-pmin)^Keff_approx,
-        "minTest_CN" = 1-(1-pmin)^Meff)
-  
 }

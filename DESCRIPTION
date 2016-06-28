@@ -14,11 +14,11 @@ Imports:
     ggplot2,
     GSA,
     stats,
-    utils,
+    utils
+Suggests:
     limma,
     edgeR,
     DESeq2
-Suggests:
 Description: Gene set analysis of longitudinal RNA-seq data with variance component
     score test accounting for data heteroscedasticity through precision weights.
 LazyData: true

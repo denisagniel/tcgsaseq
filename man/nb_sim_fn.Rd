@@ -4,17 +4,42 @@
 \alias{nb_sim_fn}
 \title{Computing negative binomial simulations results}
 \usage{
-nb_sim_fn(n = 250, n_t = 5, beta = 2, nGenes = 1000, type)
+nb_sim_fn(n = 250, n_t = 5, beta = 2, nGenes = 1000, re_sd = 1,
+  gene_sd = 1, type)
 }
 \description{
 Computing negative binomial simulations results
 }
 \examples{
-
 \dontrun{
+for (n in c(50,100, 150)){
+standard.l <- list()
+betas <- seq(-2, 2, length = 11)
+stdl.l <- list()
+ind <- 0
+for (i in 1:11){
+ ind <- ind + 1
 
-all_sim_pvals <- replicate(1000, nb_sim_fn(type = 'standard_null'))
+ if (betas[i] == 0){
+   gsd <- rsd <- 0
+ }else{
+   gsd <- rsd <- 1
+ }
+
+ standard.sim <- nb_sim_fn(type = 'standard',
+                           nGenes = 100,
+                           n = n,
+                           beta = betas[i],
+                           re_sd = rsd,
+                           gene_sd = gsd,
+                           n_t = 5)
+
+ stdl.l[[ind]] <- c(standard.sim, beta = betas[i])
 }
+standard.l <- do.call(rbind, stdl.l)
+}
+}
+
 
 }
 \keyword{internal}
