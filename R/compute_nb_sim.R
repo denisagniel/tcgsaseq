@@ -60,7 +60,7 @@ nb_sim_fn <- function(n = 250,
 
     set_size <- 10
     set_ind <- 1:set_size
-    groups <- nGenes/set_size %>% floor
+    groups <- floor(nGenes/set_size)
 
     x <- sim_data$x
     y <- sim_data$y
@@ -87,7 +87,7 @@ nb_sim_fn <- function(n = 250,
     ydge <- edgeR::estimateDisp(ydge, design_r, robust=TRUE)
 
     y_set <- y[,set_ind]
-    w_set <- w[set_ind,] %>% abs
+    w_set <- abs(w[set_ind,])
     voomw_set <- voom_w[set_ind,]
 
 

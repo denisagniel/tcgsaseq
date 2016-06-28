@@ -34,14 +34,7 @@ A list with the following elements:\itemize{
 }
 }
 \description{
-This function computes an approximation of the Variance Component test for a
-mixture of \eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
-}
-\examples{
-
-}
-\seealso{
-\code{\link[CompQuadForm]{davies}}
+Computes variance component test statistic for homogeneous trajectory
 }
 \keyword{internal}
 

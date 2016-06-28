@@ -18,6 +18,7 @@
 #'}
 #'
 #'@keywords internal
+#'@importFrom stats sd
 #@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
 #@importFrom edgeR DGEList calcNormFactors estimateDispersionsGeneEst nbinomLRT results
 #@importFrom limma roast duplicateCorrelation
@@ -49,7 +50,7 @@ nonlin_sim_fn <- function(n = 250,
 
       set_size <- 10
       set_ind <- 1:set_size
-      groups <- nGenes/set_size %>% floor
+      groups <- floor(nGenes/set_size)
 
       x <- sim_data$x
       y <- sim_data$y
@@ -143,7 +144,7 @@ sim_nonlin_data <- function(n = 250,
   x <- cbind(1, matrix(rnorm(n*n_t, mean = 100, sd = 50), n*n_t, 1))
   u <- rexp(nGenes, rate = 1/100)
   e <- t(replicate(nGenes, rnorm(n*n_t)))*u + u
-  r.ints <- replicate(n, rnorm(nGenes, sd = 0.01*apply(e, 1, sd)))
+  r.ints <- replicate(n, rnorm(nGenes, sd = 0.01*apply(e, 1, stats::sd)))
   b.0 <- t(apply(r.ints, 1, rep, each = n_t))
   y <- t(e + b.0) + rowMeans(x)
   y <- y*rowMeans(y)/1000
