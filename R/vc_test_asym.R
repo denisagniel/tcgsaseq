@@ -1,10 +1,11 @@
 #'Computes variance component test statistic for longitudinal
 #'
-#'This function computes an approximation of the Variance Component test for a
-#'mixture of \eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
+#'This function computes an approximation of the variance component test based on the asymptotic
+#'distribution of a mixture of \eqn{\chi^{2}}s using Davies method 
+#'from \code{\link[CompQuadForm]{davies}}
 #'
 #'
-#'@param y a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
+#'@param y a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
 #'genes from \code{n} samples.
 #'
 #'@param x a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -14,19 +15,16 @@
 #'attributing each sample to one of the studied individuals. Coerced
 #'to be a \code{factor}.
 #'
-#'@param phi a numeric design matrix of size \code{n x K} containing the \code{K} variables
-#'to be tested
+#'@param phi a numeric design matrix of size \code{n x K} containing the \code{K} longitudinal variables
+#'to be tested (typically a vector of time points or functions of time)
 #'
 #'@param w a vector of length \code{n} containing the weights for the \code{n}
-#'samples.
+#'samples, corresponding to the inverse of the diagonal of the estimated covariance matrix of y.
 #'
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
-#'of the \code{K} random effects.
+#'of the \code{K} random effects corresponding to \code{phi}.
 #'
 #'@return A list with the following elements:\itemize{
-#'   \item \code{lam}: TODO
-#'   \item \code{q}: TODO
-#'   \item \code{q_ext}: TODO
 #'   \item \code{score_obs}: approximation of the observed score
 #'   \item \code{pval}: associated p-value
 #' }
@@ -81,8 +79,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     stop("fault in the computation from CompQuadForm::davies", dv$trace)
   }
 
-  return(list("lam" = lam, 'q' = score_list$q, 'q_ext' = score_list$q_ext,
-              "score_obs" = score_list$score, "pval" = dv$Qq)
+  return(list("score_obs" = score_list$score, "pval" = dv$Qq)
   )
 }
 
