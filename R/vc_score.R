@@ -41,7 +41,7 @@
 #'n <- 100
 #'r <- 12
 #'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
-#'sigma <- 0.5
+#'sigma <- 0.4
 #'b0 <- 1
 #'
 #'#under the null:
@@ -77,7 +77,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   g <- nrow(y) # the number of genes measured
   n <- ncol(y) # the number of samples measured
   qq <- ncol(x) # the number of covariates
-  n.t <- ncol(phi) # the number of time bases
+  n_t <- ncol(phi) # the number of time bases
   stopifnot(nrow(x) == n)
   stopifnot(nrow(w) == g)
   stopifnot(ncol(w) == n)
@@ -94,7 +94,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
     K <- nrow(Sigma_xi)
     stopifnot(ncol(Sigma_xi) == K)
   }
-  stopifnot(n.t == K)
+  stopifnot(n_t == K)
 
 
   ## data formating ------
@@ -139,11 +139,11 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   #     #for all the genes at once
   #     select <- indiv==levels(indiv)[i]
   #     long_select <- long_indiv==levels(indiv)[i]
-  #     y_mu_i <-  as.vector(yt_mu[select,])#y_mu[long_select,]
+  #     y_mu_i <-  as.vector(y_mu[long_select,])
   #     # y_tilde_i <- c(t(y_ij))
   #     x_tilde_i <- x_tilde[long_select,]
   #
-  #     sigma_eps_inv_diag <- c(t(w[,select]))/sigma
+  #     sigma_eps_inv_diag <- as.vector(w[,select])#/sigma
   #     T_i <- sigma_eps_inv_diag*(Phi[long_select,] %*% Sigma_xi_new_sqrt)
   #     q[i,] <- c(y_mu_i %*% T_i)
   #     XT_i[i,,] <- t(x_tilde_i) %*% T_i
@@ -156,12 +156,12 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   sig_xi_sqrt <- (Sigma_xi*diag(K))%^% (-0.5)
   sig_eps_inv_T <- t(w)
   phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
-  T_fast <- matrix(sig_eps_inv_T, ncol=g*n.t, nrow=n)*matrix(phi_sig_xi_sqrt, ncol=g*n.t, nrow=n)#do.call(cbind, replicate(n.t, t(sig_eps_inv), simplify=FALSE))
-  q_fast <- matrix(yt_mu, ncol=g*n.t, nrow=n)*T_fast
+  T_fast <- matrix(sig_eps_inv_T, ncol=g*n_t, nrow=n)*matrix(phi_sig_xi_sqrt, ncol=g*n_t, nrow=n)#do.call(cbind, replicate(n_t, t(sig_eps_inv), simplify=FALSE))
+  q_fast <- matrix(yt_mu, ncol=g*n_t, nrow=n)*T_fast
   q <- do.call(rbind, by(q_fast, indiv, FUN=colSums))
   XT_fast <- t(x)%*%T_fast/nb_indiv
   avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
-  U_XT <- matrix(yt_mu, ncol=g*n.t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
+  U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
   U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums))
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})

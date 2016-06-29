@@ -1,7 +1,7 @@
 #'Computes variance component test statistic for homogeneous trajectory
 #'
 #'This function computes an approximation of the variance component test for homogeneous trajectory
-#'based on the asymptotic distribution of a mixture of \eqn{\chi^{2}}s using Davies method 
+#'based on the asymptotic distribution of a mixture of \eqn{\chi^{2}}s using Davies method
 #'from \code{\link[CompQuadForm]{davies}}
 #'
 #'@keywords internal
@@ -30,8 +30,35 @@
 #'   \item \code{pval}: associated p-value
 #' }
 #'
-#@seealso \code{\link[CompQuadForm]{davies}}
-#@importFrom CompQuadForm davies
+#'
+#'@examples
+#'rm(list=ls())
+#'set.seed(123)
+#'
+#'##generate some fake data
+#'########################
+#'n <- 100
+#'r <- 12
+#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'sigma <- 0.4
+#'b0 <- 1
+#'
+#'#under the null:
+#'b1 <- 0
+#'#under the alternative:
+#'b1 <- 0.7
+#'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+#'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+#'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
+#'x <- matrix(1, ncol=1, nrow=r)
+#'
+#'#run test
+#'scoreTest <- vc_score_h(y, x, phi=t, indiv=rep(1:4, each=3), w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+#'                     Sigma_xi=matrix(1))
+#'scoreTest
+#'
+#'@seealso \code{\link[CompQuadForm]{davies}}
+#'@importFrom CompQuadForm davies
 #'
 #'@export
 vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
@@ -73,7 +100,8 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   ## data formating ------
   indiv <- as.factor(indiv)
   nb_indiv <- length(levels(indiv))
-  y_t <- t(y)
+
+  y_T <- t(y)
 
   x_tilde_list <- y_tilde_list <- Phi_list <- list()
   for (i in 1:nb_indiv) {
@@ -81,7 +109,7 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
     select <- indiv==levels(indiv)[i]
     n_i <- length(which(select))
     x_i <- x[select,]
-    y_i <- y_t[select,]
+    y_i <- y_T[select,]
     phi_i <- phi[select,]
     Phi_list[[i]] <- matrix(rep(phi_i,g), ncol = n_t)
     x_tilde_list[[i]] <- matrix(data=rep(x_i,each=g), ncol = qq)
@@ -97,6 +125,7 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
 
   xtx_inv <- solve(t(x_tilde) %*% x_tilde)
   Sigma_xi_sqrt <- (Sigma_xi %^% (-0.5))
+
   #browser()
 
   ## test statistic computation ------
@@ -108,9 +137,11 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   long_indiv <- rep(indiv, each = g)
 
   for (i in 1:nb_indiv){
+    #for all the genes at once
     select <- indiv==levels(indiv)[i]
     long_select <- long_indiv==levels(indiv)[i]
-    y_mu_i <-  as.vector(y_mu[select,])
+    y_mu_i <-  as.vector(y_mu[long_select,])
+    # y_tilde_i <- c(y_ij)
     x_tilde_i <- x_tilde[long_select,]
 
     sigma_eps_inv_diag <- c(w[,select])
@@ -122,7 +153,7 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   XT <- colMeans(XT_i)
   q_ext <- q - U %*% XT
   QQ <- sum(colSums(q)^2/nrow(q))
-  
+
   Sig_q <- stats::cov(q_ext)
   lam <- svd(Sig_q)$d
   dv <- CompQuadForm::davies(QQ, lam)

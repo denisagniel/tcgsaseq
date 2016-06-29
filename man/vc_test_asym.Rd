@@ -8,7 +8,7 @@ vc_test_asym(y, x, indiv = rep(1, nrow(x)), phi, w,
   Sigma_xi = diag(ncol(phi)))
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
 genes from \code{n} samples.}
 
 \item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -18,27 +18,25 @@ to be adjusted for}
 attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}.}
 
-\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
-to be tested}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} longitudinal variables
+to be tested (typically a vector of time points or functions of time)}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}
-samples.}
+samples, corresponding to the inverse of the diagonal of the estimated covariance matrix of y.}
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
-of the \code{K} random effects.}
+of the \code{K} random effects corresponding to \code{phi}.}
 }
 \value{
 A list with the following elements:\itemize{
-  \item \code{lam}: TODO
-  \item \code{q}: TODO
-  \item \code{q_ext}: TODO
   \item \code{score_obs}: approximation of the observed score
   \item \code{pval}: associated p-value
 }
 }
 \description{
-This function computes an approximation of the Variance Component test for a
-mixture of \eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
+This function computes an approximation of the variance component test based on the asymptotic
+distribution of a mixture of \eqn{\chi^{2}}s using Davies method
+from \code{\link[CompQuadForm]{davies}}
 }
 \examples{
 #rm(list=ls())
@@ -49,7 +47,7 @@ set.seed(123)
 n <- 100
 r <- 12
 t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
-sigma <- 0.5
+sigma <- 0.4
 b0 <- 1
 
 #under the null:

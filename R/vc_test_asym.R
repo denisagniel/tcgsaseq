@@ -1,7 +1,7 @@
 #'Computes variance component test statistic for longitudinal
 #'
 #'This function computes an approximation of the variance component test based on the asymptotic
-#'distribution of a mixture of \eqn{\chi^{2}}s using Davies method 
+#'distribution of a mixture of \eqn{\chi^{2}}s using Davies method
 #'from \code{\link[CompQuadForm]{davies}}
 #'
 #'
@@ -40,7 +40,7 @@
 #'n <- 100
 #'r <- 12
 #'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
-#'sigma <- 0.5
+#'sigma <- 0.4
 #'b0 <- 1
 #'
 #'#under the null:
