@@ -119,7 +119,7 @@ nonlin_sim_fn <- function(n = 250,
                                 contrast=3,
                                 correlation = cor_limma$consensus.correlation,
                                 block = indiv)
-    deseq <- deseq_fn(y, x, tt, indiv, set_ind)
+    deseq <- deseq_fn_gs(y, x, tt, indiv, set_ind)
     pvals <- c(
       'tcgsaseq'=tcg$pval,
       'tcgsaseq_perm'=tcgp$pval,

@@ -16,7 +16,7 @@
 #'@param ind
 #'
 #'@examples
-#'#'\dontrun{
+#'\dontrun{
 #'#rm(list=ls())
 #'set.seed(123)
 #'
@@ -39,7 +39,7 @@
 #'indiv=rep(1:4, each=3)
 #'
 #'#run test
-#'temp <- tcgsaseq::deseq_fn(y, x, phi, indiv)
+#'temp <- deseq_fn(y, x, phi, indiv)
 #'}
 #'@importFrom stats as.formula
 #'

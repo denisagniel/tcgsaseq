@@ -126,7 +126,7 @@ nb_sim_fn <- function(n = 250,
                                 contrast=3,
                                 block = indiv,
                                 correlation = 0)
-    deseq <- deseq_fn(y, x, tt, indiv, set_ind)
+    deseq <- deseq_fn_gs(y, x, tt, indiv, set_ind)
     pvals <- c(
       'tcgsaseq'=tcg$pval,
       'tcgsaseq_perm'=tcgp$pval,
@@ -184,7 +184,7 @@ Kappa_j <- function(r, alpha_DEseq){
 
 
 #'@keywords internal
-deseq_fn <- function(y, x, tt, indiv, ind) {
+deseq_fn_gs <- function(y, x, tt, indiv, ind) {
 
   if(!requireNamespace("DESeq2", quietly=TRUE)){
     stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
