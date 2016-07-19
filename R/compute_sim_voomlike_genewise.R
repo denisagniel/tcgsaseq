@@ -136,7 +136,6 @@ compute_sim_voomlike_genewise <- function(counts, design, indiv, alternative=FAL
     ############
     tcggp <- tcgip <- tcgtp <- rep(NA, nb_g)
     tcgg_permp <- tcgi_permp <- tcgt_permp <- rep(NA, nb_g)
-    browser()
     for (i in 1:nb_g) {
       y_set <- logcoutspm_alt[i,, drop = FALSE]
       gw_set <- gene_w[i,,drop = FALSE]
