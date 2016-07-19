@@ -18,7 +18,7 @@
 #'
 #'@param doPlot a logical flag indicating whether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
-#' 
+#'
 #'@param gene_based a logical flag indicating whether to estimate weights at the gene-level.
 #' Default is \code{FALSE}, when weights will be estimated at the observation-level.
 #'
@@ -38,7 +38,7 @@
 #'variance. Default is \code{FALSE}, which uses interpolation (faster).
 #'
 #'@param transform_x a logical flag indicating whether the mean should be transformed to uniform
-#'for the purpose of local linear smoothing. This may be helpful if tail observations are sparse and 
+#'for the purpose of local linear smoothing. This may be helpful if tail observations are sparse and
 #'the specified bandwidth gives suboptimal performance there.
 #'
 #'@return a \code{n x G} matrix containing the computed precision weights.
@@ -85,7 +85,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
   stopifnot(nrow(x) == n)
   stopifnot(nrow(phi) == n)
 
-  
+
   observed <- which(colSums(y) != 0) #removing genes never observed
 
   kernel <- match.arg(kernel)
@@ -108,19 +108,18 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
   sq_err <- (y_lcpm - mu)^2
   v <- colMeans(sq_err)
   mu_avg <- colMeans(mu)
-  
+
   if (gene_based) {
     mu_x <- mu_avg
   } else {
     mu_x <- mu
   }
-  
   # transforming if necessary
   if (transform_mu) {
     sd_mu <- sd(mu_x)
     mean_mu <- mean(mu_x)
-    mu_x <- pnorm(scale(mu_x))
-    reverse_trans <- function(x) qnorm(x)*sd_mu + mean_mu
+    mu_x <- pnorm((mu_x-mean_mu)/sd_mu)
+    reverse_trans <- function(x){qnorm(x)*sd_mu + mean_mu}
   } else {
     reverse_trans <- identity
   }
@@ -218,7 +217,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
       l <- b/sum(b)
       sum(l*v)
     }
-    
+
     kern_fit <- NULL
     if(exact){
       weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol=n, nrow=p, byrow = FALSE))
@@ -234,12 +233,12 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
     #kern_fit <- sapply(mu_avg,w)
     #weights <- matrix(rep(1/kern_fit), ncol=ncol(y_lcpm), nrow=nrow(y_lcpm), byrow = TRUE)
   } else {
-    smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err), 
+    smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
                                 degree = 1, kernel = kernel, bandwidth = bw)
-    w <- (1/approx(reverse_trans(smth$x), smth$y, xout = mu)$y) 
+    w <- (1/approx(reverse_trans(smth$x), smth$y, xout = mu)$y)
     weights <- matrix(w, nrow(mu), ncol(mu))
   }
-  
+
 
   if(doPlot){
     if (gene_based) {
@@ -258,8 +257,8 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
       plot_df <- data.frame("m_o"=mu_s, "v_o"=ep_s)
       plot_df_lo <- data.frame("lo.x"=reverse_trans(smth$x), "lo.y"=smth$y)
     }
-    
-    
+
+
     #plot_df_lo_temp <- data.frame("lo.x"=mu_avg[o], "lo.y"=f_interp(mu_avg[o]))
     ggp <- (ggplot(data=plot_df)
             + geom_point(aes_string(x="m_o", y="v_o"), alpha=0.45, color="grey25", size=0.5)

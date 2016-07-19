@@ -17,7 +17,7 @@
 #'@importFrom utils data
 #'@importFrom stats cor rchisq rgamma rnorm rpois model.matrix runif
 #'@export
-data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
+data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do_gs=TRUE){
 
 
   ############################################################################
@@ -117,17 +117,22 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0){
   colnames(S_temp) <- as.character(1:ncol(S_temp))
   rownames(counts2_null) <- rownames(S_temp)
   rownames(counts2) <- rownames(S_temp)
-  browser()
-  GS <- list()
-  for(i in 1:ncol(S_temp)){
-    GS[[i]] <- which(abs(S_temp[,1])>0.8)
-    #if(inherits(GS[[i]], "try-error")){browser()}
-    S_temp <- S_temp[-GS[[i]], -GS[[i]]]
-    if(is.null(dim(S_temp)) || nrow(S_temp)==0){
-      break()
+  #browser()
+
+  if(do_gs){
+    GS <- list()
+    for(i in 1:ncol(S_temp)){
+      GS[[i]] <- which(abs(S_temp[,1])>0.8)
+      #if(inherits(GS[[i]], "try-error")){browser()}
+      S_temp <- S_temp[-GS[[i]], -GS[[i]]]
+      if(is.null(dim(S_temp)) || nrow(S_temp)==0){
+        break()
+      }
     }
+    gs_keep <- lapply(GS[sapply(GS, length)<maxGSsize & sapply(GS, length)>minGSsize], names)
+  }else{
+    gs_keep <- NULL
   }
-  gs_keep <- lapply(GS[sapply(GS, length)<maxGSsize & sapply(GS, length)>minGSsize], names)
 
   return(list("counts"=counts2, "design"=design, "gs_keep"=gs_keep, "indiv"=indiv))
 }

@@ -8,7 +8,8 @@
 #'                            design = data_sims$design,
 #'                            gs_keep = data_sims$gs_keep,
 #'                            indiv = data_sims$indiv,
-#'                            alternative=TRUEixed_eff = 0.5,
+#'                            alternative=TRUE,
+#'                            fixed_eff = 0.5,
 #'                            fixed_eff_sd = 0,
 #'                            rand_eff_sd = 0,
 #'                            RE_indiv_sd=NULL)

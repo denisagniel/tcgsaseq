@@ -158,11 +158,11 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
   T_fast <- matrix(sig_eps_inv_T, ncol=g*n_t, nrow=n)*matrix(phi_sig_xi_sqrt, ncol=g*n_t, nrow=n)#do.call(cbind, replicate(n_t, t(sig_eps_inv), simplify=FALSE))
   q_fast <- matrix(yt_mu, ncol=g*n_t, nrow=n)*T_fast
-  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums))
+  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
   XT_fast <- t(x)%*%T_fast/nb_indiv
   avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
   U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
-  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums))
+  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE))
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 

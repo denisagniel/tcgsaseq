@@ -89,7 +89,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   for(b in 1:n_perm){
     ## permute samples within indiv
     perm_index <- strat_sampling(indiv_fact)
-    scores_perm[b] <- vc_score(y[, perm_index], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
+    scores_perm[b] <- vc_score(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
   }
 
   pval <- 1-sum(scores_perm < score_obs)/n_perm
