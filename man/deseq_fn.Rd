@@ -26,6 +26,7 @@ to be a \code{factor}}
 Computes gen-wise pvals from DESeq2 method using observation-wise dispersion estimates
 }
 \examples{
+#'\dontrun{
 #rm(list=ls())
 set.seed(123)
 
@@ -49,7 +50,7 @@ indiv=rep(1:4, each=3)
 
 #run test
 temp <- tcgsaseq::deseq_fn(y, x, phi, indiv)
-
+}
 }
 \keyword{internal}
 

@@ -16,6 +16,7 @@
 #'@param ind
 #'
 #'@examples
+#'#'\dontrun{
 #'#rm(list=ls())
 #'set.seed(123)
 #'
@@ -39,7 +40,7 @@
 #'
 #'#run test
 #'temp <- tcgsaseq::deseq_fn(y, x, phi, indiv)
-#'
+#'}
 #'@importFrom stats as.formula
 #'
 #' @keywords internal
@@ -48,6 +49,7 @@ deseq_fn <- function(y, x, phi, indiv) {
   if(!requireNamespace("DESeq2", quietly=TRUE)){
     stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
   }else{
+    requireNamespace("S4Vectors", quietly=TRUE)
 
     if(is.null(colnames(phi))){
       colnames(phi) <- paste0("phi", 1:ncol(phi))
