@@ -59,7 +59,7 @@
 #'
 #'
 #'@import ggplot2
-#'@importFrom stats bw.bcv bw.nrd0 bw.nrd bw.SJ bw.ucv dnorm
+#'@importFrom stats bw.bcv bw.nrd0 bw.nrd bw.SJ bw.ucv dnorm approx
 #'@importFrom KernSmooth locpoly
 #'@export
 
@@ -227,7 +227,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
     }else{
       kern_fit <- sapply(mu_avg,w)
       weights <- 1/matrix(kern_fit, nrow=n, ncol=p, byrow=TRUE)
-      #f_interp <- approxfun(x=mu_avg, kern_fit, rule = 2)
+      #f_interp <- stats::approxfun(x=mu_avg, kern_fit, rule = 2)
       #weights <- 1/apply(mu, 2, f_interp)
     }
     #kern_fit <- sapply(mu_avg,w)
@@ -235,7 +235,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
   } else {
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
                                 degree = 1, kernel = kernel, bandwidth = bw)
-    w <- (1/approx(reverse_trans(smth$x), smth$y, xout = mu)$y)
+    w <- (1/stats::approx(reverse_trans(smth$x), smth$y, xout = mu)$y)
     weights <- matrix(w, nrow(mu), ncol(mu))
   }
 

@@ -59,8 +59,9 @@ y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 x <- matrix(1, ncol=1, nrow=r)
 
 #run test
-scoreTest <- vc_score_h(y, x, phi=t, indiv=rep(1:4, each=3), w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                    Sigma_xi=matrix(1))
+scoreTest <- vc_score_h(y, x, phi=t, indiv=rep(1:4, each=3),
+                       w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+                       Sigma_xi=matrix(1))
 scoreTest
 
 }

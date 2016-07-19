@@ -18,7 +18,8 @@ Imports:
 Suggests:
     limma,
     edgeR,
-    DESeq2
+    DESeq2,
+    KernSmooth
 Description: Gene set analysis of longitudinal RNA-seq data with variance component
     score test accounting for data heteroscedasticity through precision weights.
 LazyData: true
