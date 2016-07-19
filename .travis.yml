@@ -4,6 +4,7 @@ cache: packages
 r_packages:
 - CompQuadForm
 - GSA
+- KernSmooth
 bioc_packages:
 - limma
 - DESeq2
