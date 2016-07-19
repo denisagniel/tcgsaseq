@@ -37,9 +37,9 @@
 #'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interpolation (faster).
 #'
-#'@param transform_x a logical flag indicating whether the mean should be transformed to uniform
+#'@param transform a logical flag indicating whether value should be transformed to uniform
 #'for the purpose of local linear smoothing. This may be helpful if tail observations are sparse and
-#'the specified bandwidth gives suboptimal performance there.
+#'the specified bandwidth gives suboptimal performance there. Default is \code{FALSE}.
 #'
 #'@return a \code{n x G} matrix containing the computed precision weights.
 #'
@@ -68,7 +68,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
                        gene_based = FALSE,
                        bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-                       exact=FALSE, transform_mu = FALSE
+                       exact=FALSE, transform = FALSE
 ){
 
 
@@ -115,7 +115,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
     mu_x <- mu
   }
   # transforming if necessary
-  if (transform_mu) {
+  if (transform) {
     sd_mu <- sd(mu_x)
     mean_mu <- mean(mu_x)
     mu_x <- pnorm((mu_x-mean_mu)/sd_mu)

@@ -38,8 +38,9 @@
 #'indiv=rep(1:4, each=3)
 #'
 #'#run test
-#'deseq_fn(y, x, phi, indiv)
+#'temp <- tcgsaseq::deseq_fn(y, x, phi, indiv)
 #'
+#'@importFrom stats as.formula
 #'
 #' @keywords internal
 deseq_fn <- function(y, x, phi, indiv) {
@@ -57,8 +58,8 @@ deseq_fn <- function(y, x, phi, indiv) {
     }
 
     coldata_temp <- cbind.data.frame("indiv"=as.factor(indiv), phi, x)
-    design_formula <- as.formula(paste0("~ ", paste(colnames(x), collapse =" + "), " + ", paste(colnames(phi), collapse =" + ")))
-    design_formula_reduced <- as.formula(paste0("~ ", paste(colnames(x), collapse =" + ")))
+    design_formula <- stats::as.formula(paste0("~ ", paste(colnames(x), collapse =" + "), " + ", paste(colnames(phi), collapse =" + ")))
+    design_formula_reduced <- stats::as.formula(paste0("~ ", paste(colnames(x), collapse =" + ")))
     y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = y,
                                             colData = coldata_temp,
                                             design = design_formula)
