@@ -235,7 +235,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
   } else {
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
                                 degree = 1, kernel = kernel, bandwidth = bw)
-    w <- (1/stats::approx(reverse_trans(smth$x), smth$y, xout = mu)$y)
+    w <- (1/stats::approx(reverse_trans(smth$x), smth$y, xout = mu, rule = 2)$y)
     weights <- matrix(w, nrow(mu), ncol(mu))
   }
 

@@ -65,7 +65,13 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
                          Sigma_xi = Sigma_xi)
 
+  
   Sig_q <- stats::cov(score_list$q_ext)
+  
+  if (length(score_list$score) == 1) {
+    pv <- pchisq(score_list$score/Sig_q, df = 1, lower.tail = FALSE)
+    return(list("score_obs" = score_list$score, "pval" = pv))
+  }
 
   if(nrow(score_list$q_ext)<2){
     warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")

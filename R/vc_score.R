@@ -26,8 +26,8 @@
 #'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{score}: approximation of the observed score
-#'   \item \code{q}: TODO
-#'   \item \code{q_ext}: TODO
+#'   \item \code{q}: observation-level contributions to the score
+#'   \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -62,7 +62,6 @@
 #'
 #'@export
 vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
-
   ## validity checks
   if(sum(!is.finite(w))>0){
     stop("At least 1 non-finite weight in 'w'")
@@ -158,6 +157,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
   T_fast <- matrix(sig_eps_inv_T, ncol=g*n_t, nrow=n)*matrix(phi_sig_xi_sqrt, ncol=g*n_t, nrow=n)#do.call(cbind, replicate(n_t, t(sig_eps_inv), simplify=FALSE))
   q_fast <- matrix(yt_mu, ncol=g*n_t, nrow=n)*T_fast
+
   q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
   XT_fast <- t(x)%*%T_fast/nb_indiv
   avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
