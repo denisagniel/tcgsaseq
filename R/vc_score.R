@@ -168,6 +168,14 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
 
   QQ <- sum(colSums(q)^2/nrow(q))
 
-  return(list("score"=QQ, "q" = q, "q_ext"=q_ext))
+  return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
+              "gene_scores" = gene_score(q, q_ext)))
 }
 
+gene_score <- function(q, q_ext) {
+  Sig_q <- stats::cov(q_ext)
+  
+  indiv_q <- colSums(q)/sqrt(nrow(q))
+  indiv_v <- diag(Sig_q)
+  indiv_chi <- indiv_q^2/indiv_v
+}

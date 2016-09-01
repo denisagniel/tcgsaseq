@@ -67,10 +67,15 @@
 vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
                          n_perm=1000){
 
-  score_obs <- vc_score(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi)$score
+  test_obs <- vc_score(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi) 
+  score_obs <- test_obs$score
+  gene_score_obs <- test_obs$gene_scores
+  
   n_samples <- ncol(y)
+  n_genes <- nrow(y)
 
   scores_perm <- numeric(n_perm)
+  gene_scores_perm <- matrix(NA, n_perm, n_genes)
   indiv_fact <- factor(indiv)
 
   if(is.null(colnames(y))){
@@ -89,11 +94,16 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   for(b in 1:n_perm){
     ## permute samples within indiv
     perm_index <- strat_sampling(indiv_fact)
-    scores_perm[b] <- vc_score(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
+    test_perm <- vc_score(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)
+    scores_perm[b] <- test_perm$score
+    gene_scores_perm[b,] <- test_perm$gene_scores
   }
 
   pval <- 1-sum(scores_perm < score_obs)/n_perm
-
-  return(list("scores_perm" = scores_perm, "score_obs" = score_obs, "pval" = pval))
+  gene_pval <- 1-colSums(gene_scores_perm < gene_score_obs)/n_perm
+  return(list("scores_perm" = scores_perm, "score_obs" = score_obs, "pval" = pval,
+              "gene_scores_perm" = gene_scores_perm, 
+              "gene_score_obs" = gene_score_obs,
+              "gene_pval" = gene_pval))
 
 }

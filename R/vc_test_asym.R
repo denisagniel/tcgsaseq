@@ -65,27 +65,25 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
                          Sigma_xi = Sigma_xi)
 
-  
-  Sig_q <- stats::cov(score_list$q_ext)
-  
-  if (length(score_list$score) == 1) {
-    pv <- pchisq(score_list$score/Sig_q, df = 1, lower.tail = FALSE)
-    return(list("score_obs" = score_list$score, "pval" = pv))
-  }
+  Sig_q <- cov(score_list$q_ext)
+  indiv_chi <- score_list$gene_scores
+  indiv_pv <- pchisq(indiv_chi, df = 1, lower.tail = FALSE)
 
   if(nrow(score_list$q_ext)<2){
     warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")
     Sig_q <- matrix(1, ncol(Sig_q), nrow(Sig_q))
   }
 
-  lam <- svd(Sig_q)$d
+  lam <- Dmisc::myTry(svd(Sig_q)$d)
+  if (Dmisc::isErr(lam)) browser()
   dv <- CompQuadForm::davies(score_list$score, lam)
 
   if(dv$ifault == 1){#error
     stop("fault in the computation from CompQuadForm::davies", dv$trace)
   }
 
-  return(list("score_obs" = score_list$score, "pval" = dv$Qq)
+  return(list("set_score_obs" = score_list$score, "set_pval" = dv$Qq,
+              "gene_score_obs" = indiv_chi, "gene_pval" = indiv_pv)
   )
 }
 
