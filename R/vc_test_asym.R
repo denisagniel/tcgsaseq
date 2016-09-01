@@ -74,7 +74,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     Sig_q <- matrix(1, ncol(Sig_q), nrow(Sig_q))
   }
 
-  lam <- Dmisc::myTry(svd(Sig_q)$d)
+  lam <- Dmisc::myTry(svd(round(Sig_q,6))$d)
   if (Dmisc::isErr(lam)) browser()
   dv <- CompQuadForm::davies(score_list$score, lam)
 
