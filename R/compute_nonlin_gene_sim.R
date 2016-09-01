@@ -83,13 +83,13 @@ nonlin_sim_fn <- function(n = 100,
   ydge <- edgeR::estimateDisp(ydge, design_r, robust=TRUE)
   edger_fit <- edgeR::glmQLFit(ydge, design = design_r)
   edger_res <- edgeR::glmQLFTest(edger_fit,coef=3)
-  
-  tcgg <- Dmisc::myTry(vc_test_asym(y = t(y), 
+  # browser()
+  tcgg <- vc_test_asym(y = t(y), 
                                     x = x, 
                                     indiv = indiv, 
                                     phi = matrix(g), 
                                     Sigma_xi = 1, 
-                                    w = gene_w))
+                                    w = gene_w)
   tcgi <- Dmisc::myTry(vc_test_asym(y = t(y), 
                                     x = x, 
                                     indiv = indiv, 
@@ -208,7 +208,7 @@ nonlin_sim_fn <- function(n = 100,
   voom_fit <- limma::lmFit(vv,design_r)
   voom_fit <- limma::eBayes(voom_fit)
   
-  # deseq <- deseq_fn(round(exp(y)), x, tt, indiv, yinds)
+  deseq <- deseq_fn(round(exp(y)), x, g, indiv)
   pvals <- data.frame(
     'tcgsaseq_g'=tcgg$gene_pval,
     # 'tcgsaseq_gperm'=tcgg_perm$pval,
@@ -219,8 +219,8 @@ nonlin_sim_fn <- function(n = 100,
     'limma_voom'=voom_fit$p.value[,3],
     # 'roast_tcg'=roast_tcg$p.value["Mixed", "P.Value"],
     # 'roast_voom'=roast_voom$p.value["Mixed", "P.Value"],
-    'edger'=edger_res$table[,'PValue']
-    # 'deseq'=deseq
+    'edger'=edger_res$table[,'PValue'],
+    'deseq'=deseq
   )
   pvals
 }
@@ -270,19 +270,19 @@ deseq_fn <- function(y, x, tt, indiv, ind) {
   # browser()
   y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = t(y),
                                           colData = cbind.data.frame("indiv"=as.factor(indiv),
-                                                                     "time"=as.numeric(tt),
+                                                                     "grp"=tt,
                                                                      "x"=as.numeric(x[,2])),
-                                          design = ~ x + time)
-  # res_dsq <- DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean')
-#   pvals <- DESeq2::results(res_dsq)$pvalue
-  library(DESeq2)
-  y_dsq <- DESeq2::estimateSizeFactors(y_dsq)
-  y_dsq <- DESeq2::estimateDispersionsGeneEst(y_dsq)
-  dispersions(y_dsq) <- mcols(y_dsq)$dispGeneEst
-  # res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x))
-  res_dsq <- DESeq2::nbinomLRT(y_dsq, reduced = ~ x)
-  # if (class(res_dsq) == 'try-error') res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean'))
+                                          design = ~ x + grp)
+  res_dsq <- DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x)
   pvals <- DESeq2::results(res_dsq)$pvalue
+  # library(DESeq2)
+  # y_dsq <- DESeq2::estimateSizeFactors(y_dsq)
+  # y_dsq <- DESeq2::estimateDispersionsGeneEst(y_dsq)
+  # dispersions(y_dsq) <- mcols(y_dsq)$dispGeneEst
+  # # res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x))
+  # res_dsq <- DESeq2::nbinomLRT(y_dsq, reduced = ~ x)
+  # # if (class(res_dsq) == 'try-error') res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean'))
+  # pvals <- DESeq2::results(res_dsq)$pvalue
 #   if (length(ind) > 1) {
 #     pmin <- min(pvals[ind], na.rm = TRUE)
 #     Rij <- cor(y[,ind])
