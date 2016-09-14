@@ -9,12 +9,12 @@
 #'@param x a matrix of size \code{n x p} containing the model covariates from
 #'\code{n} samples (design matrix).
 #'
-#'@param preprocessed a logical flag indicating wether the expression data have
+#'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 #'which case \code{y} is assumed to contain raw counts and is normalized into
 #'log(counts) per million.
 #'
-#'@param doPlot a logical flag indicating wether the mean-variance plot should be drawn.
+#'@param doPlot a logical flag indicating whether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
 #'
 #'@param lowess_span smoother span for the lowess function, between 0 and 1. This gives

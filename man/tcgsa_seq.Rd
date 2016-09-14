@@ -6,7 +6,7 @@
 \usage{
 tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom"), n_perm = 1000,
+  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
   preprocessed = FALSE, doPlot = TRUE, bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
@@ -40,18 +40,18 @@ Default is \code{"permutation"}.}
 
 \item{which_weights}{a character string indicating which method to use to estimate
 the mean-variance relationship wheights. Possibilities are \code{"loclin"},
-\code{"voom"} or \code{NULL} (in which case no weighting is performed).
+\code{"voom"} or \code{"none"} (in which case no weighting is performed).
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
 \item{n_perm}{the number of perturbations}
 
-\item{preprocessed}{a logical flag indicating wether the expression data have
+\item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
 
-\item{doPlot}{a logical flag indicating wether the mean-variance plot should be drawn.
+\item{doPlot}{a logical flag indicating whether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
 \item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
@@ -64,7 +64,7 @@ Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"}
 \code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 corresponds to the loess method).}
 
-\item{exact}{a logical flag indicating wether the non-parametric weights accounting
+\item{exact}{a logical flag indicating whether the non-parametric weights accounting
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
 variance. Default is \code{FALSE}, which uses interporlation (faster computation).}

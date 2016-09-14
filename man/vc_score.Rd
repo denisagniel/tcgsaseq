@@ -29,8 +29,8 @@ of the \code{K} random effects on \code{phi}}
 \value{
 A list with the following elements:\itemize{
   \item \code{score}: approximation of the observed score
-  \item \code{q}: TODO
-  \item \code{q_ext}: TODO
+  \item \code{q}: observation-level contributions to the score
+  \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
 }
 }
 \description{

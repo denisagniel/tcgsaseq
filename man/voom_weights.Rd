@@ -14,12 +14,12 @@ preprocessed expressions from \code{n} samples for \code{G} genes.}
 \item{x}{a matrix of size \code{n x p} containing the model covariates from
 \code{n} samples (design matrix).}
 
-\item{preprocessed}{a logical flag indicating wether the expression data have
+\item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
 
-\item{doPlot}{a logical flag indicating wether the mean-variance plot should be drawn.
+\item{doPlot}{a logical flag indicating whether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
 \item{lowess_span}{smoother span for the lowess function, between 0 and 1. This gives
