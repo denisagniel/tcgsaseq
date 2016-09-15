@@ -159,8 +159,6 @@ tcgsa_seq <- function(y, x, phi, genesets,
   if(is.null(genesets)){
     genewise_flag <- TRUE
     cat("'genesets' argument not provided => only genewise p-values are computed")
-  }else if(is.vector(genesets)){
-    genewise_flag <- FALSE
   }else if(is.list(genesets)){
     genewise_flag <- FALSE
     if(class(genesets[[1]])=="character"){
@@ -190,8 +188,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
     else if(which_test == "permutation"){
       if(genewise_flag){
         rawPvals <- vc_test_perm(y = y_lcpm[g, ], x = x, indiv = indiv, phi = phi,
-                       w = w[g, ], Sigma_xi = Sigma_xi,
-                       n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
+                                 w = w[g, ], Sigma_xi = Sigma_xi,
+                                 n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
       }else{
         rawPvals <- sapply(genesets, FUN = function(gs){
           vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
@@ -207,6 +205,10 @@ tcgsa_seq <- function(y, x, phi, genesets,
     }
 
   }else{
+    if(!is.vector(genesets)){
+      error("'genesets' argument is not valid")
+    }
+    genewise_flag <- FALSE
 
     if(class(genesets)=="character"){
       gene_names_measured <- rownames(y_lcpm)
@@ -218,9 +220,11 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
     res_test <- switch(which_test,
                        asymptotic = vc_test_asym(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
-                                                 w = w[genesets, ], Sigma_xi = Sigma_xi),
+                                                 w = w[genesets, ], Sigma_xi = Sigma_xi,
+                                                 genewise_pvals = genewise_flag, homogen_traj = homogen_traj),
                        permutation = vc_test_perm(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
-                                                  w = w[genesets, ], Sigma_xi = Sigma_xi, n_perm = n_perm)
+                                                  w = w[genesets, ], Sigma_xi = Sigma_xi, n_perm = n_perm,
+                                                  genewise_pvals = genewise_flag, homogen_traj = homogen_traj)
     )
     pvals <- data.frame("rawPval" = res_test$pval, "adjPval" = NA)
     padjust_methods <- NA
