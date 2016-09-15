@@ -30,6 +30,9 @@ of the \code{K} random effects corresponding to \code{phi}.}
 
 \item{genewise_pvals}{a logical flag indicating whether genewise pvalues should be returned. Default
 is \code{FALSE} in which case geneset p-value is computed and returned instead.}
+
+\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
+Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 }
 \value{
 A list with the following elements when the set p-value is computed :\itemize{

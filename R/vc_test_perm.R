@@ -29,6 +29,9 @@
 #'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
 #'is \code{FALSE} in which case geneset p-value is computed and returned instead.
 #'
+#'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
+#'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
+#'
 #'@return A list with the following elements when the set p-value is computed:\itemize{
 #'   \item \code{score_obs}: approximation of the observed score
 #'   \item \code{pval}: the associated p-value
@@ -72,7 +75,8 @@
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 #'x <- matrix(1, ncol=1, nrow=r)
 #'permTestRes_genewise <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), n_perm=100, genewise_pvals=TRUE)
+#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3),
+#'                            n_perm=100, genewise_pvals=TRUE)
 #'quantile(permTestRes_genewise$gene_pvals)
 #'
 #'@importFrom CompQuadForm davies

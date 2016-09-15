@@ -27,6 +27,9 @@
 #'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
 #'is \code{FALSE} in which case geneset p-value is computed and returned instead.
 #'
+#'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
+#'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
+#'
 #'@return A list with the following elements when the set p-value is computed :\itemize{
 #'   \item \code{score_obs}: the approximation of the observed score
 #'   \item \code{pval}: the associated p-value
@@ -37,7 +40,7 @@
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
-#'@importFrom stats cov
+#'@importFrom stats cov pchisq
 #'@examples
 #'#rm(list=ls())
 #'set.seed(123)
@@ -90,9 +93,9 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
 
 
   if (genewise_pvals) {
-     pv <- pchisq(score_list$gene_scores/diag(Sig_q), df = 1, lower.tail = FALSE)
+     pv <- stats::pchisq(score_list$gene_scores/diag(Sig_q), df = 1, lower.tail = FALSE)
      names(pv) <- rownames(y)
-     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)
+     ans <- list("gene_scores_obs" = score_list$gene_scores, "gene_pvals" = pv)
   } else {
     if(nrow(score_list$q)<2){
       warning("Only 1 individual: asymptotics likely not reached - you should probably run permutation test")

@@ -174,8 +174,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
     if(which_test == "asymptotic"){
       if(genewise_flag){
-        rawPvals <- vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                                 w = w[gs, ], Sigma_xi = Sigma_xi,
+        rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
+                                 w = w, Sigma_xi = Sigma_xi,
                                  genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
       }else{
         rawPvals <- sapply(genesets, FUN = function(gs){
@@ -187,8 +187,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
     }
     else if(which_test == "permutation"){
       if(genewise_flag){
-        rawPvals <- vc_test_perm(y = y_lcpm[g, ], x = x, indiv = indiv, phi = phi,
-                                 w = w[g, ], Sigma_xi = Sigma_xi,
+        rawPvals <- vc_test_perm(y = y_lcpm, x = x, indiv = indiv, phi = phi,
+                                 w = w, Sigma_xi = Sigma_xi,
                                  n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
       }else{
         rawPvals <- sapply(genesets, FUN = function(gs){
@@ -206,7 +206,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
   }else{
     if(!is.vector(genesets)){
-      error("'genesets' argument is not valid")
+      stop("'genesets' argument is not valid")
     }
     genewise_flag <- FALSE
 
