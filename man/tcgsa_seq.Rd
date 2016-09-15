@@ -25,7 +25,7 @@ to be tested}
 
 \item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
 constitute the invesigated geneset. Can also be a \code{\link[GSA:GSA.read.gmt]{gmt}} \code{list}
-when several genesets are tested at once.}
+when several genesets are tested at once. If \code{NULL}, then genewise p-values are returned.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced

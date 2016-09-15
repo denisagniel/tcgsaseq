@@ -46,7 +46,7 @@
 #'#under the null:
 #'b1 <- 0
 #'#under the alternative:
-#'b1 <- 0.7
+#'#b1 <- 0.7
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -57,35 +57,46 @@
 #'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
 #'asymTestRes$pval
 #'
+#'b1 <- 0
+#'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+#'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+#'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
+#'x <- matrix(1, ncol=1, nrow=r)
+#'asymTestRes_genewise <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), genewise_pval=TRUE)
+#'quantile(asymTestRes_genewise$gene_pvals)
+#'
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi))){
+vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)), genewise_pval=FALSE){
 
   score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
                          Sigma_xi = Sigma_xi)
-
-  
   Sig_q <- stats::cov(score_list$q_ext)
-  
-  if (length(score_list$score) == 1) {
-    pv <- pchisq(score_list$score/Sig_q, df = 1, lower.tail = FALSE)
-    return(list("score_obs" = score_list$score, "pval" = pv))
+
+
+  if (genewise_pval) {
+     gene_scores_obs <- colSums(score_list$q)^2/nrow(score_list$q)
+     names(gene_scores_obs) <- rownames(y)
+     pv <- pchisq(gene_scores_obs/diag(Sig_q), df = 1, lower.tail = FALSE)
+     names(pv) <- rownames(y)
+     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)
+  } else {
+    if(nrow(score_list$q_ext)<2){
+      warning("Only 1 individual: asymptotics likely not reached - you should probably run permutation test")
+      Sig_q <- matrix(1, ncol(Sig_q), nrow(Sig_q))
+    }
+
+    lam <- svd(Sig_q)$d
+    dv <- CompQuadForm::davies(score_list$score, lam)
+
+    if(dv$ifault == 1){#error
+      stop("fault in the computation from CompQuadForm::davies", dv$trace)
+    }
+    ans <- list("score_obs" = score_list$score, "pval" = dv$Qq)
   }
 
-  if(nrow(score_list$q_ext)<2){
-    warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")
-    Sig_q <- matrix(1, ncol(Sig_q), nrow(Sig_q))
-  }
-
-  lam <- svd(Sig_q)$d
-  dv <- CompQuadForm::davies(score_list$score, lam)
-
-  if(dv$ifault == 1){#error
-    stop("fault in the computation from CompQuadForm::davies", dv$trace)
-  }
-
-  return(list("score_obs" = score_list$score, "pval" = dv$Qq)
-  )
+  return(ans)
 }
 

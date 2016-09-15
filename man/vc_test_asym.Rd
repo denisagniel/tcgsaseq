@@ -5,7 +5,7 @@
 \title{Computes variance component test statistic for longitudinal}
 \usage{
 vc_test_asym(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)))
+  Sigma_xi = diag(ncol(phi)), genewise_pval = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
@@ -53,7 +53,7 @@ b0 <- 1
 #under the null:
 b1 <- 0
 #under the alternative:
-b1 <- 0.7
+#b1 <- 0.7
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -63,6 +63,15 @@ x <- matrix(1, ncol=1, nrow=r)
 asymTestRes <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
 asymTestRes$pval
+
+b1 <- 0
+y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+      matrix(rep(y.tilde, n), ncol=n, nrow=r))
+x <- matrix(1, ncol=1, nrow=r)
+asymTestRes_genewise <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+                           Sigma_xi=matrix(1), indiv=rep(1:4, each=3), genewise_pval=TRUE)
+quantile(asymTestRes_genewise$gene_pvals)
 
 }
 \seealso{

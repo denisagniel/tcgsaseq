@@ -1,6 +1,6 @@
-#' Time-course Gene Set Analyis
+#'Time-course Gene Set Analyis
 #'
-#' Wrapper function for performing gene set analysis of longitudinal RNA-seq data
+#'Wrapper function for performing gene set analysis of longitudinal RNA-seq data
 #'
 #'@param y a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
 #'preprocessed expressions from \code{n} samples for \code{G} genes.
@@ -13,7 +13,7 @@
 #'
 #'@param genesets either a vector of index or subscripts that defines which columns of \code{y}
 #'constitute the invesigated geneset. Can also be a \code{\link[GSA:GSA.read.gmt]{gmt}} \code{list}
-#'when several genesets are tested at once.
+#'when several genesets are tested at once. If \code{NULL}, then genewise p-values are returned.
 #'
 #'@param indiv a vector of length \code{n} containing the information for
 #'attributing each sample to one of the studied individuals. Coerced
@@ -152,8 +152,13 @@ tcgsa_seq <- function(y, x, phi, genesets,
     n_perm <- NA
   }
 
-  if(is.list(genesets)){
-
+  if(is.null(genesets)){
+    genewise_flag <- TRUE
+    cat("'genesets' argument not provided => only genewise p-values are computed")
+  }else if(is.vector(genesets)){
+    genewise_flag <- FALSE
+  }else if(is.list(genesets)){
+    genewise_flag <- FALSE
     if(class(genesets[[1]])=="character"){
       gene_names_measured <- rownames(y_lcpm)
       prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
@@ -161,20 +166,33 @@ tcgsa_seq <- function(y, x, phi, genesets,
         warning("Some genes in the investigated genesets were not measured:\nremoving those genes from the geneset definition...")
         genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
       }
+    }else{
+      stop("'genesets' argument provided but is not a list")
     }
 
     if(which_test == "asymptotic"){
-      rawPvals <- sapply(genesets, FUN = function(gs){
-        vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                     w = w[gs, ], Sigma_xi = Sigma_xi)$pval}
-      )
+      if(genewise_flag){
+        rawPvals <- vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                                 w = w[gs, ], Sigma_xi = Sigma_xi, genewise_pval = genewise_flag)$gene_pvals
+      }else{
+        rawPvals <- sapply(genesets, FUN = function(gs){
+          vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, ], Sigma_xi = Sigma_xi, genewise_pval = genewise_flag)$pval}
+        )
+      }
     }
     else if(which_test == "permutation"){
-      rawPvals <- sapply(genesets, FUN = function(gs){
-        vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                     w = w[gs, ], Sigma_xi = Sigma_xi, n_perm=n_perm)$pval
-        }
-      )
+      if(genewise_flag){
+        rawPvals <- rawPvals <- sapply(1:nrow(y_lcpm), FUN = function(g){
+          vc_test_perm(y = y_lcpm[g, ], x = x, indiv = indiv, phi = phi,
+                       w = w[g, ], Sigma_xi = Sigma_xi, n_perm=n_perm)$pval}
+        )
+      }else{
+        rawPvals <- sapply(genesets, FUN = function(gs){
+          vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, ], Sigma_xi = Sigma_xi, n_perm=n_perm)$pval}
+        )
+      }
     }
 
     pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
@@ -202,8 +220,6 @@ tcgsa_seq <- function(y, x, phi, genesets,
     padjust_methods <- NA
 
   }
-
-  #print(pvals)
 
   return(list("which_test" = which_test, "preprocessed" = preprocessed, "n_perm" = n_perm,
               "genesets" = genesets, "pvals" = pvals))
