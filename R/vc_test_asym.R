@@ -24,9 +24,16 @@
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
 #'of the \code{K} random effects corresponding to \code{phi}.
 #'
-#'@return A list with the following elements:\itemize{
-#'   \item \code{score_obs}: approximation of the observed score
-#'   \item \code{pval}: associated p-value
+#'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
+#'is \code{FALSE} in which case geneset p-value is computed and returned instead.
+#'
+#'@return A list with the following elements when the set p-value is computed :\itemize{
+#'   \item \code{score_obs}: the approximation of the observed score
+#'   \item \code{pval}: the associated p-value
+#' }
+#' or a list with the following elements when genewise pvalues are computed:\itemize{
+#'   \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
+#'   \item \code{gene_pvals}: vector of associated genewise p-values
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -63,27 +70,31 @@
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 #'x <- matrix(1, ncol=1, nrow=r)
 #'asymTestRes_genewise <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), genewise_pval=TRUE)
+#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), genewise_pvals=TRUE)
 #'quantile(asymTestRes_genewise$gene_pvals)
 #'
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)), genewise_pval=FALSE){
+vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
+                         genewise_pvals=FALSE, homogen_traj=FALSE){
 
-  score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
-                         Sigma_xi = Sigma_xi)
+  if(homogen_traj){
+    score_list <- vc_score_h(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
+                           Sigma_xi = Sigma_xi)
+  }else{
+    score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
+                           Sigma_xi = Sigma_xi)
+  }
   Sig_q <- stats::cov(score_list$q_ext)
 
 
-  if (genewise_pval) {
-     gene_scores_obs <- colSums(score_list$q)^2/nrow(score_list$q)
-     names(gene_scores_obs) <- rownames(y)
-     pv <- pchisq(gene_scores_obs/diag(Sig_q), df = 1, lower.tail = FALSE)
+  if (genewise_pvals) {
+     pv <- pchisq(score_list$gene_scores/diag(Sig_q), df = 1, lower.tail = FALSE)
      names(pv) <- rownames(y)
      ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)
   } else {
-    if(nrow(score_list$q_ext)<2){
+    if(nrow(score_list$q)<2){
       warning("Only 1 individual: asymptotics likely not reached - you should probably run permutation test")
       Sig_q <- matrix(1, ncol(Sig_q), nrow(Sig_q))
     }

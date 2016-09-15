@@ -67,6 +67,9 @@
 #'Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
 #'Default is \code{0.5}.
 #'
+#'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
+#'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
+#'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{which_test}:
 #'   \item \code{preprocessed}:
@@ -95,7 +98,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                       exact = FALSE,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
-                      lowess_span = 0.5){
+                      lowess_span = 0.5,
+                      homogen_traj = FALSE){
 
 
 
@@ -173,24 +177,26 @@ tcgsa_seq <- function(y, x, phi, genesets,
     if(which_test == "asymptotic"){
       if(genewise_flag){
         rawPvals <- vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                                 w = w[gs, ], Sigma_xi = Sigma_xi, genewise_pval = genewise_flag)$gene_pvals
+                                 w = w[gs, ], Sigma_xi = Sigma_xi,
+                                 genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
       }else{
         rawPvals <- sapply(genesets, FUN = function(gs){
           vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi, genewise_pval = genewise_flag)$pval}
+                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$pval}
         )
       }
     }
     else if(which_test == "permutation"){
       if(genewise_flag){
-        rawPvals <- rawPvals <- sapply(1:nrow(y_lcpm), FUN = function(g){
-          vc_test_perm(y = y_lcpm[g, ], x = x, indiv = indiv, phi = phi,
-                       w = w[g, ], Sigma_xi = Sigma_xi, n_perm=n_perm)$pval}
-        )
+        rawPvals <- vc_test_perm(y = y_lcpm[g, ], x = x, indiv = indiv, phi = phi,
+                       w = w[g, ], Sigma_xi = Sigma_xi,
+                       n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
       }else{
         rawPvals <- sapply(genesets, FUN = function(gs){
           vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi, n_perm=n_perm)$pval}
+                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$pval}
         )
       }
     }

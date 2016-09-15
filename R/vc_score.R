@@ -25,9 +25,10 @@
 #'of the \code{K} random effects on \code{phi}
 #'
 #'@return A list with the following elements:\itemize{
-#'   \item \code{score}: approximation of the observed score
+#'   \item \code{score}: approximation of the set observed score
 #'   \item \code{q}: observation-level contributions to the score
 #'   \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
+#'   \item \code{gene_scores}: approximation of the individual gene scores
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -166,8 +167,9 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
-  QQ <- sum(colSums(q)^2/nrow(q))
+  qq <- colSums(q)^2/nb_indiv # genewise scores
+  QQ <- sum(qq) #nb_indiv=nrow(q) # set score
 
-  return(list("score"=QQ, "q" = q, "q_ext"=q_ext))
+  return(list("score"=QQ, "q" = q, "q_ext"=q_ext, "gene_scores"=qq))
 }
 

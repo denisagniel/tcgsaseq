@@ -28,8 +28,10 @@ of the \code{K} random effects corresponding to \code{phi}.}
 }
 \value{
 A list with the following elements:\itemize{
-  \item \code{score_obs}: approximation of the observed score
-  \item \code{pval}: associated p-value
+  \item \code{score}: approximation of the set observed score
+  \item \code{q}: observation-level contributions to the score
+  \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
+  \item \code{gene_scores}: approximation of the individual gene scores
 }
 }
 \description{

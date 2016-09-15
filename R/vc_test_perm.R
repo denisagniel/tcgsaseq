@@ -26,22 +26,28 @@
 #'
 #'@param n_perm the number of perturbations
 #'
-#'@return A list with the following elements:\itemize{
-#'   \item \code{scores_perm}: a vector of length \code{nperm} containing the
-#'   aproximated score test statistics observed for each permutation
+#'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
+#'is \code{FALSE} in which case geneset p-value is computed and returned instead.
+#'
+#'@return A list with the following elements when the set p-value is computed:\itemize{
 #'   \item \code{score_obs}: approximation of the observed score
-#'   \item \code{pval}: associated p-value
+#'   \item \code{pval}: the associated p-value
 #' }
+#' or a list with the following elements when genewise pvalues are computed:\itemize{
+#'   \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
+#'   \item \code{gene_pvals}: vector of associated genewise p-values
+#' }
+#'
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
 #'
 #'@examples
 #'#rm(list=ls())
-#'set.seed(123)
+#'set.seed(321)
 #'
 #'##generate some fake data
 #'########################
-#'n <- 100
+#'n <- 100 #1000
 #'r <- 12
 #'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
 #'sigma <- 0.4
@@ -60,22 +66,36 @@
 #'permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
 #'                            indiv=rep(1:4, each=3), n_perm=100)
 #'permTestRes$pval
+#'b1 <- 0
+#'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+#'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+#'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
+#'x <- matrix(1, ncol=1, nrow=r)
+#'permTestRes_genewise <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), n_perm=100, genewise_pvals=TRUE)
+#'quantile(permTestRes_genewise$gene_pvals)
 #'
 #'@importFrom CompQuadForm davies
 #'
 #'@export
 vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         n_perm=1000){
+                         n_perm=1000, genewise_pvals=FALSE, homogen_traj=FALSE){
 
-  score_obs <- vc_score(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi)$score
   n_samples <- ncol(y)
 
-  scores_perm <- numeric(n_perm)
   indiv_fact <- factor(indiv)
 
-  if(is.null(colnames(y))){
-    colnames(y) <- 1:ncol(y)
+    if(is.null(colnames(y))){
+    colnames(y) <- 1:n_samples
   }
+
+  if(homogen_traj){
+    vc_score_2use <- vc_score_h
+  }else{
+    vc_score_2use <- vc_score
+  }
+
+  score_list <- vc_score_2use(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi)
 
   strat_sampling <- function(fact){
     res <- numeric(length(fact))
@@ -86,14 +106,29 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     return(res)
   }
 
-  for(b in 1:n_perm){
-    ## permute samples within indiv
-    perm_index <- strat_sampling(indiv_fact)
-    scores_perm[b] <- vc_score(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
+  if(genewise_pvals){
+    scores_perm <- matrix(nrow=nrow(y), ncol=n_perm)
+    for(b in 1:n_perm){
+      ## permute samples within indiv
+      perm_index <- strat_sampling(indiv_fact)
+      scores_perm[, b] <- vc_score_2use(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE],
+                                   indiv_fact, phi, w, Sigma_xi = Sigma_xi)$gene_scores
+    }
+    pvals <- 1 - rowSums(apply(scores_perm, 2, function(x){x < score_list$gene_scores}))/n_perm
+    names(pvals) <- rownames(y)
+    ans <- list("gene_scores_obs" = score_list$gene_scores, "gene_pvals" = pvals)
+  }else{
+    scores_perm <- numeric(n_perm)
+    for(b in 1:n_perm){
+      ## permute samples within indiv
+      perm_index <- strat_sampling(indiv_fact)
+      scores_perm[b] <- vc_score_2use(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE],
+                                 indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
+    }
+    pval <- 1-sum(scores_perm < score_list$score)/n_perm
+    ans <- list("score_obs" = score_list$score, "pval" = pval)
   }
 
-  pval <- 1-sum(scores_perm < score_obs)/n_perm
-
-  return(list("scores_perm" = scores_perm, "score_obs" = score_obs, "pval" = pval))
+  return(ans)
 
 }
