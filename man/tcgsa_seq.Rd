@@ -93,6 +93,31 @@ A list with the following elements:\itemize{
 \description{
 Wrapper function for performing gene set analysis of longitudinal RNA-seq data
 }
+\examples{
+#rm(list=ls())
+n <- 200
+r <- 12
+t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+sigma <- 0.4
+b0 <- 1
+
+#under the null:
+b1 <- 0
+
+y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+      matrix(rep(y.tilde, n), ncol=n, nrow=r))
+x <- matrix(1, ncol=1, nrow=r)
+
+#run test
+res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
+                        Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+                        which_weights="none", preprocessed=TRUE)
+res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
+                      Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+                      which_weights="none", preprocessed=TRUE)
+quantile(res_genes$pvals[, "rawPval"])
+}
 \references{
 Agniel D, Hejblum BP, Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{submitted}, 2016.

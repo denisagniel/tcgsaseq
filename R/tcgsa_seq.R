@@ -87,6 +87,31 @@
 #'Biology}, 15(2), R29.
 #'
 #'@importFrom stats p.adjust
+#'
+#'@examples
+#'#rm(list=ls())
+#'n <- 200
+#'r <- 12
+#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'sigma <- 0.4
+#'b0 <- 1
+#'
+#'#under the null:
+#'b1 <- 0
+#'
+#'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+#'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+#'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
+#'x <- matrix(1, ncol=1, nrow=r)
+#'
+#'#run test
+#'res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
+#'                         Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+#'                         which_weights="none", preprocessed=TRUE)
+#'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
+#'                       Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+#'                       which_weights="none", preprocessed=TRUE)
+#'quantile(res_genes$pvals[, "rawPval"])
 #'@export
 tcgsa_seq <- function(y, x, phi, genesets,
                       indiv = rep(1, nrow(x)), Sigma_xi = diag(ncol(phi)),
@@ -100,8 +125,6 @@ tcgsa_seq <- function(y, x, phi, genesets,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                       lowess_span = 0.5,
                       homogen_traj = FALSE){
-
-
 
 
   stopifnot(is.matrix(y))
@@ -157,46 +180,16 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
 
   if(is.null(genesets)){
-    genewise_flag <- TRUE
-    cat("'genesets' argument not provided => only genewise p-values are computed")
-  }else if(is.list(genesets)){
-    genewise_flag <- FALSE
-    if(class(genesets[[1]])=="character"){
-      gene_names_measured <- rownames(y_lcpm)
-      prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
-      if(sum(prop_meas)!=length(prop_meas)){
-        warning("Some genes in the investigated genesets were not measured:\nremoving those genes from the geneset definition...")
-        genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
-      }
-    }else{
-      stop("'genesets' argument provided but is not a list")
-    }
+    cat("'genesets' argument not provided => only genewise p-values are computed\n")
 
     if(which_test == "asymptotic"){
-      if(genewise_flag){
-        rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
-                                 w = w, Sigma_xi = Sigma_xi,
-                                 genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
-      }else{
-        rawPvals <- sapply(genesets, FUN = function(gs){
-          vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi,
-                       genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$pval}
-        )
-      }
-    }
-    else if(which_test == "permutation"){
-      if(genewise_flag){
-        rawPvals <- vc_test_perm(y = y_lcpm, x = x, indiv = indiv, phi = phi,
-                                 w = w, Sigma_xi = Sigma_xi,
-                                 n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$gene_pvals
-      }else{
-        rawPvals <- sapply(genesets, FUN = function(gs){
-          vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi,
-                       n_perm=n_perm, genewise_pvals = genewise_flag, homogen_traj = homogen_traj)$pval}
-        )
-      }
+      rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
+                               w = w, Sigma_xi = Sigma_xi,
+                               genewise_pvals = TRUE, homogen_traj = homogen_traj)$gene_pvals
+    }else if(which_test == "permutation"){
+      rawPvals <- vc_test_perm(y = y_lcpm, x = x, indiv = indiv, phi = phi,
+                               w = w, Sigma_xi = Sigma_xi,
+                               n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj)$gene_pvals
     }
 
     pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
@@ -204,11 +197,43 @@ tcgsa_seq <- function(y, x, phi, genesets,
       rownames(pvals) <- names(genesets)
     }
 
-  }else{
-    if(!is.vector(genesets)){
-      stop("'genesets' argument is not valid")
+  }else if(is.list(genesets)){
+    if(class(genesets[[1]])=="character"){
+      gene_names_measured <- rownames(y_lcpm)
+      prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
+      if(sum(prop_meas)!=length(prop_meas)){
+        warning("Some genes in the investigated genesets were not measured:\nremoving those genes from the geneset definition...")
+        genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
+      }
+    }else if(!is.vector(genesets)){
+      stop("'genesets' argument provided but is neither a list nor an atomic vector")
     }
-    genewise_flag <- FALSE
+
+    if(which_test == "asymptotic"){
+
+        rawPvals <- sapply(genesets, FUN = function(gs){
+          vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       genewise_pvals = FALSE, homogen_traj = homogen_traj)$pval}
+        )
+    } else if(which_test == "permutation"){
+        rawPvals <- sapply(genesets, FUN = function(gs){
+          vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$pval}
+        )
+      }
+
+    pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
+    if(!is.null(names(genesets))){
+      rownames(pvals) <- names(genesets)
+    }
+
+  }else{
+
+    if(!is.vector(genesets)){
+      stop("'genesets' argument provided but is neither a list nor a vector")
+    }
 
     if(class(genesets)=="character"){
       gene_names_measured <- rownames(y_lcpm)
@@ -221,10 +246,10 @@ tcgsa_seq <- function(y, x, phi, genesets,
     res_test <- switch(which_test,
                        asymptotic = vc_test_asym(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
                                                  w = w[genesets, ], Sigma_xi = Sigma_xi,
-                                                 genewise_pvals = genewise_flag, homogen_traj = homogen_traj),
+                                                 genewise_pvals = FALSE, homogen_traj = homogen_traj),
                        permutation = vc_test_perm(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
                                                   w = w[genesets, ], Sigma_xi = Sigma_xi, n_perm = n_perm,
-                                                  genewise_pvals = genewise_flag, homogen_traj = homogen_traj)
+                                                  genewise_pvals = FALSE, homogen_traj = homogen_traj)
     )
     pvals <- data.frame("rawPval" = res_test$pval, "adjPval" = NA)
     padjust_methods <- NA
