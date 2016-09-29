@@ -139,10 +139,12 @@ tcgsa_seq <- function(y, x, phi, genesets,
   rm(y)
 
   if(is.data.frame(x)){
-    phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
+    warning("design matrix 'x' is a data.frame instead of a matrix:\n all variables (including factors) are converted to numeric...")
+    x <- as.matrix(as.data.frame(lapply(x, as.numeric)))
   }
 
   if(is.data.frame(phi)){
+    warning("design matrix 'phi' is a data.frame instead of a matrix:\n all variables (including factors) are converted to numeric... ")
     phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
   }
 
@@ -170,7 +172,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    bw = bw, kernel = kernel,
                                    exact = exact),
-               voom = voom_weights(y = y_lcpm, x = x, preprocessed = preprocessed, doPlot = doPlot,
+               voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
+                                   preprocessed = preprocessed, doPlot = doPlot,
                                    lowess_span = lowess_span),
                none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
