@@ -26,11 +26,19 @@
 #'
 #'@param n_perm the number of perturbations
 #'
-#'@return A list with the following elements:\itemize{
-#'   \item \code{scores_perm}: a vector of length \code{nperm} containing the
-#'   aproximated score test statistics observed for each permutation
-#'   \item \code{score_obs}: approximation of the observed score
-#'   \item \code{pval}: associated p-value
+#'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
+#'is \code{FALSE} in which case geneset p-value is computed and returned instead.
+#'
+#'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
+#'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
+#'
+#'@return A list with the following elements when the set p-value is computed :\itemize{
+#'   \item \code{set_score_obs}: the approximation of the observed set score
+#'   \item \code{set_pval}: the associated set p-value
+#' }
+#' or a list with the following elements when genewise pvalues are computed:\itemize{
+#'   \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
+#'   \item \code{gene_pvals}: vector of associated genewise p-values
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -50,7 +58,7 @@
 #'#under the null:
 #'b1 <- 0
 #'#under the alternative:
-#'b1 <- 0.7
+#'b1 <- 0.5
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -58,28 +66,27 @@
 #'
 #'#run test
 #'permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            indiv=rep(1:4, each=3), n_perm=100)
-#'permTestRes$pval
+#'                            indiv=rep(1:4, each=3), n_perm=50) #1000)
+#'permTestRes$set_pval
 #'
 #'@importFrom CompQuadForm davies
 #'
 #'@export
 vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         n_perm=1000){
+                         n_perm=1000, genewise_pvals=FALSE, homogen_traj=FALSE){
 
-  test_obs <- vc_score(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi) 
-  score_obs <- test_obs$score
-  gene_score_obs <- test_obs$gene_scores
-  
   n_samples <- ncol(y)
+  if(is.null(colnames(y))){
+    colnames(y) <- 1:n_samples
+  }
   n_genes <- nrow(y)
 
-  scores_perm <- numeric(n_perm)
-  gene_scores_perm <- matrix(NA, n_perm, n_genes)
   indiv_fact <- factor(indiv)
 
-  if(is.null(colnames(y))){
-    colnames(y) <- 1:ncol(y)
+  if(homogen_traj){
+    vc_score_2use <- vc_score_h
+  }else{
+    vc_score_2use <- vc_score
   }
 
   strat_sampling <- function(fact){
@@ -91,19 +98,31 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     return(res)
   }
 
-  for(b in 1:n_perm){
-    ## permute samples within indiv
-    perm_index <- strat_sampling(indiv_fact)
-    test_perm <- vc_score(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE], indiv_fact, phi, w, Sigma_xi = Sigma_xi)
-    scores_perm[b] <- test_perm$score
-    gene_scores_perm[b,] <- test_perm$gene_scores
-  }
+  score_list_obs <- vc_score_2use(y = y, x = x, indiv = indiv, phi = phi, w = w, Sigma_xi = Sigma_xi)
 
-  pval <- 1-sum(scores_perm < score_obs)/n_perm
-  gene_pval <- 1-colSums(gene_scores_perm < gene_score_obs)/n_perm
-  return(list("scores_perm" = scores_perm, "score_obs" = score_obs, "pval" = pval,
-              "gene_scores_perm" = gene_scores_perm, 
-              "gene_score_obs" = gene_score_obs,
-              "gene_pval" = gene_pval))
+  if(genewise_pvals){
+    gene_scores_obs <- gene_score(score_list_obs$qq, score_list_obs$q_ext)
+    gene_scores_perm <- matrix(NA, nrow=n_genes, ncol=n_perm)
+    for(b in 1:n_perm){
+      ## permute samples within indiv
+      perm_index <- strat_sampling(indiv_fact)
+      temp_list <- vc_score_2use(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE],
+                                 indiv_fact, phi, w, Sigma_xi = Sigma_xi)
+      gene_scores_perm[, b] <- gene_score(temp_list$qq, temp_list$q_ext)
+    }
+    pvals <- 1 - rowSums(apply(gene_scores_perm, 2, function(x){x < gene_scores_obs}))/n_perm
+    names(pvals) <- rownames(y)
+    ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals)
+  }else{
+    scores_perm <- numeric(n_perm)
+    for(b in 1:n_perm){
+      ## permute samples within indiv
+      perm_index <- strat_sampling(indiv_fact)
+      scores_perm[b] <- vc_score_2use(y[, perm_index, drop=FALSE], x[perm_index, , drop=FALSE],
+                                      indiv_fact, phi, w, Sigma_xi = Sigma_xi)$score
+    }
+    pval <- 1-sum(scores_perm < score_list_obs$score)/n_perm
+    ans <- list("set_score_obs" = score_list_obs$score, "set_pval" = pval)
+  }
 
 }

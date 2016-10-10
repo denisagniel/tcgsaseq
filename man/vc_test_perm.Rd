@@ -5,7 +5,8 @@
 \title{Permutation-based variance component test statistic for longitudinal RNA-seq data}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = 1000)
+  Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
+  homogen_traj = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
@@ -28,13 +29,21 @@ samples.}
 of the \code{K} random effects.}
 
 \item{n_perm}{the number of perturbations}
+
+\item{genewise_pvals}{a logical flag indicating whether genewise pvalues should be returned. Default
+is \code{FALSE} in which case geneset p-value is computed and returned instead.}
+
+\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
+Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 }
 \value{
-A list with the following elements:\itemize{
-  \item \code{scores_perm}: a vector of length \code{nperm} containing the
-  aproximated score test statistics observed for each permutation
-  \item \code{score_obs}: approximation of the observed score
-  \item \code{pval}: associated p-value
+A list with the following elements when the set p-value is computed :\itemize{
+  \item \code{set_score_obs}: the approximation of the observed set score
+  \item \code{set_pval}: the associated set p-value
+}
+or a list with the following elements when genewise pvalues are computed:\itemize{
+  \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
+  \item \code{gene_pvals}: vector of associated genewise p-values
 }
 }
 \description{
@@ -57,7 +66,7 @@ b0 <- 1
 #under the null:
 b1 <- 0
 #under the alternative:
-b1 <- 0.7
+b1 <- 0.5
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -65,8 +74,8 @@ x <- matrix(1, ncol=1, nrow=r)
 
 #run test
 permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                           indiv=rep(1:4, each=3), n_perm=100)
-permTestRes$pval
+                           indiv=rep(1:4, each=3), n_perm=50) #1000)
+permTestRes$set_pval
 
 }
 \seealso{

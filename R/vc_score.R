@@ -25,9 +25,10 @@
 #'of the \code{K} random effects on \code{phi}
 #'
 #'@return A list with the following elements:\itemize{
-#'   \item \code{score}: approximation of the observed score
+#'   \item \code{score}: approximation of the set observed score
 #'   \item \code{q}: observation-level contributions to the score
 #'   \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
+#'   \item \code{gene_scores}: approximation of the individual gene scores
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -75,14 +76,13 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
 
   g <- nrow(y) # the number of genes measured
   n <- ncol(y) # the number of samples measured
-  qq <- ncol(x) # the number of covariates
+  p <- ncol(x) # the number of covariates
   n_t <- ncol(phi) # the number of time bases
   stopifnot(nrow(x) == n)
   stopifnot(nrow(w) == g)
   stopifnot(ncol(w) == n)
   stopifnot(nrow(phi) == n)
   stopifnot(length(indiv) == n)
-
 
 
   # the number of random effects
@@ -129,8 +129,8 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   #   ## test statistic computation ------
   #   #q <- matrix(NA, nrow=nb_indiv, ncol=K)
   #   q <- matrix(NA, nrow=nb_indiv, ncol=g*K)
-  #   XT_i <- array(NA, c(nb_indiv, g*qq, g*K))
-  #   U <- matrix(NA, nrow = nb_indiv, ncol = qq*g)
+  #   XT_i <- array(NA, c(nb_indiv, g*p, g*K))
+  #   U <- matrix(NA, nrow = nb_indiv, ncol = p*g)
   #
   #   long_indiv <- rep(indiv, each = g)
   #
@@ -166,16 +166,14 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
-  QQ <- sum(colSums(q)^2/nrow(q))
+  qq <- colSums(q)^2/nb_indiv # genewise scores ?
+  QQ <- sum(qq) #nb_indiv=nrow(q) # set score
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores" = gene_score(q, q_ext)))
+              "gene_scores_unscaled" = qq)) #gene_score(qq, q_ext)
 }
 
-gene_score <- function(q, q_ext) {
-  Sig_q <- stats::cov(q_ext)
-  
-  indiv_q <- colSums(q)/sqrt(nrow(q))
-  indiv_v <- diag(Sig_q)
-  indiv_chi <- indiv_q^2/indiv_v
+gene_score <- function(indiv_q_2, q_ext) {
+  indiv_v <- apply(X=q_ext, margin = 2, FUN=stats::var)
+  indiv_chi <- indiv_q_2/indiv_v
 }

@@ -40,25 +40,38 @@
 #'##generate some fake data
 #'########################
 #'n <- 100
-#'r <- 12
-#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'nindiv <- 100
+#'nt <- 30
+#'r <- nindiv*nt
+#'t <- matrix(rep(1:nt), nindiv, ncol=1, nrow=r)
 #'sigma <- 0.4
 #'b0 <- 1
 #'
 #'#under the null:
-#'b1 <- 0
+#'beta1 <- rep(rnorm(n=nindiv, 0, sd=0), each=nt)
 #'#under the alternative:
-#'b1 <- 0.7
-#'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+#'beta1 <- rep(rnorm(n=nindiv, 0, sd=0.1), each=nt)
+#'
+#'y.tilde <- b0 + beta1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 #'x <- matrix(1, ncol=1, nrow=r)
 #'
 #'#run test
-#'scoreTest <- vc_score_h(y, x, phi=t, indiv=rep(1:4, each=3),
-#'                        w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                        Sigma_xi=matrix(1))
-#'scoreTest
+#'score_homogen <- vc_score_h(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
+#'                            w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+#'                            Sigma_xi=matrix(1))
+#'score_heterogen <- vc_score(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
+#'                            w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+#'                            Sigma_xi=matrix(1))
+#'scoreTest_homogen <- vc_test_asym(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
+#'                                  w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=matrix(1),
+#'                                  homogen_traj = TRUE)
+#'scoreTest_homogen$set_pval
+#'scoreTest_heterogen <- vc_test_asym(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
+#'                                    w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=matrix(1),
+#'                                    homogen_traj = FALSE)
+#'scoreTest_heterogen$set_pval
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
 #'@importFrom CompQuadForm davies
@@ -79,14 +92,13 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
 
   g <- nrow(y) # the number of genes measured
   n <- ncol(y) # the number of samples measured
-  qq <- ncol(x) # the number of covariates
+  p <- ncol(x) # the number of covariates
   n_t <- ncol(phi) # the number of time bases
   stopifnot(nrow(x) == n)
   stopifnot(nrow(w) == g)
   stopifnot(ncol(w) == n)
   stopifnot(nrow(phi) == n)
   stopifnot(length(indiv) == n)
-
 
 
   # the number of random effects
@@ -108,14 +120,13 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
 
   x_tilde_list <- y_tilde_list <- Phi_list <- list()
   for (i in 1:nb_indiv) {
-    # browser()
     select <- indiv==levels(indiv)[i]
     n_i <- length(which(select))
     x_i <- x[select,]
     y_i <- y_T[select,]
     phi_i <- phi[select,]
-    Phi_list[[i]] <- matrix(rep(phi_i,g), ncol = n_t)
-    x_tilde_list[[i]] <- matrix(data=rep(x_i,each=g), ncol = qq)
+    Phi_list[[i]] <- matrix(rep(phi_i, g), ncol = n_t) #TODO
+    x_tilde_list[[i]] <- matrix(data=rep(x_i, each=g), ncol = p) #TODO
     y_tilde_list[[i]] <- matrix(y_i, ncol=1)
   }
   x_tilde <- do.call(rbind, x_tilde_list)
@@ -127,15 +138,12 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   y_mu <- y_tilde - mu_new
 
   xtx_inv <- solve(t(x_tilde) %*% x_tilde)
-  Sigma_xi_sqrt <- (Sigma_xi %^% (-0.5))
-
-  #browser()
+  Sigma_xi_sqrt <- (Sigma_xi %^% (-0.5)) #TODO
 
   ## test statistic computation ------
-  #q <- matrix(NA, nrow=nb_indiv, ncol=K)
   q <- matrix(NA, nrow=nb_indiv, ncol=K)
-  XT_i <- array(NA, c(nb_indiv, qq, K))
-  U <- matrix(NA, nrow = nb_indiv, ncol = qq)
+  XT_i <- array(NA, c(nb_indiv, p, K))
+  U <- matrix(NA, nrow = nb_indiv, ncol = p)
 
   long_indiv <- rep(indiv, each = g)
 
@@ -155,14 +163,9 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   }
   XT <- colMeans(XT_i)
   q_ext <- q - U %*% XT
-  qq <- colSums(q)^2/nrow(q)
+  qq <- colSums(q)^2/nb_indiv
   QQ <- sum(qq)
-  browser()
 
-  #Sig_q <- stats::cov(q_ext)
-  #lam <- svd(Sig_q)$d
-  #dv <- CompQuadForm::davies(QQ, lam)
-  #pval=dv$Qq
-
-  return(list("score"=QQ, "q" = q, "q_ext"=q_ext, "gene_scores"=qq))
+  return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
+              "gene_scores_unscaled"=qq))
 }
