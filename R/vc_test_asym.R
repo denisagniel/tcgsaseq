@@ -69,7 +69,7 @@
 #'asymTestRes$set_pval
 #'
 #'@importFrom CompQuadForm davies
-#'@importFrom stats pchisq
+#'@importFrom stats pchisq var
 #'
 #'@export
 vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
@@ -86,7 +86,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
 
 
   if (genewise_pvals) {
-    gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, var)
+    gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
     pv <- pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
     names(pv) <- rownames(y)
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)

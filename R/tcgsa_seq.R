@@ -181,7 +181,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    gene_based = gene_based,
                                    bw = bw, kernel = kernel,
-                                   exact = exact, transfotm = transform),
+                                   exact = exact, transform = transform),
                voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
                                    preprocessed = preprocessed, doPlot = doPlot,
                                    lowess_span = lowess_span),
@@ -227,13 +227,13 @@ tcgsa_seq <- function(y, x, phi, genesets,
         rawPvals <- sapply(genesets, FUN = function(gs){
           vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
                        w = w[gs, ], Sigma_xi = Sigma_xi,
-                       genewise_pvals = FALSE, homogen_traj = homogen_traj)$pval}
+                       genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
         )
     } else if(which_test == "permutation"){
         rawPvals <- sapply(genesets, FUN = function(gs){
           vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
                        w = w[gs, ], Sigma_xi = Sigma_xi,
-                       n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$pval}
+                       n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
         )
       }
 
@@ -264,7 +264,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
                                                   w = w[genesets, ], Sigma_xi = Sigma_xi, n_perm = n_perm,
                                                   genewise_pvals = FALSE, homogen_traj = homogen_traj)
     )
-    pvals <- data.frame("rawPval" = res_test$pval, "adjPval" = NA)
+    pvals <- data.frame("rawPval" = res_test$set_pval, "adjPval" = NA)
     padjust_methods <- NA
 
   }
