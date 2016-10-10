@@ -19,9 +19,6 @@
 #'
 #'@keywords internal
 #'@importFrom stats sd
-#@importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
-#@importFrom edgeR DGEList calcNormFactors estimateDispersionsGeneEst nbinomLRT results
-#@importFrom limma roast duplicateCorrelation
 #'@export
 
 

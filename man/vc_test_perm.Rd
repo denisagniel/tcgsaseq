@@ -5,8 +5,7 @@
 \title{Permutation-based variance component test statistic for longitudinal RNA-seq data}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
-  homogen_traj = FALSE)
+  Sigma_xi = diag(ncol(phi)), n_perm = 1000)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
@@ -29,21 +28,13 @@ samples.}
 of the \code{K} random effects.}
 
 \item{n_perm}{the number of perturbations}
-
-\item{genewise_pvals}{a logical flag indicating whether genewise pvalues should be returned. Default
-is \code{FALSE} in which case geneset p-value is computed and returned instead.}
-
-\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
-Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 }
 \value{
-A list with the following elements when the set p-value is computed:\itemize{
+A list with the following elements:\itemize{
+  \item \code{scores_perm}: a vector of length \code{nperm} containing the
+  aproximated score test statistics observed for each permutation
   \item \code{score_obs}: approximation of the observed score
-  \item \code{pval}: the associated p-value
-}
-or a list with the following elements when genewise pvalues are computed:\itemize{
-  \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
-  \item \code{gene_pvals}: vector of associated genewise p-values
+  \item \code{pval}: associated p-value
 }
 }
 \description{
@@ -53,11 +44,11 @@ asymptotic approximation for small sample sizes
 }
 \examples{
 #rm(list=ls())
-set.seed(321)
+set.seed(123)
 
 ##generate some fake data
 ########################
-n <- 100 #1000
+n <- 100
 r <- 12
 t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
 sigma <- 0.4
@@ -76,15 +67,6 @@ x <- matrix(1, ncol=1, nrow=r)
 permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                            indiv=rep(1:4, each=3), n_perm=100)
 permTestRes$pval
-b1 <- 0
-y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
-y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
-      matrix(rep(y.tilde, n), ncol=n, nrow=r))
-x <- matrix(1, ncol=1, nrow=r)
-permTestRes_genewise <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                           Sigma_xi=matrix(1), indiv=rep(1:4, each=3),
-                           n_perm=100, genewise_pvals=TRUE)
-quantile(permTestRes_genewise$gene_pvals)
 
 }
 \seealso{

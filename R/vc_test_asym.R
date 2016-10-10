@@ -58,6 +58,7 @@
 #'asymTestRes$pval
 #'
 #'@importFrom CompQuadForm davies
+#'@importFrom stats pchisq
 #'
 #'@export
 vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi))){
@@ -67,7 +68,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
 
   Sig_q <- cov(score_list$q_ext)
   indiv_chi <- score_list$gene_scores
-  indiv_pv <- pchisq(indiv_chi, df = 1, lower.tail = FALSE)
+  indiv_pv <- stats::pchisq(indiv_chi, df = 1, lower.tail = FALSE)
 
   if(nrow(score_list$q_ext)<2){
     warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")

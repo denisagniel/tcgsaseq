@@ -15,6 +15,8 @@
 #'
 #'@param ind
 #'
+#'@importFrom DESeq2 DESeqDataSetFromMatrix dispersions results estimateDispersionsGeneEst nbinomLRT
+#'
 #'@examples
 #'\dontrun{
 #'#rm(list=ls())
