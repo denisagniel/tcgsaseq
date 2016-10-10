@@ -6,12 +6,12 @@
 \usage{
 tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom"), n_perm = 1000,
+  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
   preprocessed = FALSE, doPlot = TRUE, bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
-  lowess_span = 0.5)
+  lowess_span = 0.5, homogen_traj = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -25,7 +25,7 @@ to be tested}
 
 \item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
 constitute the invesigated geneset. Can also be a \code{\link[GSA:GSA.read.gmt]{gmt}} \code{list}
-when several genesets are tested at once.}
+when several genesets are tested at once. If \code{NULL}, then genewise p-values are returned.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
@@ -40,18 +40,18 @@ Default is \code{"permutation"}.}
 
 \item{which_weights}{a character string indicating which method to use to estimate
 the mean-variance relationship wheights. Possibilities are \code{"loclin"},
-\code{"voom"} or \code{NULL} (in which case no weighting is performed).
+\code{"voom"} or \code{"none"} (in which case no weighting is performed).
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
 \item{n_perm}{the number of perturbations}
 
-\item{preprocessed}{a logical flag indicating wether the expression data have
+\item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
 
-\item{doPlot}{a logical flag indicating wether the mean-variance plot should be drawn.
+\item{doPlot}{a logical flag indicating whether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
 \item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
@@ -64,7 +64,7 @@ Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"}
 \code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 corresponds to the loess method).}
 
-\item{exact}{a logical flag indicating wether the non-parametric weights accounting
+\item{exact}{a logical flag indicating whether the non-parametric weights accounting
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
 variance. Default is \code{FALSE}, which uses interporlation (faster computation).}
@@ -78,6 +78,9 @@ Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 the proportion of points in the plot which influence the smooth at each value.
 Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
 Default is \code{0.5}.}
+
+\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
+Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 }
 \value{
 A list with the following elements:\itemize{
@@ -89,6 +92,31 @@ A list with the following elements:\itemize{
 }
 \description{
 Wrapper function for performing gene set analysis of longitudinal RNA-seq data
+}
+\examples{
+#rm(list=ls())
+n <- 200
+r <- 12
+t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+sigma <- 0.4
+b0 <- 1
+
+#under the null:
+b1 <- 0
+
+y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+      matrix(rep(y.tilde, n), ncol=n, nrow=r))
+x <- matrix(1, ncol=1, nrow=r)
+
+#run test
+res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
+                        Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+                        which_weights="none", preprocessed=TRUE)
+res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
+                      Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+                      which_weights="none", preprocessed=TRUE)
+quantile(res_genes$pvals[, "rawPval"])
 }
 \references{
 Agniel D, Hejblum BP, Variance component score test for

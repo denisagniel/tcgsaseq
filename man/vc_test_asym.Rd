@@ -5,7 +5,8 @@
 \title{Computes variance component test statistic for longitudinal}
 \usage{
 vc_test_asym(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)))
+  Sigma_xi = diag(ncol(phi)), genewise_pvals = FALSE,
+  homogen_traj = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
@@ -26,11 +27,21 @@ samples, corresponding to the inverse of the diagonal of the estimated covarianc
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects corresponding to \code{phi}.}
+
+\item{genewise_pvals}{a logical flag indicating whether genewise pvalues should be returned. Default
+is \code{FALSE} in which case geneset p-value is computed and returned instead.}
+
+\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
+Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 }
 \value{
-A list with the following elements:\itemize{
-  \item \code{score_obs}: approximation of the observed score
-  \item \code{pval}: associated p-value
+A list with the following elements when the set p-value is computed :\itemize{
+  \item \code{score_obs}: the approximation of the observed score
+  \item \code{pval}: the associated p-value
+}
+or a list with the following elements when genewise pvalues are computed:\itemize{
+  \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
+  \item \code{gene_pvals}: vector of associated genewise p-values
 }
 }
 \description{
@@ -53,7 +64,7 @@ b0 <- 1
 #under the null:
 b1 <- 0
 #under the alternative:
-b1 <- 0.7
+#b1 <- 0.7
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -63,6 +74,15 @@ x <- matrix(1, ncol=1, nrow=r)
 asymTestRes <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
 asymTestRes$pval
+
+b1 <- 0
+y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+      matrix(rep(y.tilde, n), ncol=n, nrow=r))
+x <- matrix(1, ncol=1, nrow=r)
+asymTestRes_genewise <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+                           Sigma_xi=matrix(1), indiv=rep(1:4, each=3), genewise_pvals=TRUE)
+quantile(asymTestRes_genewise$gene_pvals)
 
 }
 \seealso{

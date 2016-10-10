@@ -11,7 +11,7 @@
 #'
 #'@param phi a numeric design matrix of size \code{n x K} containing the K bases of time.
 #'
-#'@param preprocessed a logical flag indicating wether the expression data have
+#'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 #'which case \code{y} is assumed to contain raw counts and is normalized into
 #'log(counts) per million.
@@ -32,7 +32,7 @@
 #'\code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 #'corresponds to the loess method).
 #'
-#'@param exact a logical flag indicating wether the non-parametric weights accounting
+#'@param exact a logical flag indicating whether the non-parametric weights accounting
 #'for the mean-variance relationship should be computed exactly or extrapolated
 #'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interpolation (faster).

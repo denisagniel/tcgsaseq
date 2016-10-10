@@ -17,7 +17,8 @@
 #'@importFrom utils data
 #'@importFrom stats cor rchisq rgamma rnorm rpois model.matrix runif
 #'@export
-data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do_gs=TRUE){
+data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do_gs=TRUE,
+                              longitudinal=TRUE, mixed_hypothesis=FALSE){
 
 
   ############################################################################
@@ -38,7 +39,7 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do
   nindiv <- 6#32
   ngroup <- 2
   ntime <- 3#4
-  group <- factor(rep(1:2, each=n/ngroup))
+  group <- rep(0:1, each=n/ngroup)
   indiv <- factor(rep(1:nindiv, each=n/nindiv))
   time <- rep(1:ntime, nindiv)
   design <- stats::model.matrix(~ group + time)
@@ -72,7 +73,11 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do
 
   # Biological variation ----
   mu0_null <- mu0
-  mu0 <- exp(log(mu0) + matrix(beta*time, ncol=n, nrow=ngenes))
+  if(longitudinal){
+    mu0 <- exp(log(mu0) + matrix(beta*time, ncol=n, nrow=ngenes))
+  }else{
+    mu0 <- exp(log(mu0) + matrix(beta*group, ncol=n, nrow=ngenes))
+  }
 
   BCV0 <- 0.2+1/sqrt(mu0)
   BCV0_null <- 0.2+1/sqrt(mu0_null)
@@ -134,6 +139,13 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do
     gs_keep <- NULL
   }
 
-  return(list("counts"=counts2, "design"=design, "gs_keep"=gs_keep, "indiv"=indiv))
+  if(mixed_hypothesis){
+    select_alt <- sample(x=1:nrow(counts2), size=floor(ngenes/10))
+    countsfin <- rbind(counts2[select_alt, ], counts2_null[!(1:nrow(counts2) %in% select_alt), ])
+  }else{
+    countsfin <- counts2
+  }
+
+  return(list("counts"=countsfin, "design"=design, "gs_keep"=gs_keep, "indiv"=indiv))
 }
 

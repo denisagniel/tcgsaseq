@@ -19,7 +19,7 @@ preprocessed expression from \code{n} samples for \code{G} genes.}
 
 \item{phi}{a numeric design matrix of size \code{n x K} containing the K bases of time.}
 
-\item{preprocessed}{a logical flag indicating wether the expression data have
+\item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
@@ -40,7 +40,7 @@ Possibilities are \code{"gaussian"}, \code{"epanechnikov"}, \code{"rectangular"}
 \code{"optcosine"}. Default is \code{"gaussian"} (NB: \code{"tricube"} kernel
 corresponds to the loess method).}
 
-\item{exact}{a logical flag indicating wether the non-parametric weights accounting
+\item{exact}{a logical flag indicating whether the non-parametric weights accounting
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
 variance. Default is \code{FALSE}, which uses interpolation (faster).}
