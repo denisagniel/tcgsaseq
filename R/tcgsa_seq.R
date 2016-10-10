@@ -12,8 +12,9 @@
 #'to be tested
 #'
 #'@param genesets either a vector of index or subscripts that defines which columns of \code{y}
-#'constitute the invesigated geneset. Can also be a \code{\link[GSA:GSA.read.gmt]{gmt}} \code{list}
-#'when several genesets are tested at once. If \code{NULL}, then genewise p-values are returned.
+#'constitute the invesigated geneset. Can also be a \code{list} of index when several genesets are
+#'tested at once, such as the first element of a \code{\link[GSA:GSA.read.gmt]{gmt}} object.
+#'If \code{NULL}, then genewise p-values are returned.
 #'
 #'@param indiv a vector of length \code{n} containing the information for
 #'attributing each sample to one of the studied individuals. Coerced
@@ -138,10 +139,12 @@ tcgsa_seq <- function(y, x, phi, genesets,
   rm(y)
 
   if(is.data.frame(x)){
-    phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
+    warning("design matrix 'x' is a data.frame instead of a matrix:\n all variables (including factors) are converted to numeric...")
+    x <- as.matrix(as.data.frame(lapply(x, as.numeric)))
   }
 
   if(is.data.frame(phi)){
+    warning("design matrix 'phi' is a data.frame instead of a matrix:\n all variables (including factors) are converted to numeric... ")
     phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
   }
 
@@ -169,7 +172,8 @@ tcgsa_seq <- function(y, x, phi, genesets,
                                    preprocessed = preprocessed, doPlot=doPlot,
                                    bw = bw, kernel = kernel,
                                    exact = exact),
-               voom = voom_weights(y = y_lcpm, x = x, preprocessed = preprocessed, doPlot = doPlot,
+               voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
+                                   preprocessed = preprocessed, doPlot = doPlot,
                                    lowess_span = lowess_span),
                none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
@@ -193,10 +197,9 @@ tcgsa_seq <- function(y, x, phi, genesets,
     }
 
     pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
-    if(!is.null(names(genesets))){
-      rownames(pvals) <- names(genesets)
+    if(!is.null(rownames(y_lcpm))){
+      rownames(pvals) <- rownames(y_lcpm)
     }
-
   }else if(is.list(genesets)){
     if(class(genesets[[1]])=="character"){
       gene_names_measured <- rownames(y_lcpm)
