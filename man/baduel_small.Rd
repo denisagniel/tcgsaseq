@@ -44,7 +44,7 @@ set.seed(54321)
 KAvsTBG <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[, c("Intercept",
    "Vernalized", "Age_weeks", "Vernalized_Population", "AgeWeeks_Population"), drop=FALSE]),
        2, as.numeric),
-                     phi=design[, c("PopulationKA"), drop=FALSE],
+                     phi=as.matrix(design[, c("PopulationKA"), drop=FALSE]),
                      genesets=baduel_gmt$genesets[c(3,5)],
                      which_test = "permutation", which_weights = "loclin",
                      n_perm=5000, preprocessed = TRUE, doPlot = TRUE)
@@ -52,7 +52,7 @@ KAvsTBG <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[, c("Int
 set.seed(54321)
 Cold <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[, c("Intercept",
    "Age_weeks", "PopulationKA", "AgeWeeks_Population"), drop=FALSE]), 2, as.numeric),
-                 phi=design[, c("Vernalized", "Vernalized_Population"), drop=FALSE],
+                 phi=as.matrix(design[, c("Vernalized", "Vernalized_Population")]),
                  genesets=baduel_gmt$genesets[c(3,5)],
                  which_test = "permutation", which_weights = "loclin",
                  n_perm=5000, preprocessed = TRUE, doPlot = TRUE)
