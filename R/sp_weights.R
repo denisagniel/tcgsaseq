@@ -37,7 +37,7 @@
 #'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interpolation (faster).
 #'
-#'@param transform a logical flag indicating whether value should be transformed to uniform
+#'@param transform a logical flag indicating whether values should be transformed to uniform
 #'for the purpose of local linear smoothing. This may be helpful if tail observations are sparse and
 #'the specified bandwidth gives suboptimal performance there. Default is \code{FALSE}.
 #'

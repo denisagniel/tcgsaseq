@@ -7,11 +7,11 @@
 tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
   which_weights = c("loclin", "voom", "none"), n_perm = 1000,
-  preprocessed = FALSE, doPlot = TRUE, bw = "nrd",
+  preprocessed = FALSE, doPlot = TRUE, gene_based = FALSE, bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
-  lowess_span = 0.5, homogen_traj = FALSE)
+  transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
+  "hommel", "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -55,6 +55,10 @@ log(counts) per million.}
 \item{doPlot}{a logical flag indicating whether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
+\item{gene_based}{a logical flag used for "loclin" weights, indicating whether to estimate
+weights at the gene-level. Default is \code{FALSE}, when weights will be estimated at the
+observation-level.}
+
 \item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
 \code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
 \code{"bcv"}, \code{"nrd"} or \code{"nrd0"}}
@@ -69,6 +73,11 @@ corresponds to the loess method).}
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
 variance. Default is \code{FALSE}, which uses interporlation (faster computation).}
+
+\item{transform}{a logical flag used for "loclin" weights, indicating whether values should be
+transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
+observations are sparse and the specified bandwidth gives suboptimal performance there.
+Default is \code{FALSE}.}
 
 \item{padjust_methods}{multiple testing correction method used if \code{genesets}
 is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.

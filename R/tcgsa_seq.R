@@ -43,6 +43,10 @@
 #'@param doPlot a logical flag indicating whether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
 #'
+#'@param gene_based a logical flag used for "loclin" weights, indicating whether to estimate
+#'weights at the gene-level. Default is \code{FALSE}, when weights will be estimated at the
+#'observation-level.
+#'
 #'@param bw a character string indicating the smoothing bandwidth selection method to use. See
 #'\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
 #'\code{"bcv"}, \code{"nrd"} or \code{"nrd0"}
@@ -57,6 +61,11 @@
 #'for the mean-variance relationship should be computed exactly or extrapolated
 #'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interporlation (faster computation).
+#'
+#'@param transform a logical flag used for "loclin" weights, indicating whether values should be
+#'transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
+#'observations are sparse and the specified bandwidth gives suboptimal performance there.
+#'Default is \code{FALSE}.
 #'
 #'@param padjust_methods multiple testing correction method used if \code{genesets}
 #'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
@@ -119,10 +128,10 @@ tcgsa_seq <- function(y, x, phi, genesets,
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom", "none"),
                       n_perm = 1000,
-                      preprocessed = FALSE, doPlot = TRUE,
+                      preprocessed = FALSE, doPlot = TRUE, gene_based = FALSE,
                       bw = "nrd",
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-                      exact = FALSE,
+                      exact = FALSE, transform = FALSE,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                       lowess_span = 0.5,
                       homogen_traj = FALSE){
@@ -170,8 +179,9 @@ tcgsa_seq <- function(y, x, phi, genesets,
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
+                                   gene_based = gene_based,
                                    bw = bw, kernel = kernel,
-                                   exact = exact),
+                                   exact = exact, transfotm = transform),
                voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
                                    preprocessed = preprocessed, doPlot = doPlot,
                                    lowess_span = lowess_span),
