@@ -19,6 +19,8 @@
 #'
 #'@keywords internal
 #'@importFrom stats sd
+#@importFrom edgeR DGEList
+#@importFrom limma roast duplicateCorrelation
 #'@export
 
 
@@ -30,9 +32,7 @@ nonlin_sim_fn <- function(n = 250,
                           re_sd = 1,
                           type) {
 
-  if(!requireNamespace("DESeq2", quietly=TRUE)){
-    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
-  }else if(!requireNamespace("limma", quietly=TRUE)){
+  if(!requireNamespace("limma", quietly=TRUE)){
     stop("Package 'limma' is not available.\n  -> Try running 'install.packages(\"limma\")'\n")
   }else if(!requireNamespace("edgeR", quietly=TRUE)){
     stop("Package 'edgeR' is not available.\n  -> Try running 'install.packages(\"edgeR\")'\n")

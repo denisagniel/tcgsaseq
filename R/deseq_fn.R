@@ -15,8 +15,6 @@
 #'
 #'@param ind
 #'
-#'@importFrom DESeq2 DESeqDataSetFromMatrix dispersions results estimateDispersionsGeneEst nbinomLRT
-#'
 #'@examples
 #'\dontrun{
 #'#rm(list=ls())
@@ -44,6 +42,7 @@
 #'temp <- deseq_fn(y, x, phi, indiv)
 #'}
 #'@importFrom stats as.formula
+#@importFrom DESeq2 DESeqDataSetFromMatrix dispersions results estimateDispersionsGeneEst nbinomLRT
 #'
 #' @keywords internal
 deseq_fn <- function(y, x, phi, indiv) {
