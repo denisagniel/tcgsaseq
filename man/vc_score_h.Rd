@@ -57,7 +57,7 @@ b0 <- 10
 #under the null:
 beta1 <- rnorm(n=ng, 0, sd=0)
 #under the (heterogen) alternative:
-beta1 <- rnorm(n=ng, 0, sd=0.3)
+beta1 <- rnorm(n=ng, 0, sd=0.1)
 #under the (homogen) alternative:
 beta1 <- rnorm(n=ng, 0.06, sd=0)
 

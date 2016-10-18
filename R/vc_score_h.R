@@ -51,7 +51,7 @@
 #'#under the null:
 #'beta1 <- rnorm(n=ng, 0, sd=0)
 #'#under the (heterogen) alternative:
-#'beta1 <- rnorm(n=ng, 0, sd=0.3)
+#'beta1 <- rnorm(n=ng, 0, sd=0.1)
 #'#under the (homogen) alternative:
 #'beta1 <- rnorm(n=ng, 0.06, sd=0)
 #'
@@ -192,6 +192,7 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   q_ext <-  q - U_XT_indiv #U_indiv %*% XT
 
   qq <- colSums(q)^2/nb_indiv
+  #do.call(rbind, by(t(qq), rep(1:K, g), FUN=colSums, simplify=FALSE))
   QQ <- sum(qq)
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
