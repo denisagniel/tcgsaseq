@@ -142,7 +142,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   #     # y_tilde_i <- c(t(y_ij))
   #     x_tilde_i <- x_tilde[long_select,]
   #
-  #     sigma_eps_inv_diag <- as.vector(w[,select])#/sigma
+  #     sigma_eps_inv_diag <- as.vector(t(w)[select,])#/sigma
   #     T_i <- sigma_eps_inv_diag*(Phi[long_select,] %*% Sigma_xi_new_sqrt)
   #     q[i,] <- c(y_mu_i %*% T_i)
   #     XT_i[i,,] <- t(x_tilde_i) %*% T_i

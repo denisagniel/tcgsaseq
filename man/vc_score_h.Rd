@@ -45,37 +45,44 @@ set.seed(123)
 
 ##generate some fake data
 ########################
-n <- 100
-nindiv <- 100
-nt <- 30
-r <- nindiv*nt
-t <- matrix(rep(1:nt), nindiv, ncol=1, nrow=r)
-sigma <- 0.4
-b0 <- 1
+ng <- 100
+nindiv <- 30
+nt <- 5
+nsample <- nindiv*nt
+tim <- matrix(rep(1:nt), nindiv, ncol=1, nrow=nsample)
+tim <- cbind(tim, tim^2)
+sigma <- 5
+b0 <- 10
 
 #under the null:
-beta1 <- rep(rnorm(n=nindiv, 0, sd=0), each=nt)
-#under the alternative:
-beta1 <- rep(rnorm(n=nindiv, 0, sd=0.1), each=nt)
+beta1 <- rnorm(n=ng, 0, sd=0)
+#under the (heterogen) alternative:
+beta1 <- rnorm(n=ng, 0, sd=0.3)
+#under the (homogen) alternative:
+beta1 <- rnorm(n=ng, 0.06, sd=0)
 
-y.tilde <- b0 + beta1*t + rnorm(r, sd = sigma)
-y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
-      matrix(rep(y.tilde, n), ncol=n, nrow=r))
-x <- matrix(1, ncol=1, nrow=r)
+y.tilde <- b0 + rnorm(ng, sd = sigma)
+y <- t(matrix(rep(y.tilde, nsample), ncol=ng, nrow=nsample, byrow=TRUE) +
+      matrix(rep(beta1, each=nsample), ncol=ng, nrow=nsample, byrow=FALSE)*matrix(rep(tim, ng), ncol=ng, nrow=nsample, byrow=FALSE) +
+      matrix(rnorm(ng*nsample, sd = sigma), ncol=ng, nrow=nsample, byrow=FALSE)
+      )
+myindiv <- rep(1:nindiv, each=nt)
+x <- cbind(1, myindiv/2==floor(myindiv/2))
+myw <- matrix(rnorm(nsample*ng, sd=0.1), ncol=nsample, nrow=ng)
 
 #run test
-score_homogen <- vc_score_h(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
-                           w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                           Sigma_xi=matrix(1))
-score_heterogen <- vc_score(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
-                           w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                           Sigma_xi=matrix(1))
-scoreTest_homogen <- vc_test_asym(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
-                                 w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=matrix(1),
+score_homogen <- vc_score_h(y, x, phi=tim, indiv=myindiv,
+                           w=myw, Sigma_xi=cov(tim))
+
+score_heterogen <- vc_score(y, x, phi=tim, indiv=myindiv,
+                           w=myw, Sigma_xi=cov(tim))
+
+scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
+                                 w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=cov(tim),
                                  homogen_traj = TRUE)
 scoreTest_homogen$set_pval
-scoreTest_heterogen <- vc_test_asym(y, x, phi=t, indiv=rep(1:nindiv, each=nt),
-                                   w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=matrix(1),
+scoreTest_heterogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
+                                   w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=cov(tim),
                                    homogen_traj = FALSE)
 scoreTest_heterogen$set_pval
 
