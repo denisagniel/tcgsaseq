@@ -95,7 +95,8 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
 
     if(nrow(score_list$q_ext)<2){
       warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")
-      Sig_q <- matrix(1, ncol(Sig_q), nrow(Sig_q))
+      ng <- ncol(score_list$q_ext)
+      Sig_q <- matrix(1, ng, ng)
     }else{
       Sig_q <- cov(score_list$q_ext)
     }
