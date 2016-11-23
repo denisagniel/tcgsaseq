@@ -17,12 +17,23 @@
 #'@format 3 objects\itemize{
 #'\item{\code{design}:} a design matrix for the 48 measured samples, containing the following variables:\itemize{
 #'  \item \code{SampleName} corresponding column names from \code{expr_norm_corr}
+#'  \item \code{Intercept} an intercept variable
 #'  \item \code{Population} a factor identifying the plant population
 #'  \item \code{Age_weeks} numeric age of the plant at sampling time (in weeks)
 #'  \item \code{Replicate} a purely technical variable as replicates are not from the same individual over weeks.
 #'  Should not be used in analysis.
-#'  \item \code{Verbnalized} a logical variable indicating whether the plant had undergone
+#'  \item \code{Vernalized} a logical variable indicating whether the plant had undergone
 #'  vernalization (exposition to cold and short day photoperiods)
+#'  \item \code{Vernalized} a binary variable indicating whether the plant belonged to the KA
+#'  population
+#'  \item \code{AgeWeeks_Population} interaction variable between the \code{AgeWeeks} and
+#'  \code{Population} variables
+#'  \item \code{AgeWeeks_Vernalized} interaction variable between the \code{AgeWeeks} and
+#'  \code{Vernalized} variables
+#'  \item \code{Vernalized_Population} interaction variable between the \code{Vernalized} and
+#'  \code{Population} variables
+#'  \item \code{AgeWeeks_Vernalized_Population} interaction variable between the \code{AgeWeeks},
+#'  \code{Vernalized} and \code{Population} variables
 #'}
 #'\item{\code{baduel_gmt}:} a gmt object containing 5 gene sets of interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
 #'\item{\code{expr_norm_corr}:} a numeric matrix containing the normalized batch corrected expression
