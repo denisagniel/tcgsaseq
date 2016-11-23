@@ -2,11 +2,11 @@
 #'
 #'A subsample of the RNA-seq data from Baduel et al. studying Arabidopsis Arenosa physiology.
 #'
-#'@name baduel_small
-#'@rdname baduel_small
-#'@aliases baduel baduel_small baduel_gmt design expr_norm_corr
+#'@name baduel_5gs
+#'@rdname baduel_5gs
+#'@aliases baduel baduel_5gs baduel_gmt design expr_norm_corr
 #'
-#'@usage data(baduel_small)
+#'@usage data(baduel_5gs)
 #'
 #'@references Baduel P, Arnold B, Weisman CM, Hunter B & Bomblies K, Habitat-Associated Life
 #'History and Stress-Tolerance Variation in Arabidopsis Arenosa. \emph{Plant Physiology}: 01875, 2015.
@@ -24,19 +24,15 @@
 #'  \item \code{Verbnalized} a logical variable indicating whether the plant had undergone
 #'  vernalization (exposition to cold and short day photoperiods)
 #'}
-#'\item{\code{baduel_gmt}:} a gmt file (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
-#'\item{\code{expr_norm_corr}:} a numeric matrix
+#'\item{\code{baduel_gmt}:} a gmt object containing 5 gene sets of interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
+#'\item{\code{expr_norm_corr}:} a numeric matrix containing the normalized batch corrected expression
+#'for the 2454 genes included in either of the 5 gene sets of interests
 #'}
 #'
 #'@examples
 #' \dontrun{
 #' rm(list=ls())
-#' data("baduel_small")
-#' design$Intercept <- 1
-#' design$PopulationKA <- 1*(design$Population=="KA")
-#' design$AgeWeeks_Population <- design$Age_weeks*(design$Population=="KA")
-#' design$Vernalized <- 1*design$Vernalized
-#' design$Vernalized_Population <- design$Vernalized*(design$Population=="KA")
+#' data("baduel_5gs")
 #'
 #' set.seed(54321)
 #' KAvsTBG <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[, c("Intercept",
@@ -45,7 +41,7 @@
 #'                      phi=as.matrix(design[, c("PopulationKA"), drop=FALSE]),
 #'                      genesets=baduel_gmt$genesets[c(3,5)],
 #'                      which_test = "permutation", which_weights = "loclin",
-#'                      n_perm=5000, preprocessed = TRUE, doPlot = TRUE)
+#'                      n_perm=1000, preprocessed = TRUE, doPlot = TRUE)
 #'
 #' set.seed(54321)
 #' Cold <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[, c("Intercept",
@@ -53,7 +49,7 @@
 #'                  phi=as.matrix(design[, c("Vernalized", "Vernalized_Population")]),
 #'                  genesets=baduel_gmt$genesets[c(3,5)],
 #'                  which_test = "permutation", which_weights = "loclin",
-#'                  n_perm=5000, preprocessed = TRUE, doPlot = TRUE)
+#'                  n_perm=1000, preprocessed = TRUE, doPlot = TRUE)
 #' }
 #'
 #'

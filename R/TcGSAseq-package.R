@@ -6,8 +6,8 @@
 #'\tabular{ll}{
 #'Package: \tab tcgsaseq\cr
 #'Type: \tab Package\cr
-#'Version: \tab 1.2.0\cr
-#'Date: \tab 2016-07-19\cr
+#'Version: \tab 1.3.0\cr
+#'Date: \tab 2016-11-23\cr
 #'License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 #'}
 #'The main functions of the tcgsaseq package is \code{\link{tcgsa_seq}}

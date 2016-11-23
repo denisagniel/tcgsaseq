@@ -57,7 +57,8 @@
 #'
 #'y.tilde <- b0 + rnorm(ng, sd = sigma)
 #'y <- t(matrix(rep(y.tilde, nsample), ncol=ng, nrow=nsample, byrow=TRUE) +
-#'       matrix(rep(beta1, each=nsample), ncol=ng, nrow=nsample, byrow=FALSE)*matrix(rep(tim, ng), ncol=ng, nrow=nsample, byrow=FALSE) +
+#'       matrix(rep(beta1, each=nsample), ncol=ng, nrow=nsample, byrow=FALSE)*matrix(rep(tim, ng),
+#'                                                             ncol=ng, nrow=nsample, byrow=FALSE) +
 #'       matrix(rnorm(ng*nsample, sd = sigma), ncol=ng, nrow=nsample, byrow=FALSE)
 #'       )
 #'myindiv <- rep(1:nindiv, each=nt)
