@@ -299,7 +299,7 @@ nonlin_sim_fn <- function(n = 100,
     #
     #     Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
     #     Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(0.05))))
-    #     Meff <- 1 + sum(1-cor(y[,ind])^2, na.rm = TRUE)/ncol(Rij) #Cheverud–Nyholt
+    #     Meff <- 1 + sum(1-cor(y[,ind])^2, na.rm = TRUE)/ncol(Rij) #Cheverud-Nyholt
     #     cbind("minTest_exact" = 1-(1-pmin)^Keff,
     #           "minTest_approx" = 1-(1-pmin)^Keff_approx,
     #           "minTest_CN" = 1-(1-pmin)^Meff)

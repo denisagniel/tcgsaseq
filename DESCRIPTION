@@ -1,8 +1,8 @@
 Package: tcgsaseq
 Type: Package
 Title: Time-Course Gene Set Analysis for RNA-Seq Data
-Version: 1.3.0
-Date: 2016-11-23
+Version: 1.3.1
+Date: 2016-11-24
 Authors@R: c(person("Denis", "Agniel", role = c("aut"),
                     email = "denis.agniel@gmail.com"),
 	           person("Boris P.", "Hejblum", role = c("aut", "cre"),

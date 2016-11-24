@@ -149,7 +149,7 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
 
       Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
       Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(alpha_DEseq))))
-      Meff <- 1 + sum(1-cor(t(y_deseq))^2, na.rm = TRUE)/g #Cheverud–Nyholt
+      Meff <- 1 + sum(1-cor(t(y_deseq))^2, na.rm = TRUE)/g #Cheverud-Nyholt
       res_DEseq <- rbind(res_DEseq, cbind("minTest_exact" = 1-(1-DEseq_pmin)^Keff,
                                           "minTest_approx" = 1-(1-DEseq_pmin)^Keff_approx,
                                           "minTest_CN" = 1-(1-DEseq_pmin)^Meff)
