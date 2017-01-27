@@ -69,7 +69,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   }
 
   ## dimensions check------
-
+# browser()
   stopifnot(is.matrix(y))
   stopifnot(is.matrix(x))
   stopifnot(is.matrix(phi))
@@ -99,7 +99,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   ## data formating ------
   indiv <- as.factor(indiv)
   nb_indiv <- length(levels(indiv))
-
+# browser()
   y_T <- t(y)
   yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T
 
@@ -150,10 +150,16 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   # q_ext <- q - U %*% XT
 
   #sig_eps_inv <- w/sigma #no need as this just scales the test statistics
+  # browser()
   sig_xi_sqrt <- (Sigma_xi*diag(K))%^% (-0.5)
   sig_eps_inv_T <- t(w)
   phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
+
   T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*t(matrix(rep(t(phi_sig_xi_sqrt), each=g), nrow=g*K))
+  ###---------------------
+  ## the structure of T_fast is time_basis_1*gene_1, time_basis_1*gene_2, ...,
+  ## time_basis_1*gene_p, ..., time_basis_K*gene_1, ..., time_basis_K*gene_p
+  ##----------------------------
   q_fast <- matrix(yt_mu, ncol=g*n_t, nrow=n)*T_fast
 
   q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
@@ -164,15 +170,14 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
-  qq <- colSums(q)^2/nb_indiv # genewise scores ?
+  gene_inds <- lapply(1:g, function(x) x + (g)*(0:(K-1)))
+
+  qq <- colSums(q)^2/nb_indiv
+  gene_Q <- sapply(gene_inds, function(x) sum(qq[x]))
   #do.call(rbind, by(t(qq), rep(1:K, g), FUN=colSums, simplify=FALSE))
   QQ <- sum(qq) #nb_indiv=nrow(q) # set score
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled" = qq)) #gene_score(qq, q_ext)
-}
-
-gene_score <- function(indiv_q_2, q_ext) {
-  indiv_v <- apply(X=q_ext, margin = 2, FUN=stats::var)
-  indiv_chi <- indiv_q_2/indiv_v
+              "gene_scores_unscaled" = gene_Q,
+              "gene_inds" = gene_inds))
 }
