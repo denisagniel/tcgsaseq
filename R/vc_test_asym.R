@@ -92,6 +92,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   }
 
   if (genewise_pvals) {
+# begin to be optimized
     if (length(score_list$gene_scores_unscaled) == 1) {
       gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
       pv <- pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
@@ -106,6 +107,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
         pv[i] <- CompQuadForm::davies(gene_scores_obs[i], gene_lambda[[i]])$Qq
       }
     }
+# end to be optimized
 
     names(pv) <- rownames(y)
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)
