@@ -87,7 +87,7 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   nindiv <- nrow(score_list$q_ext)
   ng <- ncol(score_list$q_ext)
 
-  if(nindiv < 2){
+  if(nindiv == 1){
     warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")
     Sig_q <- matrix(1, ng, ng)
   }else{
@@ -95,14 +95,21 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   }
 
   if (genewise_pvals) {
-
-    if (ng < 2 ) {
+    if (ng == 1 & nindiv > 1) {
       gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
       pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
-    } else {
+    }else if(ng > 1 & nindiv > 1){
       gene_scores_obs <- score_list$gene_scores_unscaled
       gene_lambda <- diag(Sig_q)
       pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
+    }else if(ng == 1 & nindiv == 1){
+      gene_scores_obs <- score_list$gene_scores_unscaled
+      pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
+    }else if(ng > 1 & nindiv == 1){
+      gene_scores_obs <- score_list$gene_scores_unscaled
+      pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
+    }else{
+      stop("no gene measured/no sample included ...")
     }
 
     names(pv) <- rownames(y)
