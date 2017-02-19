@@ -112,7 +112,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
                                              Sigma_xi = Sigma_xi)$gene_scores_unscaled
     }
     browser()
-    pvals2 <- 1-rowMeans(sapply(gene_scores_perm, function(x){x<gene_scores_obs}))
+    pvals <- 1-rowMeans(sapply(gene_scores_perm, function(x){x<gene_scores_obs}))
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals)
   }else{
     scores_perm <- numeric(n_perm)
