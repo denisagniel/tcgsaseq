@@ -106,13 +106,23 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     gene_scores_perm <- list()
     for(b in 1:n_perm){
       ## permute samples within indiv
+      ## tried to pertub genes by gene (to avoid inducing dependency between genes, doesn't change a thing)
+      # gene_scores_perm[[b]] <- sapply(1:n_genes, function(i){
+      #   perm_index <- strat_sampling(indiv_fact)
+      #   res <- vc_score_2use(y = y[i, perm_index, drop=FALSE], x = x[perm_index, , drop=FALSE],
+      #                        indiv = indiv_fact, phi = phi, w = w[i, perm_index, drop = FALSE],
+      #                        Sigma_xi = Sigma_xi)$gene_scores_unscaled
+      #   return(res)})
+
       perm_index <- strat_sampling(indiv_fact)
       gene_scores_perm[[b]] <- vc_score_2use(y = y[, perm_index, drop=FALSE], x = x[perm_index, , drop=FALSE],
-                                             indiv = indiv_fact, phi = phi, w = w[, perm_index, drop = FALSE],
-                                             Sigma_xi = Sigma_xi)$gene_scores_unscaled
+                             indiv = indiv_fact, phi = phi, w = w[, perm_index, drop = FALSE],
+                             Sigma_xi = Sigma_xi)$gene_scores_unscaled
     }
-    browser()
+    #browser()
     pvals <- 1-rowMeans(sapply(gene_scores_perm, function(x){x<gene_scores_obs}))
+    pvals2 <- 1-rowMeans(do.call(cbind, gene_scores_perm)<gene_scores_obs)
+    hist(pvals)
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals)
   }else{
     scores_perm <- numeric(n_perm)
