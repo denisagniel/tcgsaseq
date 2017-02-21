@@ -171,7 +171,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
 
-  gene_inds <- lapply(1:g, function(x) x + (g)*(0:(K-1)))
+  gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
 
   qq <- colSums(q)^2/nb_indiv # genewise scores
   gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # to be optimized

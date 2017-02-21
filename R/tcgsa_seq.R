@@ -176,6 +176,10 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
+  if(is.null(genesets) & which_test == "permutation"){
+    stop("Gene-wise permutation test is not supported yet... But we are working on it !")
+  }
+
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
