@@ -13,7 +13,7 @@ test acocunting for data heteroscedasticity through precision weights.
 \tabular{ll}{
 Package: \tab tcgsaseq\cr
 Type: \tab Package\cr
-Version: \tab 1.4.0\cr
+Version: \tab 1.4.1\cr
 Date: \tab 2017-02-21\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
