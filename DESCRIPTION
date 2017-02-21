@@ -26,4 +26,4 @@ Description: Gene set analysis of longitudinal RNA-seq data with variance compon
 LazyData: true
 License: GPL-2 | file LICENSE
 BugReports: https://github.com/denisagniel/tcgsaseq/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

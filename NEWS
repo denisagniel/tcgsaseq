@@ -1,6 +1,9 @@
 News about the R package tcgsaseq:
 --------------------------------
 
+Main changes in Version 1.4.0 (2017-02-21):
+* Corrected a bug in gene-wise testing
+
 Main changes in Version 1.3.1 (2016-11-24):
 * Fixed a bug occuring when testing several covariates together (such as several bases of time) which was giving wrong p-values
 * Support for gene-wise testing

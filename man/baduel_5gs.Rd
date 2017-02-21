@@ -2,8 +2,8 @@
 % Please edit documentation in R/baduel.R
 \docType{data}
 \name{baduel_5gs}
-\alias{baduel}
 \alias{baduel_5gs}
+\alias{baduel}
 \alias{baduel_gmt}
 \alias{design}
 \alias{expr_norm_corr}
@@ -75,4 +75,3 @@ Agniel D, Hejblum BP, Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{submitted}, 2016.
 }
 \keyword{datasets}
-

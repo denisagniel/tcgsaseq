@@ -13,19 +13,18 @@ test acocunting for data heteroscedasticity through precision weights.
 \tabular{ll}{
 Package: \tab tcgsaseq\cr
 Type: \tab Package\cr
-Version: \tab 1.3.1\cr
-Date: \tab 2016-11-24\cr
+Version: \tab 1.4.0\cr
+Date: \tab 2017-02-21\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
 The main functions of the tcgsaseq package is \code{\link{tcgsa_seq}}
-}
-\author{
-Boris P. Hejblum, Denis Agniel
---- Maintainer: Boris P. Hejblum
 }
 \references{
 Agniel D, Hejblum BP, Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{submitted}, 2016.
 \url{http://arxiv.org/abs/1605.02351}
 }
-
+\author{
+Boris P. Hejblum, Denis Agniel
+--- Maintainer: Boris P. Hejblum
+}

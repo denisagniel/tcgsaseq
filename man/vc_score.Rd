@@ -69,4 +69,3 @@ scoreTest$score
 \code{\link[CompQuadForm]{davies}}
 }
 \keyword{internal}
-

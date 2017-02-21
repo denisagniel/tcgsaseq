@@ -1,5 +1,7 @@
 language: R
-r: devel
+r:
+- release
+- devel
 cache: packages
 r_packages:
 - CompQuadForm

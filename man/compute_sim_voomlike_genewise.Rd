@@ -32,4 +32,3 @@ colnames(res_all) <- c(paste0(rep(c("asym", "perm", "camera", "roast"), 3),
 
 }
 \keyword{internal}
-

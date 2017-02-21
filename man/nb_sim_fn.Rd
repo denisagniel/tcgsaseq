@@ -43,4 +43,3 @@ standard.l <- do.call(rbind, stdl.l)
 
 }
 \keyword{internal}
-

@@ -53,4 +53,3 @@ temp <- deseq_fn(y, x, phi, indiv)
 }
 }
 \keyword{internal}
-

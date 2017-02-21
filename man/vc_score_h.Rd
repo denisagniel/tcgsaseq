@@ -92,4 +92,3 @@ scoreTest_heterogen$set_pval
 \code{\link[CompQuadForm]{davies}}
 }
 \keyword{internal}
-

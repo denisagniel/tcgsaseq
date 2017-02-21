@@ -79,4 +79,3 @@ asymTestRes$set_pval
 \seealso{
 \code{\link[CompQuadForm]{davies}}
 }
-

@@ -61,4 +61,3 @@ Biology}, 15(2), R29.
 \seealso{
 \code{\link{lowess}}  \code{\link{approxfun}}  \code{\link[limma]{voom}}
 }
-

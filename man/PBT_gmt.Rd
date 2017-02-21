@@ -2,8 +2,8 @@
 % Please edit documentation in R/PBT_gmt.R
 \docType{data}
 \name{PBT_gmt}
-\alias{PBT}
 \alias{PBT_gmt}
+\alias{PBT}
 \title{PBT gene sets related to kidney transplant}
 \format{a gmt objects containing 9 gene sets specific to kidney transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})}
 \source{
@@ -34,4 +34,3 @@ donor-specific antibody-positive kidney transplant patients with normal biopsies
 \emph{Genomics Data} 2: 357-60, 2014.
 }
 \keyword{datasets}
-

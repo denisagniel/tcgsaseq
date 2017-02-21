@@ -139,4 +139,3 @@ Biology}, 15(2), R29.
 \seealso{
 \code{\link{sp_weights}} \code{\link{vc_test_perm}} \code{\link{vc_test_asym}} \code{\link{p.adjust}}
 }
-

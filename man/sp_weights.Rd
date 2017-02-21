@@ -73,4 +73,3 @@ x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 \seealso{
 \code{\link[stats]{bandwidth}} \code{\link{density}}
 }
-

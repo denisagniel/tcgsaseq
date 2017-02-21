@@ -81,4 +81,3 @@ permTestRes$set_pval
 \seealso{
 \code{\link[CompQuadForm]{davies}}
 }
-

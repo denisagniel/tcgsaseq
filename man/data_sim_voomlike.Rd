@@ -23,4 +23,3 @@ weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome
 Biology}, 15(2), R29.
 }
 \keyword{internal}
-
