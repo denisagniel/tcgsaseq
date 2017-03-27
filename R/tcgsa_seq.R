@@ -6,7 +6,8 @@
 #'preprocessed expressions from \code{n} samples for \code{G} genes.
 #'
 #'@param x a numeric matrix of size \code{n x p} containing the model covariates from
-#'\code{n} samples (design matrix).
+#'\code{n} samples (design matrix). Usually, its first column is the intercept (full of
+#'\code{1}s).
 #'
 #'@param phi a numeric design matrix of size \code{n x K} containing the \code{K} variables
 #'to be tested
@@ -33,7 +34,7 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations
+#'@param n_perm the number of perturbations. Default is \code{1000}.
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -121,7 +122,14 @@
 #'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
 #'                       Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
 #'                       which_weights="none", preprocessed=TRUE)
+#'length(res_genes$pvals[, "rawPval"])
 #'quantile(res_genes$pvals[, "rawPval"])
+#'
+#'\dontrun{
+#'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
+#'                       Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="permutation",
+#'                       which_weights="none", preprocessed=TRUE, nperm=100)
+#'}
 #'@export
 tcgsa_seq <- function(y, x, phi, genesets,
                       indiv = rep(1, nrow(x)), Sigma_xi = diag(ncol(phi)),
@@ -176,9 +184,9 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
-  if(is.null(genesets) & which_test == "permutation"){
-    stop("Gene-wise permutation test is not supported yet... But we are working on it !")
-  }
+  # if(is.null(genesets) & which_test == "permutation"){
+  #   warning("Gene-wise permutation test is still under development... It should work but we are still testing its behavior!\n")
+  # }
 
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
@@ -205,7 +213,9 @@ tcgsa_seq <- function(y, x, phi, genesets,
                                w = w, Sigma_xi = Sigma_xi,
                                genewise_pvals = TRUE, homogen_traj = homogen_traj)$gene_pvals
     }else if(which_test == "permutation"){
-      rawPvals <- vc_test_perm(y = y_lcpm, x = x, indiv = indiv, phi = phi,
+      y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm))
+      x_res <- matrix(1, nrow=nrow(x), ncol=1)
+      rawPvals <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
                                w = w, Sigma_xi = Sigma_xi,
                                n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj)$gene_pvals
     }
@@ -227,19 +237,20 @@ tcgsa_seq <- function(y, x, phi, genesets,
     }
 
     if(which_test == "asymptotic"){
-
-        rawPvals <- sapply(genesets, FUN = function(gs){
-          vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi,
-                       genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
-        )
+      rawPvals <- sapply(genesets, FUN = function(gs){
+        vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                     w = w[gs, ], Sigma_xi = Sigma_xi,
+                     genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
+      )
     } else if(which_test == "permutation"){
-        rawPvals <- sapply(genesets, FUN = function(gs){
-          vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi,
-                       n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
-        )
-      }
+      y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm))
+      x_res <- matrix(1, nrow=nrow(x), ncol=1)
+      rawPvals <- sapply(genesets, FUN = function(gs){
+        vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                     w = w[gs, ], Sigma_xi = Sigma_xi,
+                     n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
+      )
+    }
 
     pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
     if(!is.null(names(genesets))){

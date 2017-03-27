@@ -18,7 +18,8 @@ tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
 preprocessed expressions from \code{n} samples for \code{G} genes.}
 
 \item{x}{a numeric matrix of size \code{n x p} containing the model covariates from
-\code{n} samples (design matrix).}
+\code{n} samples (design matrix). Usually, its first column is the intercept (full of
+\code{1}s).}
 
 \item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
@@ -45,7 +46,7 @@ the mean-variance relationship wheights. Possibilities are \code{"loclin"},
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
-\item{n_perm}{the number of perturbations}
+\item{n_perm}{the number of perturbations. Default is \code{1000}.}
 
 \item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -126,7 +127,14 @@ res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
 res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
                       Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
                       which_weights="none", preprocessed=TRUE)
+length(res_genes$pvals[, "rawPval"])
 quantile(res_genes$pvals[, "rawPval"])
+
+\dontrun{
+res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
+                      Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="permutation",
+                      which_weights="none", preprocessed=TRUE, nperm=100)
+}
 }
 \references{
 Agniel D, Hejblum BP, Variance component score test for

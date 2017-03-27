@@ -24,7 +24,7 @@
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
 #'of the \code{K} random effects.
 #'
-#'@param n_perm the number of perturbations
+#'@param n_perm the number of perturbations. Default is \code{1000}.
 #'
 #'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
 #'is \code{FALSE} in which case geneset p-value is computed and returned instead.
