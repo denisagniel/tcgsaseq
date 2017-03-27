@@ -82,10 +82,19 @@
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
 #'@return A list with the following elements:\itemize{
-#'   \item \code{which_test}:
-#'   \item \code{preprocessed}:
-#'   \item \code{n_perm}:
-#'   \item \code{pval}: associated p-value
+#'   \item \code{which_test}: a character string carrying forward the value of the '\code{which_test}' argument
+#'    indicating which test was perform (either "asymptotic" or "permutation").
+#'   \item \code{preprocessed}: a logical flag carrying forward the value of the '\code{preprocessed}' argument
+#'   indicating whether the expression data were already preprocessed, or were provided as raw counts and
+#'   transformed into log-counts per million.
+#'   \item \code{n_perm}: an integer carrying forward the value of the '\code{n_perm}' argument indicating
+#'   the number of perturbations performed (\code{NA} if asymptotic test was performed).
+#'   \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the genesets
+#'   of interest (\code{NULL} for gene-wise testing).
+#'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each geneset, or
+#'   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
+#'   contains the raw p-values, the second one '\code{adjPval}' contains the adjusted p-values (according to
+#'   the '\code{padjust_methods}' argument).
 #' }
 #'
 #'@seealso \code{\link{sp_weights}} \code{\link{vc_test_perm}} \code{\link{vc_test_asym}} \code{\link{p.adjust}}
