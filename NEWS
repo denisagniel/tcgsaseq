@@ -1,6 +1,9 @@
 News about the R package tcgsaseq:
 --------------------------------
 
+Main changes in Version 1.5.1 (2017-05-24):
+* homogeneous test is now available for gene-wise testing.
+
 Main changes in Version 1.5.0 (2017-03-27):
 * Permutation test is now available for gene-wise testing.
 

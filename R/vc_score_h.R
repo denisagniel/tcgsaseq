@@ -68,9 +68,11 @@
 #'#run test
 #'score_homogen <- vc_score_h(y, x, phi=tim, indiv=myindiv,
 #'                            w=myw, Sigma_xi=cov(tim))
+#'score_homogen$score
 #'
 #'score_heterogen <- vc_score(y, x, phi=tim, indiv=myindiv,
 #'                            w=myw, Sigma_xi=cov(tim))
+#'score_heterogen$score
 #'
 #'scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
 #'                                  w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=cov(tim),
@@ -180,22 +182,23 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
   T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*t(matrix(rep(t(phi_sig_xi_sqrt), each=g), nrow=g*K))
   q_fast <- do.call(cbind, replicate(K, yt_mu, simplify = FALSE))*T_fast
-  q <- do.call(rbind, by(do.call(cbind, by(t(q_fast), as.factor(rep(1:K, each=g)), FUN=colSums, simplify=FALSE)), indiv, FUN=colSums, simplify=FALSE))
 
-  avg_xtx_inv_tx <- solve(t(x)%*%x)%*%t(x)
-  #XT <- matrix(rowSums(crossprod(x, T_fast))/nb_indiv, nrow=p)
-  XT_fast <- crossprod(x, T_fast)/nb_indiv
-  U_XT_fast <- rowMeans(yt_mu)*rowSums(t(avg_xtx_inv_tx)%*%XT_fast)
-  U_XT_fast <- rowMeans(yt_mu)*do.call(cbind, by(crossprod(XT_fast, avg_xtx_inv_tx), rep(1:K, each=g), FUN=colSums, simplify=FALSE))
-  U_XT_indiv <- do.call(rbind, by(U_XT_fast, indiv, FUN=colSums, simplify=FALSE))
-  #U2 <- apply(avg_xtx_inv_tx, 1, function(xx){rowMeans(do.call(cbind, replicate(g, xx, simplify = FALSE))*yt_mu)})
-  #U_indiv <- do.call(rbind, by(U2, indiv, FUN=colSums, simplify=FALSE))
-  q_ext <-  q - U_XT_indiv #U_indiv %*% XT
+  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
+  XT_fast <- t(x)%*%T_fast/nb_indiv
+  avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
+  U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
+  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE))
+  q_ext <-  q - U_XT_indiv
+
+
+  gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
 
   qq <- colSums(q)^2/nb_indiv
-  #do.call(rbind, by(t(qq), rep(1:K, g), FUN=colSums, simplify=FALSE))
-  QQ <- sum(qq)
+
+  gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # to be optimized
+  QQ <- sum(qq)#nb_indiv=nrow(q) # set score
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled"=qq))
+              "gene_scores_unscaled" = gene_Q,
+              "gene_inds" = gene_inds))
 }
