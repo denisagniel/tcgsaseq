@@ -212,6 +212,9 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
   if(which_test == "asymptotic"){
     n_perm <- NA
+
+    if(nrow(x) < 10)
+    warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
   }
 
   if(is.null(genesets)){

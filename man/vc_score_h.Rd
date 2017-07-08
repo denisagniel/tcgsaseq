@@ -74,9 +74,11 @@ myw <- matrix(rnorm(nsample*ng, sd=0.1), ncol=nsample, nrow=ng)
 #run test
 score_homogen <- vc_score_h(y, x, phi=tim, indiv=myindiv,
                            w=myw, Sigma_xi=cov(tim))
+score_homogen$score
 
 score_heterogen <- vc_score(y, x, phi=tim, indiv=myindiv,
                            w=myw, Sigma_xi=cov(tim))
+score_heterogen$score
 
 scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
                                  w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=cov(tim),

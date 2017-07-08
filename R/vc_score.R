@@ -162,6 +162,17 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   ##----------------------------
   q_fast <- matrix(yt_mu, ncol=g*n_t, nrow=n)*T_fast
 
+  #dplyr seems to be less efficient here
+  #q_fast_tb <- tibble::as_tibble(cbind.data.frame(indiv, q_fast))
+  #q_dp <- q_fast_tb %>% group_by(indiv) %>% summarise_all(sum)
+  #aggregate is much longer also
+  #qtemp <- aggregate(. ~ indiv, cbind.data.frame(indiv, q_fast), sum)
+  #qtemp <- aggregate(. ~ indiv, cbind.data.frame(indiv, q_fast), sum)
+  #data.table hard to test, but seems to be at least 10 times slower on big datasets (weird)
+  #m_dt <- data.table("indiv"=factor(rep(c(1:20), each=5)), mbig)
+  #temp <- m_dt[, lapply(.SD, sum), by=indiv]
+
+  #those 2 by statements represent the longest AND more memory intensive part of this for genewise analysis:
   q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
   XT_fast <- t(x)%*%T_fast/nb_indiv
   avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)

@@ -18,7 +18,8 @@
 #'@importFrom stats cor rchisq rgamma rnorm rpois model.matrix runif
 #'@export
 data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do_gs=TRUE,
-                              longitudinal=TRUE, mixed_hypothesis=FALSE){
+                              longitudinal=TRUE, mixed_hypothesis=FALSE,
+                              n=18, nindiv=6, ntime=3){
 
 
   ############################################################################
@@ -33,16 +34,20 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do
   baselineprop <- baselineprop/sum(baselineprop)
 
   # Design ----
-  n <- 18#128
+  #n <- 18#128
   n1 <- n/2
   n2 <- n1
-  nindiv <- 6#32
+  #nindiv <- 6#32
   ngroup <- 2
-  ntime <- 3#4
+  #ntime <- 3#4
   group <- rep(0:1, each=n/ngroup)
   indiv <- factor(rep(1:nindiv, each=n/nindiv))
-  time <- rep(1:ntime, nindiv)
-  design <- stats::model.matrix(~ group + time)
+  if(ntime > 1){
+    time <- rep(1:ntime, nindiv)
+    design <- stats::model.matrix(~ group + time)
+  }else{
+    design <- stats::model.matrix(~ group)
+  }
   #design <- design[, 1, drop=FALSE]
   nlibs <- n
 
@@ -117,14 +122,15 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do
   counts2 <- counts[keep,]
   counts2_null <- counts_null[keep,]
 
-  S_temp <- stats::cor(t(counts2_null))
-  rownames(S_temp) <- as.character(1:nrow(S_temp))
-  colnames(S_temp) <- as.character(1:ncol(S_temp))
-  rownames(counts2_null) <- rownames(S_temp)
-  rownames(counts2) <- rownames(S_temp)
+  rownames(counts2_null) <- as.character(1:nkeep)
+  rownames(counts2) <- as.character(1:nkeep)
   #browser()
 
   if(do_gs){
+    S_temp <- stats::cor(t(counts2_null))
+    rownames(S_temp) <- as.character(1:nkeep)
+    colnames(S_temp) <- as.character(1:nkeep)
+
     GS <- list()
     for(i in 1:ncol(S_temp)){
       GS[[i]] <- which(abs(S_temp[,1])>0.8)
@@ -141,7 +147,7 @@ data_sim_voomlike <- function(seed=NULL, maxGSsize=400, minGSsize=30, beta=0, do
 
   if(mixed_hypothesis){
     select_alt <- sample(x=1:nrow(counts2), size=floor(ngenes/10))
-    countsfin <- rbind(counts2[select_alt, ], counts2_null[!(1:nrow(counts2) %in% select_alt), ])
+    countsfin <- rbind(counts2[select_alt, ], counts2_null[!(1:nrow(counts2_null) %in% select_alt), ])
   }else{
     countsfin <- counts2
   }

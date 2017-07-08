@@ -87,21 +87,15 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   nindiv <- nrow(score_list$q_ext)
   ng <- ncol(score_list$q_ext)
 
-  if(nindiv == 1){
-    warning("Only 1 individual: asymptotics likely not reached - Should probably run permutation test")
-    Sig_q <- matrix(1, ng, ng)
-  }else{
-    Sig_q <- cov(score_list$q_ext)
-  }
-
   if (genewise_pvals) {
     if (ng == 1 & nindiv > 1) {
       gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
       pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
     }else if(ng > 1 & nindiv > 1){
       gene_scores_obs <- score_list$gene_scores_unscaled
-      gene_lambda <- diag(Sig_q)
+      gene_lambda <- apply(X=score_list$q_ext, MARGIN=2, FUN=var)
       pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
+      #pv <- stats::pchisq(gene_scores_obs/gene_lambda, df = 1, lower.tail = FALSE) # same result ? only if phi is univariate
     }else if(ng == 1 & nindiv == 1){
       gene_scores_obs <- score_list$gene_scores_unscaled
       pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
@@ -116,6 +110,12 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)
 
   } else {
+
+    if(nindiv == 1){
+      Sig_q <- matrix(1, ng, ng)
+    }else{
+      Sig_q <- cov(score_list$q_ext)
+    }
 
     lam <- try(svd(Sig_q)$d)
     if (inherits(lam, "try-error")){
