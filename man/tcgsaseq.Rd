@@ -4,20 +4,21 @@
 \name{tcgsaseq}
 \alias{tcgsaseq}
 \alias{tcgsaseq-package}
-\title{tcgsaseq: a package to perform Time-course Gene Set Analysis of RNA-seq data}
+\title{tcgsaseq: a package to perform Time-course Gene Set Analysis and General Gene-Wise Analysis of RNA-seq data}
 \description{
-Gene set analysis of longitudinal RNA-seq data with variance component score
+Analysis of RNA-seq data with variance component score
 test acocunting for data heteroscedasticity through precision weights.
 }
 \details{
 \tabular{ll}{
 Package: \tab tcgsaseq\cr
 Type: \tab Package\cr
-Version: \tab 1.5.1\cr
-Date: \tab 2017-05-24\cr
+Version: \tab 1.5.2\cr
+Date: \tab 2017-07-11\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
-The main function of the tcgsaseq package is \code{\link{tcgsa_seq}}
+The two main functions of the tcgsaseq package are \code{\link{varseq}}
+\code{\link{tcgsa_seq}}
 }
 \references{
 Agniel D, Hejblum BP, Variance component score test for

@@ -22,7 +22,8 @@
 #'to be a \code{factor}.
 #'
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
-#'of the \code{K} random effects.
+#'of the \code{K} random effects. Only used if \code{homogen_traj} is \code{FALSE}.
+#'Default assume diagonal correlation matrix, i.e. independence of random effects.
 #'
 #'@param which_weights a character string indicating which method to use to estimate
 #'the mean-variance relationship wheights. Possibilities are \code{"loclin"},
@@ -44,7 +45,7 @@
 #'@param doPlot a logical flag indicating whether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
 #'
-#'@param gene_based a logical flag used for "loclin" weights, indicating whether to estimate
+#'@param gene_based_weights a logical flag used for "loclin" weights, indicating whether to estimate
 #'weights at the gene-level. Default is \code{FALSE}, when weights will be estimated at the
 #'observation-level.
 #'
@@ -80,6 +81,9 @@
 #'
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
+#'
+#'@param verbose a logical flag indicating whether informative message are printed
+#'during the computation. Default is \code{TRUE}.
 #'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{which_test}: a character string carrying forward the value of the '\code{which_test}' argument
@@ -137,7 +141,7 @@
 #'\dontrun{
 #'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
 #'                       Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="permutation",
-#'                       which_weights="none", preprocessed=TRUE, nperm=100)
+#'                       which_weights="none", preprocessed=TRUE, n_perm=100)
 #'}
 #'@export
 tcgsa_seq <- function(y, x, phi, genesets,
@@ -145,13 +149,14 @@ tcgsa_seq <- function(y, x, phi, genesets,
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom", "none"),
                       n_perm = 1000,
-                      preprocessed = FALSE, doPlot = TRUE, gene_based = FALSE,
+                      preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
                       bw = "nrd",
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                       exact = FALSE, transform = FALSE,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                       lowess_span = 0.5,
-                      homogen_traj = FALSE){
+                      homogen_traj = FALSE,
+                      verbose = TRUE){
 
 
   stopifnot(is.matrix(y))
@@ -196,7 +201,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
                                    preprocessed = preprocessed, doPlot=doPlot,
-                                   gene_based = gene_based,
+                                   gene_based = gene_based_weights,
                                    bw = bw, kernel = kernel,
                                    exact = exact, transform = transform),
                voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
@@ -214,8 +219,9 @@ tcgsa_seq <- function(y, x, phi, genesets,
   }
 
   if(is.null(genesets)){
-    cat("'genesets' argument not provided => only genewise p-values are computed\n")
-
+    if(verbose){
+      cat("'genesets' argument not provided => only genewise p-values are computed\n")
+    }
     if(which_test == "asymptotic"){
       rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
                                w = w, Sigma_xi = Sigma_xi,
