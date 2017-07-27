@@ -7,7 +7,7 @@
 tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
   which_weights = c("loclin", "voom", "none"), n_perm = 1000,
-  preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
+  preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
   bw = "nrd", kernel = c("gaussian", "epanechnikov", "rectangular",
   "triangular", "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
   transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
@@ -59,8 +59,8 @@ log(counts) per million.}
 Default is \code{FALSE}.}
 
 \item{gene_based_weights}{a logical flag used for "loclin" weights, indicating whether to estimate
-weights at the gene-level. Default is \code{FALSE}, when weights will be estimated at the
-observation-level.}
+weights at the gene-level, or rather at the observation-level. Default is \code{TRUE},
+and weights are then estimated at the gene-level.}
 
 \item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
 \code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
