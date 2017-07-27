@@ -2,7 +2,7 @@
 
 ### Main changes in Version 1.5.2 (2017-07-11)
 
-* user-friendly wrapper varseq for gene-wise testing.
+* user-friendly wrapper function `varseq` for gene-wise testing.
 
 * RAM usage optimization
 
