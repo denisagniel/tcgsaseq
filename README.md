@@ -8,9 +8,14 @@
 Overview
 --------
 
-`tcgsaseq` is a package for analyzing RNA-seq data. *Time-course Gene Set Analysis of RNA-seq data*. The method implemented is this package are escribed in the following article :
+`tcgsaseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `varseq` and `tcgsaseq`:
 
--   D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, Biostatistics. arXiv:1605.02351.
+-   **Gene-wise Differential Analysis of RNA-seq data** can be performed using the function `varseq`.
+-   **Gene Set Analysis of RNA-seq data** can be performed using the function `tcgsaseq`.
+
+The method implemented in this package is detailed in the following article:
+
+-   D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, Biostatistics. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4).
 
 Installation
 ------------
