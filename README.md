@@ -24,7 +24,7 @@ Installation
 # The easiest way to get tcgsaseq is to install it from CRAN:
 install.packages("tcgsaseq")
 
-# Or to getthe development version from GitHub:
+# Or to get the development version from GitHub:
 #install.packages("devtools")
 devtools::install_github("denisagniel/tcgsaseq")
 ```
