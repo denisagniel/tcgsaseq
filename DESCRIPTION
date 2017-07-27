@@ -20,7 +20,9 @@ Suggests:
     limma,
     edgeR,
     DESeq2,
-    S4Vectors
+    S4Vectors,
+    knitr,
+    rmarkdown
 Description: Gene set analysis of longitudinal RNA-seq data with variance component
     score test accounting for data heteroscedasticity through precision weights. 
     Method is detailed in: Agniel D, Hejblum BP (2016) Variance component score test 
@@ -29,3 +31,4 @@ LazyData: true
 License: GPL-2 | file LICENSE
 BugReports: https://github.com/denisagniel/tcgsaseq/issues
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

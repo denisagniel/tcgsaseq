@@ -1,0 +1,19 @@
+---
+title: "Userguide for performing RNA-seq data analysis with `varseq` & `tcgsaseq`"
+author: "Boris Hejblum, Denis Agniel"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{*varseq* & *tcgsaseq* userguide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+# Differential expression analysis of RNA-seq data with `varseq`
+
+# Gene set analysis of RNA-seq data with `tcgsaseq`
