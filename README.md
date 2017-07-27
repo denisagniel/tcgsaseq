@@ -8,10 +8,10 @@
 Overview
 --------
 
-`tcgsaseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `varseq` and `tcgsaseq`:
+`tcgsaseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `varseq` and `tcgsa_seq`:
 
 -   **Gene-wise Differential Analysis of RNA-seq data** can be performed using the function `varseq`.
--   **Gene Set Analysis of RNA-seq data** can be performed using the function `tcgsaseq`.
+-   **Gene Set Analysis of RNA-seq data** can be performed using the function `tcgsa_seq`.
 
 The method implemented in this package is detailed in the following article:
 
