@@ -14,6 +14,9 @@ r_packages:
 - CompQuadForm
 - GSA
 - KernSmooth
+- knitr
+- rmarkdown
+
 bioc_packages:
 - limma
 - DESeq2
