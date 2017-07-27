@@ -7,7 +7,7 @@ output:
     fig_caption: yes
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{*varseq* & *tcgsaseq* userguide}
+  %\VignetteIndexEntry{Userguide for performing RNA-seq data analysis with `varseq` & `tcgsaseq`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
