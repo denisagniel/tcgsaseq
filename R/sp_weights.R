@@ -9,8 +9,6 @@
 #'@param x a numeric matrix of size \code{n x p} containing the model covariates from
 #'\code{n} samples (design matrix).
 #'
-#'@param phi a numeric design matrix of size \code{n x K} containing the K bases of time.
-#'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 #'which case \code{y} is assumed to contain raw counts and is normalized into
@@ -64,11 +62,13 @@
 #'@export
 
 
-sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
+sp_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE,
                        gene_based = FALSE,
                        bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-                       exact=FALSE, transform = FALSE
+                       exact=FALSE, transform = FALSE,
+                       trim_low = 1e-7,
+                       trim_high = 100
 ){
 
 
@@ -76,14 +76,11 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
   stopifnot(is.matrix(y))
   stopifnot(is.matrix(x))
-  stopifnot(is.matrix(phi))
 
   g <- nrow(y) # the number of genes measured
   n <- ncol(y) # the number of samples measured
   qq <- ncol(x) # the number of covariates
-  n.t <- ncol(phi) # the number of time bases
   stopifnot(nrow(x) == n)
-  stopifnot(nrow(phi) == n)
 
 
   observed <- which(colSums(y) != 0) #removing genes never observed
@@ -101,9 +98,9 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
 
   # fitting OLS to the lcpm
-  xphi <- cbind(x,phi)
-  B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm
-  mu <- xphi%*%B_ols
+
+  B_ols <- solve(crossprod(x))%*%t(x)%*%y_lcpm
+  mu <- x%*%B_ols
 
   sq_err <- (y_lcpm - mu)^2
   v <- colMeans(sq_err)
@@ -274,6 +271,13 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
   colnames(weights) <- colnames(y_lcpm)
   rownames(weights) <- rownames(y_lcpm)
+
+  ## re-scale weights
+  weights <- weights/median(weights)
+
+  ### trim weights above and below
+  weights <- pmin(trim_high, weights) %>% pmax(trim_low) %>% matrix(nrow(y_lcpm), ncol(y_lcpm))
+
 
   return(t(weights))
 }
