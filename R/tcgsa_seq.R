@@ -164,7 +164,7 @@ tcgsa_seq <- function(y, x, phi, genesets,
   stopifnot(is.matrix(y))
 
   if(!preprocessed){
-    y_lcpm <- t(apply(y, MARGIN=1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
+    y_lcpm <- apply(y, MARGIN=2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }else{
     y_lcpm <- y
   }

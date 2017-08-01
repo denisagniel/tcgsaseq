@@ -1,5 +1,11 @@
 # News about the `tcgsaseq` R package
 
+### Main changes in Version 1.6.0 (2017-08-01)
+
+* bug fix to the log2-cpm transformation computation (for `preprocessed = FALSE`)
+
+* improvement to defaults in `varseq` and `tcgsa_seq` wrapper functions
+
 ### Main changes in Version 1.5.2 (2017-07-11)
 
 * user-friendly wrapper function `varseq` for gene-wise testing.
