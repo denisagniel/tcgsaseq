@@ -15,16 +15,20 @@ Overview
 
 The method implemented in this package is detailed in the following article:
 
--   D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, Biostatistics. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4).
+> D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, *Biostatistics*. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4).
 
 Installation
 ------------
 
-``` r
-# The easiest way to get tcgsaseq is to install it from CRAN:
-install.packages("tcgsaseq")
+The easiest way to get `tcgsaseq` is to install it from [CRAN](https://cran.r-project.org/package=tcgsaseq):
 
-# Or to get the development version from GitHub:
+``` r
+install.packages("ludic")
+```
+
+Or to get the development version from [GitHub](https://github.com/denisagniel/tcgsaseq):
+
+``` r
 #install.packages("devtools")
 devtools::install_github("denisagniel/tcgsaseq")
 ```

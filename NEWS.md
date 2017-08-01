@@ -13,7 +13,7 @@
 * RAM usage optimization
 
 
-### Main changes in Version 1.5.1 (2017-05-24) - this is only a minor release:
+### Main changes in Version 1.5.1 (2017-05-24) --- *this is only a minor release*:
 
 * homogeneous test is now available for gene-wise testing.
 
@@ -43,11 +43,11 @@
 * improved imports
 * Documentation updated
 
-### Main changes in Version 1.0.2 (2016-05-18) - this is only a minor release:
+### Main changes in Version 1.0.2 (2016-05-18) --- *this is only a minor release*:
 
 * Documentation and CITATION updated
 
-### Main changes in Version 1.0.1 (2016-05-14) - this is only a minor release:
+### Main changes in Version 1.0.1 (2016-05-14) --- *this is only a minor release*:
 
 * Help file improvements
 

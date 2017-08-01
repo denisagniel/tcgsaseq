@@ -27,17 +27,20 @@ knitr::opts_chunk$set(
 
 The method implemented in this package is detailed in the following article:
 
-* D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of
-longitudinal RNA-seq data, 2017, Biostatistics. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4).
+> D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of
+longitudinal RNA-seq data, 2017, *Biostatistics*. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4).
 
 
 ## Installation
 
-```R
-# The easiest way to get tcgsaseq is to install it from CRAN:
-install.packages("tcgsaseq")
 
-# Or to get the development version from GitHub:
+The easiest way to get `tcgsaseq` is to install it from [CRAN](https://cran.r-project.org/package=tcgsaseq):
+```{r CRAN-install, eval=FALSE}
+install.packages("ludic")
+```
+
+Or to get the development version from [GitHub](https://github.com/denisagniel/tcgsaseq):
+```{r GitHub-install, eval=FALSE}
 #install.packages("devtools")
 devtools::install_github("denisagniel/tcgsaseq")
 ```
