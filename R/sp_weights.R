@@ -41,20 +41,23 @@
 #'for the purpose of local linear smoothing. This may be helpful if tail observations are sparse and
 #'the specified bandwidth gives suboptimal performance there. Default is \code{FALSE}.
 #'
+#'@param verbose a logical flag indicating whether informative messages are printed
+#'during the computation. Default is \code{TRUE}.
+#'
 #'@return a \code{n x G} matrix containing the computed precision weights.
 #'
 #'@seealso \code{\link[stats]{bandwidth}} \code{\link{density}}
 #'
 #'@examples
-#'#rm(list=ls())
+#'#rm(list = ls())
 #'set.seed(123)
 #'
 #'G <- 10000
 #'n <- 12
 #'p <- 2
-#'y <- sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)})
+#'y <- sapply(1:G, FUN = function(x){rnbinom(n = n, size = 0.07, mu = 200)})
 #'
-#'x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
+#'x <- sapply(1:p, FUN = function(x){rnorm(n = n, mean = n, sd = 1)})
 #'
 #'
 #'
@@ -64,11 +67,12 @@
 #'@export
 
 
-sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
+sp_weights <- function(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
                        gene_based = FALSE,
                        bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-                       exact=FALSE, transform = FALSE
+                       exact = FALSE, transform = FALSE,
+                       verbose = TRUE
 ){
 
 
@@ -90,10 +94,10 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
   kernel <- match.arg(kernel)
   if(preprocessed){
-    y_lcpm <- t(y[,observed])
+    y_lcpm <- t(y[, observed])
   }else{
     # transforming rna raw counts to log-counts per million (lcpm)
-    y_lcpm <- apply(y[,observed], MARGIN=1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
+    y_lcpm <- apply(y[, observed], MARGIN = 1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }
   rm(y)
   N <- length(y_lcpm)
@@ -101,7 +105,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
 
   # fitting OLS to the lcpm
-  xphi <- cbind(x,phi)
+  xphi <- cbind(x, phi)
   B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm
   mu <- xphi%*%B_ols
 
@@ -126,7 +130,7 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
   if(is.character(bw)){
     if(length(bw>1)){
-        bw <- bw[1]
+      bw <- bw[1]
     }
     if (N < 2){stop("need at least 2 points to select a bandwidth automatically")}
     if(!exact & gene_based){
@@ -146,7 +150,9 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
                    SJ = stats::bw.SJ(as.vector(mu), method = "ste"),
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }
-    cat("\nBandwith computed.\n")
+    if(verbose){
+      cat("\nBandwith computed.\n")
+    }
   }
 
   if(!is.finite(bw)){
@@ -157,46 +163,46 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
   }
 
 
-  if(kernel=="gaussian"){
+  if(kernel == "gaussian"){
     kern_func <- function(x, bw){
       stats::dnorm(x, sd = bw)
     }
-  }else if(kernel=="rectangular"){
+  }else if(kernel == "rectangular"){
     kern_func2 <- function(x, bw){
       a <- bw * sqrt(3)
       (abs(x) < a)*0.5/a#ifelse(abs(x) < a, 0.5/a, 0)
 
     }
-  }else if(kernel=="triangular"){
+  }else if(kernel == "triangular"){
     kern_func <- function(x, bw){
       h <- bw * sqrt(6)
       ax <- abs(x)
       (ax < h)*((1 - ax/h)/h)
     }
-  }else if(kernel=="tricube"){
+  }else if(kernel == "tricube"){
     kern_func <- function(x, bw){
       h <- bw * sqrt(243/35)
       ax <- abs(x)
       (ax < h)*(70/81*(1 - (ax/h)^3)^3)/h
     }
-  }else if(kernel=="epanechnikov"){
+  }else if(kernel == "epanechnikov"){
     kern_func <- function(x, bw){
       h <- bw * sqrt(5)
       ax <- abs(x)
       (ax < h)*(3/4*(1 - (ax/h)^2)/h)
     }
-  }else if(kernel=="biweight"){
+  }else if(kernel == "biweight"){
     kern_func <- function(x, bw){
       h <- bw * sqrt(7)
       ax <- abs(x)
       (ax < h)*(15/16*(1 - (ax/h)^2)^2/h)
     }
-  }else if(kernel=="cosine"){
+  }else if(kernel == "cosine"){
     kern_func <- function(x, bw){
       h <- bw/sqrt(1/3 - 2/pi^2)
       (abs(x) < h)*((1 + cos(pi*x/h))/(2*h))
     }
-  }else if(kernel=="optcosine"){
+  }else if(kernel == "optcosine"){
     kern_func <- function(x, bw){
       h <- bw/sqrt(1 - 8/pi^2)
       (abs(x) < h)*(pi/4 * cos(pi*x/(2*h))/h)
@@ -220,18 +226,18 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
     kern_fit <- NULL
     if(exact){
-      weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol=n, nrow=p, byrow = FALSE))
+      weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol = n, nrow = p, byrow = FALSE))
       if(sum(!is.finite(weights))>0){
         warning("At least 1 non finite weight. Try to increase the bandwith")
       }
     }else{
-      kern_fit <- sapply(mu_avg,w)
-      weights <- 1/matrix(kern_fit, nrow=n, ncol=p, byrow=TRUE)
-      #f_interp <- stats::approxfun(x=mu_avg, kern_fit, rule = 2)
+      kern_fit <- sapply(mu_avg, w)
+      weights <- 1/matrix(kern_fit, nrow = n, ncol = p, byrow = TRUE)
+      #f_interp <- stats::approxfun(x = mu_avg, kern_fit, rule = 2)
       #weights <- 1/apply(mu, 2, f_interp)
     }
-    #kern_fit <- sapply(mu_avg,w)
-    #weights <- matrix(rep(1/kern_fit), ncol=ncol(y_lcpm), nrow=nrow(y_lcpm), byrow = TRUE)
+    #kern_fit <- sapply(mu_avg, w)
+    #weights <- matrix(rep(1/kern_fit), ncol = ncol(y_lcpm), nrow = nrow(y_lcpm), byrow = TRUE)
   } else {
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
                                 degree = 1, kernel = kernel, bandwidth = bw)
@@ -242,32 +248,32 @@ sp_weights <- function(y, x, phi, preprocessed=FALSE, doPlot=FALSE,
 
   if(doPlot){
     if (gene_based) {
-        o <- order(mu_avg, na.last = NA)
-      plot_df <- data.frame("m_o"=mu_avg[o], "v_o"=v[o])
+      o <- order(mu_avg, na.last = NA)
+      plot_df <- data.frame("m_o" = mu_avg[o], "v_o" = v[o])
       if(is.null(kern_fit)){
-        kern_fit <- sapply(mu_avg[o],w)
+        kern_fit <- sapply(mu_avg[o], w)
       }else{
         kern_fit <- kern_fit[o]
       }
-      plot_df_lo <- data.frame("lo.x"=mu_avg[o], "lo.y"=kern_fit)
+      plot_df_lo <- data.frame("lo.x" = mu_avg[o], "lo.y" = kern_fit)
     } else {
       inds <- sample(1:length(mu), size = 1000)
       mu_s <- mu[inds]
       ep_s <- sq_err[inds]
-      plot_df <- data.frame("m_o"=mu_s, "v_o"=ep_s)
-      plot_df_lo <- data.frame("lo.x"=reverse_trans(smth$x), "lo.y"=smth$y)
+      plot_df <- data.frame("m_o" = mu_s, "v_o" = ep_s)
+      plot_df_lo <- data.frame("lo.x" = reverse_trans(smth$x), "lo.y" = smth$y)
     }
 
 
-    #plot_df_lo_temp <- data.frame("lo.x"=mu_avg[o], "lo.y"=f_interp(mu_avg[o]))
-    ggp <- (ggplot(data=plot_df)
-            + geom_point(aes_string(x="m_o", y="v_o"), alpha=0.45, color="grey25", size=0.5)
+    #plot_df_lo_temp <- data.frame("lo.x" = mu_avg[o], "lo.y" = f_interp(mu_avg[o]))
+    ggp <- (ggplot(data = plot_df)
+            + geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.45, color = "grey25", size = 0.5)
             + theme_bw()
             + xlab("Conditionnal mean")
             + ylab("Variance")
             + ggtitle("Mean-variance local regression non-parametric fit")
-            + geom_line(data=plot_df_lo, aes_string(x="lo.x", y="lo.y"), color="blue", lwd=1.4, lty="solid", alpha=0.8)
-            #+ geom_line(data=plot_df_lo_temp, aes(x=lo.x, y=lo.y), color="red", lwd=1, lty=2)
+            + geom_line(data = plot_df_lo, aes_string(x = "lo.x", y = "lo.y"), color = "blue", lwd = 1.4, lty = "solid", alpha = 0.8)
+            #+ geom_line(data = plot_df_lo_temp, aes(x = lo.x, y = lo.y), color = "red", lwd = 1, lty = 2)
     )
     print(ggp)
   }

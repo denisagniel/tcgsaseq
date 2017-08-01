@@ -8,7 +8,7 @@ sp_weights(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
   gene_based = FALSE, bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  transform = FALSE)
+  transform = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
@@ -48,6 +48,9 @@ variance. Default is \code{FALSE}, which uses interpolation (faster).}
 \item{transform}{a logical flag indicating whether values should be transformed to uniform
 for the purpose of local linear smoothing. This may be helpful if tail observations are sparse and
 the specified bandwidth gives suboptimal performance there. Default is \code{FALSE}.}
+
+\item{verbose}{a logical flag indicating whether informative messages are printed
+during the computation. Default is \code{TRUE}.}
 }
 \value{
 a \code{n x G} matrix containing the computed precision weights.
@@ -57,15 +60,15 @@ Computes precision weights that account for heteroscedasticity in RNAseq count d
 based on non-parametric local linear regression estimates.
 }
 \examples{
-#rm(list=ls())
+#rm(list = ls())
 set.seed(123)
 
 G <- 10000
 n <- 12
 p <- 2
-y <- sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)})
+y <- sapply(1:G, FUN = function(x){rnbinom(n = n, size = 0.07, mu = 200)})
 
-x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
+x <- sapply(1:p, FUN = function(x){rnorm(n = n, mean = n, sd = 1)})
 
 
 
