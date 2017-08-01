@@ -128,7 +128,8 @@
 #'}
 #'@export
 varseq <- function(exprmat, covariates, variables2test,
-                   sample_group = rep(1, nrow(covariates)), cov_variables2test_eff = diag(ncol(variables2test)),
+                   sample_group = NULL,
+                   cov_variables2test_eff = diag(ncol(variables2test)),
                    which_test = c("permutation", "asymptotic"),
                    which_weights = c("loclin", "voom", "none"),
                    n_perm = 1000,
@@ -140,8 +141,10 @@ varseq <- function(exprmat, covariates, variables2test,
                    lowess_span = 0.5,
                    homogen_traj = FALSE){
 
-  return(tcgsa_seq(y=exprmat, x=covariates, phi=variables2test, genesets=NULL,
-                   indiv = sample_group, Sigma_xi = cov_variables2test_eff,
+  return(tcgsa_seq(y = exprmat, x = covariates, phi = variables2test,
+                   genesets = NULL,
+                   indiv = sample_group,
+                   Sigma_xi = cov_variables2test_eff,
                    which_test = which_test,
                    which_weights = which_weights,
                    n_perm = n_perm,
@@ -152,6 +155,6 @@ varseq <- function(exprmat, covariates, variables2test,
                    padjust_methods = padjust_methods,
                    lowess_span = lowess_span,
                    homogen_traj = homogen_traj,
-                   verbose=FALSE))
+                   verbose = FALSE))
 
 }

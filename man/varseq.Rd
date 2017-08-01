@@ -4,8 +4,8 @@
 \alias{varseq}
 \title{Variance component testing for RNA-seq data analysis}
 \usage{
-varseq(exprmat, covariates, variables2test, sample_group = rep(1,
-  nrow(covariates)), cov_variables2test_eff = diag(ncol(variables2test)),
+varseq(exprmat, covariates, variables2test, sample_group = NULL,
+  cov_variables2test_eff = diag(ncol(variables2test)),
   which_test = c("permutation", "asymptotic"), which_weights = c("loclin",
   "voom", "none"), n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
   gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",

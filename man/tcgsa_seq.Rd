@@ -4,15 +4,14 @@
 \alias{tcgsa_seq}
 \title{Time-course Gene Set Analyis}
 \usage{
-tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
-  Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
-  preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
-  bw = "nrd", kernel = c("gaussian", "epanechnikov", "rectangular",
-  "triangular", "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
-  "hommel", "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
-  verbose = TRUE)
+tcgsa_seq(y, x, phi, genesets, indiv = NULL, Sigma_xi = diag(ncol(phi)),
+  which_test = c("permutation", "asymptotic"), which_weights = c("loclin",
+  "voom", "none"), n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
+  gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",
+  "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine",
+  "optcosine"), exact = FALSE, transform = FALSE,
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+  lowess_span = 0.5, homogen_traj = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -32,7 +31,8 @@ If \code{NULL}, then genewise p-values are returned.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
-to be a \code{factor}.}
+to be a \code{factor}. Default is \code{NULL} in which case each sample is considered
+as coming from independent subjects.}
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects. Only used if \code{homogen_traj} is \code{FALSE}.
@@ -95,7 +95,7 @@ Default is \code{0.5}.}
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 
-\item{verbose}{a logical flag indicating whether informative message are printed
+\item{verbose}{a logical flag indicating whether informative messages are printed
 during the computation. Default is \code{TRUE}.}
 }
 \value{

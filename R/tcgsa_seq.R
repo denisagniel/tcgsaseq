@@ -19,7 +19,8 @@
 #'
 #'@param indiv a vector of length \code{n} containing the information for
 #'attributing each sample to one of the studied individuals. Coerced
-#'to be a \code{factor}.
+#'to be a \code{factor}. Default is \code{NULL} in which case each sample is considered
+#'as coming from independent subjects.
 #'
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
 #'of the \code{K} random effects. Only used if \code{homogen_traj} is \code{FALSE}.
@@ -82,7 +83,7 @@
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
-#'@param verbose a logical flag indicating whether informative message are printed
+#'@param verbose a logical flag indicating whether informative messages are printed
 #'during the computation. Default is \code{TRUE}.
 #'
 #'@return A list with the following elements:\itemize{
@@ -145,7 +146,8 @@
 #'}
 #'@export
 tcgsa_seq <- function(y, x, phi, genesets,
-                      indiv = rep(1, nrow(x)), Sigma_xi = diag(ncol(phi)),
+                      indiv = NULL,
+                      Sigma_xi = diag(ncol(phi)),
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom", "none"),
                       n_perm = 1000,
@@ -163,7 +165,6 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
   if(!preprocessed){
     y_lcpm <- t(apply(y, MARGIN=1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
-    preprocessed <- TRUE
   }else{
     y_lcpm <- y
   }
@@ -200,12 +201,12 @@ tcgsa_seq <- function(y, x, phi, genesets,
 
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
-                                   preprocessed = preprocessed, doPlot=doPlot,
+                                   preprocessed = TRUE, doPlot=doPlot,
                                    gene_based = gene_based_weights,
                                    bw = bw, kernel = kernel,
-                                   exact = exact, transform = transform),
+                                   exact = exact, transform = transform, verbose = verbose),
                voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
-                                   preprocessed = preprocessed, doPlot = doPlot,
+                                   preprocessed = TRUE, doPlot = doPlot,
                                    lowess_span = lowess_span),
                none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
   )
@@ -218,15 +219,25 @@ tcgsa_seq <- function(y, x, phi, genesets,
     warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
   }
 
+
+
   if(is.null(genesets)){
     if(verbose){
       cat("'genesets' argument not provided => only genewise p-values are computed\n")
     }
     if(which_test == "asymptotic"){
+      if(is.null(indiv)){
+        indiv <- 1:nrow(x)
+      }
+
       rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
                                w = w, Sigma_xi = Sigma_xi,
                                genewise_pvals = TRUE, homogen_traj = homogen_traj)$gene_pvals
     }else if(which_test == "permutation"){
+      if(is.null(indiv)){
+        indiv <- rep(1, nrow(x))
+      }
+
       y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm))
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
       rawPvals <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
@@ -251,12 +262,20 @@ tcgsa_seq <- function(y, x, phi, genesets,
     }
 
     if(which_test == "asymptotic"){
+      if(is.null(indiv)){
+        indiv <- 1:nrow(x)
+      }
+
       rawPvals <- sapply(genesets, FUN = function(gs){
         vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
                      w = w[gs, ], Sigma_xi = Sigma_xi,
                      genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
       )
     } else if(which_test == "permutation"){
+      if(is.null(indiv)){
+        indiv <- rep(1, nrow(x))
+      }
+
       y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm))
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
       rawPvals <- sapply(genesets, FUN = function(gs){
