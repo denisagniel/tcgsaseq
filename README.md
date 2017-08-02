@@ -3,7 +3,7 @@
 `tcgsaseq`
 ==========
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tcgsaseq)](https://cran.r-project.org/package=tcgsaseq) [![Travis-CI Build Status](https://travis-ci.org/denisagniel/tcgsaseq.svg?branch=master)](https://travis-ci.org/denisagniel/tcgsaseq)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tcgsaseq)](https://cran.r-project.org/package=tcgsaseq) [![Travis-CI Build Status](https://travis-ci.org/denisagniel/tcgsaseq.svg?branch=master)](https://travis-ci.org/denisagniel/tcgsaseq) [![Downloads](https://cranlogs.r-pkg.org/badges/tcgsaseq?color=blue)](https://www.r-pkg.org/pkg/tcgsaseq)
 
 Overview
 --------
@@ -15,7 +15,7 @@ Overview
 
 The method implemented in this package is detailed in the following article:
 
-> D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, *Biostatistics*. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4).
+> D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, [*Biostatistics*](https://doi.org/10.1093/biostatistics/kxx005). [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4) [DOI:10.1093/biostatistics/kxx005](https://doi.org/10.1093/biostatistics/kxx005)
 
 Installation
 ------------
