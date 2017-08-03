@@ -5,6 +5,7 @@
 \title{Variance component testing for RNA-seq data analysis}
 \usage{
 varseq(exprmat, covariates, variables2test, sample_group = NULL,
+  weights_var2test_condi = TRUE,
   cov_variables2test_eff = diag(ncol(variables2test)),
   which_test = c("permutation", "asymptotic"), which_weights = c("loclin",
   "voom", "none"), n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
@@ -28,6 +29,12 @@ to be tested}
 \item{sample_group}{a vector of length \code{n} indicating wether the samples should be
 grouped (e.g. paired samples or longitudinal data). Coerced
 to be a \code{factor}. Default is \code{NULL} in which case no grouping is performed.}
+
+\item{weights_var2test_condi}{a logical flag indicating whether heteroscedasticity
+weights computation should be conditional on both the variables to be tested 
+\code{variables2test} and on the \code{covariates}, or on \code{covariates} alone. 
+Default is \code{TRUE} in which case conditional means are estimated conditionally 
+on both \code{variables2test} and \code{covariates}.}
 
 \item{cov_variables2test_eff}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects. Only used if \code{homogen_traj} is \code{FALSE}.

@@ -6,10 +6,16 @@
 #'@param y a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
 #'preprocessed expression from \code{n} samples for \code{G} genes.
 #'
-#'@param x a numeric matrix of size \code{n x p} containing the model covariates from
+#'@param x a numeric matrix of size \code{n x p} containing the model covariate(s) from
 #'\code{n} samples (design matrix).
 #'
-#'@param phi a numeric design matrix of size \code{n x K} containing the K bases of time.
+#'@param phi a numeric design matrix of size \code{n x K} containing the K
+#'variable(s) of interest( e.g. bases of time).
+#'
+#'@param use_phi a logical flag indicating whether conditional means should be conditioned
+#'on \code{phi} and on covariate(s) \code{x}, or on \code{x} alone. Default is
+#'\code{TRUE} in which case conditional means are estimated conditionally on both
+#'\code{x} and \code{phi}.
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -67,7 +73,7 @@
 #'@export
 
 
-sp_weights <- function(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
+sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = FALSE,
                        gene_based = FALSE,
                        bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
@@ -90,14 +96,14 @@ sp_weights <- function(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
   stopifnot(nrow(phi) == n)
 
 
-  observed <- which(colSums(y) != 0) #removing genes never observed
+  observed <- which(rowSums(y) != 0) #removing genes never observed
 
   kernel <- match.arg(kernel)
   if(preprocessed){
-    y_lcpm <- t(y[, observed])
+    y_lcpm <- t(y[observed, ])
   }else{
-    # transforming rna raw counts to log-counts per million (lcpm)
-    y_lcpm <- apply(y[, observed], MARGIN = 1, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
+    # transforming raw counts to log-counts per million (lcpm)
+    y_lcpm <- apply(y[observed, ], MARGIN = 2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }
   rm(y)
   N <- length(y_lcpm)
@@ -105,7 +111,7 @@ sp_weights <- function(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
 
 
   # fitting OLS to the lcpm
-  xphi <- cbind(x, phi)
+  xphi <- if(use_phi){cbind(x, phi)}else{x}
   B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm
   mu <- xphi%*%B_ols
 
@@ -269,7 +275,7 @@ sp_weights <- function(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
     ggp <- (ggplot(data = plot_df)
             + geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.45, color = "grey25", size = 0.5)
             + theme_bw()
-            + xlab("Conditionnal mean")
+            + xlab("Conditional mean")
             + ylab("Variance")
             + ggtitle("Mean-variance local regression non-parametric fit")
             + geom_line(data = plot_df_lo, aes_string(x = "lo.x", y = "lo.y"), color = "blue", lwd = 1.4, lty = "solid", alpha = 0.8)

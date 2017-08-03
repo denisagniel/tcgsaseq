@@ -12,6 +12,11 @@
 #'@param phi a numeric design matrix of size \code{n x K} containing the \code{K} variables
 #'to be tested
 #'
+#'@param weights_phi_condi a logical flag indicating whether heteroscedasticity
+#'weights computation should be conditional on both the variable(s) to be tested
+#'\code{phi} and on covariate(s) \code{x}, or on \code{x} alone. #'Default is \code{TRUE}
+#'in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.
+#'
 #'@param genesets either a vector of index or subscripts that defines which columns of \code{y}
 #'constitute the invesigated geneset. Can also be a \code{list} of index when several genesets are
 #'tested at once, such as the first element of a \code{\link[GSA:GSA.read.gmt]{gmt}} object.
@@ -145,7 +150,8 @@
 #'                       which_weights="none", preprocessed=TRUE, n_perm=100)
 #'}
 #'@export
-tcgsa_seq <- function(y, x, phi, genesets,
+tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
+                      genesets,
                       indiv = NULL,
                       Sigma_xi = diag(ncol(phi)),
                       which_test = c("permutation", "asymptotic"),
@@ -200,12 +206,12 @@ tcgsa_seq <- function(y, x, phi, genesets,
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
   w <-  switch(which_weights,
-               loclin = sp_weights(y = y_lcpm, x = x, phi=phi,
-                                   preprocessed = TRUE, doPlot=doPlot,
+               loclin = sp_weights(y = y_lcpm, x = x, phi = phi, use_phi = weights_phi_condi,
+                                   preprocessed = TRUE, doPlot = doPlot,
                                    gene_based = gene_based_weights,
                                    bw = bw, kernel = kernel,
                                    exact = exact, transform = transform, verbose = verbose),
-               voom = voom_weights(y = y_lcpm, x = cbind(x, phi),
+               voom = voom_weights(y = y_lcpm, x = if(weights_phi_condi){cbind(x, phi)}else{x},
                                    preprocessed = TRUE, doPlot = doPlot,
                                    lowess_span = lowess_span),
                none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))

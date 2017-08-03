@@ -12,6 +12,12 @@
 #'@param variables2test a numeric design matrix of size \code{n x K} containing the \code{K} variables
 #'to be tested
 #'
+#'@param weights_var2test_condi  a logical flag indicating whether heteroscedasticity
+#'weights computation should be conditional on both the variables to be tested 
+#'\code{variables2test} and on the \code{covariates}, or on \code{covariates} alone. 
+#'Default is \code{TRUE} in which case conditional means are estimated conditionally 
+#'on both \code{variables2test} and \code{covariates}.
+#'
 #'@param sample_group a vector of length \code{n} indicating wether the samples should be
 #'grouped (e.g. paired samples or longitudinal data). Coerced
 #'to be a \code{factor}. Default is \code{NULL} in which case no grouping is performed.
@@ -128,7 +134,7 @@
 #'}
 #'@export
 varseq <- function(exprmat, covariates, variables2test,
-                   sample_group = NULL,
+                   sample_group = NULL, weights_var2test_condi = TRUE,
                    cov_variables2test_eff = diag(ncol(variables2test)),
                    which_test = c("permutation", "asymptotic"),
                    which_weights = c("loclin", "voom", "none"),
@@ -142,6 +148,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    homogen_traj = FALSE){
 
   return(tcgsa_seq(y = exprmat, x = covariates, phi = variables2test,
+                   weights_phi_condi = weights_var2test_condi,
                    genesets = NULL,
                    indiv = sample_group,
                    Sigma_xi = cov_variables2test_eff,

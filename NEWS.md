@@ -3,7 +3,9 @@
 
 ### Main changes in Version 1.6.0 (2017-08-01)
 * bug fix to the log2-cpm transformation computation (for `preprocessed = FALSE`)
-* improvement to defaults in `varseq` and `tcgsa_seq` wrapper functions
+* improvement to defaults in `varseq` and `tcgsa_seq` wrapper functions, including
+ an option to compute heteroscedasticity weights without conditioning on the variable(s)
+ to be tested
 
 
 ### Main changes in Version 1.5.2 (2017-07-11)

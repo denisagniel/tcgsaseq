@@ -4,9 +4,9 @@
 \alias{sp_weights}
 \title{Non parametric local heteroscedasticity weights}
 \usage{
-sp_weights(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
-  gene_based = FALSE, bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
-  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
+sp_weights(y, x, phi, use_phi = TRUE, preprocessed = FALSE,
+  doPlot = FALSE, gene_based = FALSE, bw = c("nrd", "ucv", "SJ", "nrd0",
+  "bcv"), kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
   transform = FALSE, verbose = TRUE)
 }
@@ -14,10 +14,16 @@ sp_weights(y, x, phi, preprocessed = FALSE, doPlot = FALSE,
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
 preprocessed expression from \code{n} samples for \code{G} genes.}
 
-\item{x}{a numeric matrix of size \code{n x p} containing the model covariates from
+\item{x}{a numeric matrix of size \code{n x p} containing the model covariate(s) from
 \code{n} samples (design matrix).}
 
-\item{phi}{a numeric design matrix of size \code{n x K} containing the K bases of time.}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the K
+variable(s) of interest( e.g. bases of time).}
+
+\item{use_phi}{a logical flag indicating whether conditional means should be conditioned
+on \code{phi} and on covariate(s) \code{x}, or on \code{x} alone. Default is
+\code{TRUE} in which case conditional means are estimated conditionally on both
+\code{x} and \code{phi}.}
 
 \item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in

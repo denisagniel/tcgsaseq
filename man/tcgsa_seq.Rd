@@ -4,14 +4,15 @@
 \alias{tcgsa_seq}
 \title{Time-course Gene Set Analyis}
 \usage{
-tcgsa_seq(y, x, phi, genesets, indiv = NULL, Sigma_xi = diag(ncol(phi)),
-  which_test = c("permutation", "asymptotic"), which_weights = c("loclin",
-  "voom", "none"), n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
-  gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",
-  "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine",
-  "optcosine"), exact = FALSE, transform = FALSE,
-  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
-  lowess_span = 0.5, homogen_traj = FALSE, verbose = TRUE)
+tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
+  Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
+  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
+  preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
+  bw = "nrd", kernel = c("gaussian", "epanechnikov", "rectangular",
+  "triangular", "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
+  transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
+  "hommel", "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
+  verbose = TRUE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -23,6 +24,11 @@ preprocessed expressions from \code{n} samples for \code{G} genes.}
 
 \item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
+
+\item{weights_phi_condi}{a logical flag indicating whether heteroscedasticity
+weights computation should be conditional on both the variable(s) to be tested
+\code{phi} and on covariate(s) \code{x}, or on \code{x} alone. #'Default is \code{TRUE}
+in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.}
 
 \item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
 constitute the invesigated geneset. Can also be a \code{list} of index when several genesets are
