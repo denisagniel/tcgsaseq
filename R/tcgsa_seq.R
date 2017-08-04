@@ -51,7 +51,7 @@
 #'@param doPlot a logical flag indicating whether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
 #'
-#'@param gene_based_weights a logical flag used for "loclin" weights, indicating whether to estimate
+#'@param gene_based_weights a logical flag used for \code{"loclin"} weights, indicating whether to estimate
 #'weights at the gene-level, or rather at the observation-level. Default is \code{TRUE},
 #'and weights are then estimated at the gene-level.
 #'
@@ -70,7 +70,7 @@
 #'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interpolation (faster computation).
 #'
-#'@param transform a logical flag used for "loclin" weights, indicating whether values should be
+#'@param transform a logical flag used for \code{"loclin"} weights, indicating whether values should be
 #'transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
 #'observations are sparse and the specified bandwidth gives suboptimal performance there.
 #'Default is \code{FALSE}.
@@ -99,9 +99,9 @@
 #'   transformed into log-counts per million.
 #'   \item \code{n_perm}: an integer carrying forward the value of the '\code{n_perm}' argument indicating
 #'   the number of perturbations performed (\code{NA} if asymptotic test was performed).
-#'   \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the genesets
+#'   \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the gene sets
 #'   of interest (\code{NULL} for gene-wise testing).
-#'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each geneset, or
+#'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
 #'   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
 #'   contains the raw p-values, the second one '\code{adjPval}' contains the adjusted p-values (according to
 #'   the '\code{padjust_methods}' argument).

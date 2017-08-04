@@ -7,7 +7,7 @@
 deseq_fn(y, x, phi, indiv)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
 genes from \code{n} samples}
 
 \item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates

@@ -11,7 +11,7 @@ sp_weights(y, x, phi, use_phi = TRUE, preprocessed = FALSE,
   transform = FALSE, verbose = TRUE)
 }
 \arguments{
-\item{y}{a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
+\item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
 preprocessed expression from \code{n} samples for \code{G} genes.}
 
 \item{x}{a numeric matrix of size \code{n x p} containing the model covariate(s) from
@@ -62,7 +62,7 @@ during the computation. Default is \code{TRUE}.}
 a \code{n x G} matrix containing the computed precision weights.
 }
 \description{
-Computes precision weights that account for heteroscedasticity in RNAseq count data
+Computes precision weights that account for heteroscedasticity in RNA-seq count data
 based on non-parametric local linear regression estimates.
 }
 \examples{

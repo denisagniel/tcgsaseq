@@ -46,7 +46,7 @@
 #'@param doPlot a logical flag indicating whether the mean-variance plot should be drawn.
 #' Default is \code{FALSE}.
 #'
-#'@param gene_based_weights a logical flag used for "loclin" weights, indicating whether to estimate
+#'@param gene_based_weights a logical flag used for \code{"loclin"} weights, indicating whether to estimate
 #'weights at the gene-level, or rather at the observation-level. Default is \code{TRUE},
 #'and weights are then estimated at the gene-level.
 #'
@@ -65,13 +65,13 @@
 #'from the interpolation of local regression of the mean against the
 #'variance. Default is \code{FALSE}, which uses interpolation (faster computation).
 #'
-#'@param transform a logical flag used for "loclin" weights, indicating whether values should be
+#'@param transform a logical flag used for \code{"loclin"} weights, indicating whether values should be
 #'transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
 #'observations are sparse and the specified bandwidth gives suboptimal performance there.
 #'Default is \code{FALSE}.
 #'
 #'@param padjust_methods multiple testing correction method used if \code{genesets}
-#'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
+#'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for controlling the FDR.
 #'Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 #'\code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).
 #'

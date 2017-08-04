@@ -5,7 +5,7 @@
 #'from \code{\link[CompQuadForm]{davies}}
 #'
 #'
-#'@param y a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
+#'@param y a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
 #'genes from \code{n} samples.
 #'
 #'@param x a numeric design matrix of dim \code{n x p} containing the \code{p} covariates

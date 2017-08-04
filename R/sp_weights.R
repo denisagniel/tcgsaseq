@@ -1,9 +1,9 @@
 #'Non parametric local heteroscedasticity weights
 #'
-#'Computes precision weights that account for heteroscedasticity in RNAseq count data
+#'Computes precision weights that account for heteroscedasticity in RNA-seq count data
 #'based on non-parametric local linear regression estimates.
 #'
-#'@param y a numeric matrix of size \code{G x n} containing the raw RNAseq counts or
+#'@param y a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
 #'preprocessed expression from \code{n} samples for \code{G} genes.
 #'
 #'@param x a numeric matrix of size \code{n x p} containing the model covariate(s) from

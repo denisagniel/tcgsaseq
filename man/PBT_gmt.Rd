@@ -5,7 +5,7 @@
 \alias{PBT_gmt}
 \alias{PBT}
 \title{PBT gene sets related to kidney transplant}
-\format{a gmt objects containing 9 gene sets specific to kidney transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})}
+\format{a \code{gmt} object containing 9 gene sets specific to kidney transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})}
 \source{
 \url{http://atagc.med.ualberta.ca/Research/GeneLists}
 }
@@ -22,7 +22,7 @@ PBT_gmt
 
 }
 \references{
-Halloran PF, De Freitas DG, Einecke G, et al., The molecular phenotype of kidney
+Halloran PF, De Freitas DG, Einecke G, \emph{et al.}, The molecular phenotype of kidney
 transplants: Personal viewpoint, \emph{Am J Transplant}, 10: 2215-2222, 2010.
 .
 

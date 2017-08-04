@@ -1,6 +1,6 @@
 #' Small portion of RNA-seq data from plant physiology study.
 #'
-#'A subsample of the RNA-seq data from Baduel et al. studying Arabidopsis Arenosa physiology.
+#'A subsample of the RNA-seq data from Baduel \emph{et al.} studying Arabidopsis Arenosa physiology.
 #'
 #'@name baduel_5gs
 #'@rdname baduel_5gs
@@ -35,7 +35,7 @@
 #'  \item \code{AgeWeeks_Vernalized_Population} interaction variable between the \code{AgeWeeks},
 #'  \code{Vernalized} and \code{Population} variables
 #'}
-#'\item{\code{baduel_gmt}:} a gmt object containing 5 gene sets of interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
+#'\item{\code{baduel_gmt}:} a \code{gmt} object containing 5 gene sets of interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
 #'\item{\code{expr_norm_corr}:} a numeric matrix containing the normalized batch corrected expression
 #'for the 2454 genes included in either of the 5 gene sets of interests
 #'}
