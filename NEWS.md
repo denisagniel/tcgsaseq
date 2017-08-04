@@ -1,7 +1,7 @@
 # News about the `tcgsaseq` R package
 
 
-### Main changes in Version 1.6.1 (2017-08-04)
+### Main changes in Version 1.6.2 (2017-08-04)
 * bug fix to the log2-cpm transformation computation (for `preprocessed = FALSE`)
 * improvement to defaults in `varseq` and `tcgsa_seq` wrapper functions, including
  an option to compute heteroscedasticity weights without conditioning on the variable(s)
