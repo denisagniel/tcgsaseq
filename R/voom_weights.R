@@ -36,8 +36,8 @@
 #'G <- 10000
 #'n <- 12
 #'p <- 2
-#'y <- t(sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)}))
 #'
+#'y <- sapply(1:n, FUN=function(x){rnbinom(n=G, size=0.07, mu=200)})
 #'x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 #'
 #'my_w <-  voom_weights(y, x, doPlot=TRUE)
