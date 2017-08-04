@@ -1,6 +1,6 @@
 #'Precision weights accounting for heteroscedasticity in RNA-seq count data
 #'
-#'Implementation of the procedure descibed in Law \emph{et al} for estimating precision
+#'Implementation of the procedure described in Law \emph{et al} for estimating precision
 #'weights from RNA-seq data.
 #'
 #'@param y a matrix of size \code{G x n} containing the raw RNA-seq counts or

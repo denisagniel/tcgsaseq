@@ -13,12 +13,12 @@
 #'to be tested
 #'
 #'@param weights_var2test_condi  a logical flag indicating whether heteroscedasticity
-#'weights computation should be conditional on both the variables to be tested 
-#'\code{variables2test} and on the \code{covariates}, or on \code{covariates} alone. 
-#'Default is \code{TRUE} in which case conditional means are estimated conditionally 
+#'weights computation should be conditional on both the variables to be tested
+#'\code{variables2test} and on the \code{covariates}, or on \code{covariates} alone.
+#'Default is \code{TRUE} in which case conditional means are estimated conditionally
 #'on both \code{variables2test} and \code{covariates}.
 #'
-#'@param sample_group a vector of length \code{n} indicating wether the samples should be
+#'@param sample_group a vector of length \code{n} indicating whether the samples should be
 #'grouped (e.g. paired samples or longitudinal data). Coerced
 #'to be a \code{factor}. Default is \code{NULL} in which case no grouping is performed.
 #'
@@ -27,7 +27,7 @@
 #'Default assume diagonal correlation matrix, i.e. independence of random effects.
 #'
 #'@param which_weights a character string indicating which method to use to estimate
-#'the mean-variance relationship wheights. Possibilities are \code{"loclin"},
+#'the mean-variance relationship weights. Possibilities are \code{"loclin"},
 #'\code{"voom"} or \code{"none"} (in which case no weighting is performed).
 #'Default is \code{"loclin"}.
 #'See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.
@@ -63,7 +63,7 @@
 #'@param exact a logical flag indicating whether the non-parametric weights accounting
 #'for the mean-variance relationship should be computed exactly or extrapolated
 #'from the interpolation of local regression of the mean against the
-#'variance. Default is \code{FALSE}, which uses interporlation (faster computation).
+#'variance. Default is \code{FALSE}, which uses interpolation (faster computation).
 #'
 #'@param transform a logical flag used for "loclin" weights, indicating whether values should be
 #'transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
@@ -91,9 +91,9 @@
 #'   transformed into log-counts per million.
 #'   \item \code{n_perm}: an integer carrying forward the value of the '\code{n_perm}' argument indicating
 #'   the number of perturbations performed (\code{NA} if asymptotic test was performed).
-#'   \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the genesets
+#'   \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the gene sets
 #'   of interest (\code{NULL} for gene-wise testing).
-#'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each geneset, or
+#'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
 #'   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
 #'   contains the raw p-values, the second one '\code{adjPval}' contains the adjusted p-values (according to
 #'   the '\code{padjust_methods}' argument).

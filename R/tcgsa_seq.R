@@ -1,6 +1,6 @@
-#'Time-course Gene Set Analyis
+#'Time-course Gene Set Analysis
 #'
-#'Wrapper function for performing gene set analysis of longitudinal RNA-seq data
+#'Wrapper function for performing gene set analysis of (potentially longitudinal) RNA-seq data
 #'
 #'@param y a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
 #'preprocessed expressions from \code{n} samples for \code{G} genes.
@@ -18,9 +18,9 @@
 #'in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.
 #'
 #'@param genesets either a vector of index or subscripts that defines which columns of \code{y}
-#'constitute the invesigated geneset. Can also be a \code{list} of index when several genesets are
+#'constitute the investigated geneset. Can also be a \code{list} of index when several gene sets are
 #'tested at once, such as the first element of a \code{\link[GSA:GSA.read.gmt]{gmt}} object.
-#'If \code{NULL}, then genewise p-values are returned.
+#'If \code{NULL}, then gene-wise p-values are returned.
 #'
 #'@param indiv a vector of length \code{n} containing the information for
 #'attributing each sample to one of the studied individuals. Coerced
@@ -32,7 +32,7 @@
 #'Default assume diagonal correlation matrix, i.e. independence of random effects.
 #'
 #'@param which_weights a character string indicating which method to use to estimate
-#'the mean-variance relationship wheights. Possibilities are \code{"loclin"},
+#'the mean-variance relationship weights. Possibilities are \code{"loclin"},
 #'\code{"voom"} or \code{"none"} (in which case no weighting is performed).
 #'Default is \code{"loclin"}.
 #'See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.
@@ -68,7 +68,7 @@
 #'@param exact a logical flag indicating whether the non-parametric weights accounting
 #'for the mean-variance relationship should be computed exactly or extrapolated
 #'from the interpolation of local regression of the mean against the
-#'variance. Default is \code{FALSE}, which uses interporlation (faster computation).
+#'variance. Default is \code{FALSE}, which uses interpolation (faster computation).
 #'
 #'@param transform a logical flag used for "loclin" weights, indicating whether values should be
 #'transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
@@ -76,7 +76,7 @@
 #'Default is \code{FALSE}.
 #'
 #'@param padjust_methods multiple testing correction method used if \code{genesets}
-#'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
+#'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for controlling the FDR.
 #'Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 #'\code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).
 #'
@@ -229,7 +229,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
   if(is.null(genesets)){
     if(verbose){
-      cat("'genesets' argument not provided => only genewise p-values are computed\n")
+      cat("'genesets' argument not provided => only gene-wise p-values are computed\n")
     }
     if(which_test == "asymptotic"){
       if(is.null(indiv)){
@@ -260,7 +260,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       gene_names_measured <- rownames(y_lcpm)
       prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
       if(sum(prop_meas)!=length(prop_meas)){
-        warning("Some genes in the investigated genesets were not measured:\nremoving those genes from the geneset definition...")
+        warning("Some genes in the investigated gene sets were not measured:\nremoving those genes from the gene set  definition...")
         genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
       }
     }else if(!is.vector(genesets)){
@@ -305,7 +305,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     if(class(genesets)=="character"){
       gene_names_measured <- rownames(y_lcpm)
       if((length(intersect(genesets, gene_names_measured))/length(x)) != 1){
-        warning("Some genes in the investigated genesets were not measured:\n removing those genes from the geneset definition...")
+        warning("Some genes in the investigated gene sets were not measured:\n removing those genes from the gene set  definition...")
         genesets <- genesets[which(genesets %in% gene_names_measured)]
       }
     }

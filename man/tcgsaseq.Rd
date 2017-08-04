@@ -7,7 +7,7 @@
 \title{tcgsaseq: a package to perform Time-course Gene Set Analysis and General Gene-Wise Analysis of RNA-seq data}
 \description{
 Analysis of RNA-seq data with variance component score
-test acocunting for data heteroscedasticity through precision weights.
+test accounting for data heteroscedasticity through precision weights.
 }
 \details{
 \tabular{ll}{
@@ -22,7 +22,7 @@ The two main functions of the \code{tcgsaseq} package are \code{\link{varseq}} a
 \references{
 Agniel D, Hejblum BP, Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics}, 2017.
-\href{http://arxiv.org/abs/1605.02351v4}{arxiv:1605.02351} \url{https://doi.org/10.1093/biostatistics/kxx005}
+\href{http://arxiv.org/abs/1605.02351v4}{arXiv:1605.02351} \url{https://doi.org/10.1093/biostatistics/kxx005}
 }
 \author{
 Boris P. Hejblum, Denis Agniel

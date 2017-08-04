@@ -2,7 +2,7 @@
 % Please edit documentation in R/deseq_fn.R
 \name{deseq_fn}
 \alias{deseq_fn}
-\title{Computes gen-wise pvals from DESeq2 method using observation-wise dispersion estimates}
+\title{Computes gene-wise p-values from DESeq2 method using observation-wise dispersion estimates}
 \usage{
 deseq_fn(y, x, phi, indiv)
 }
@@ -23,7 +23,7 @@ to be a \code{factor}}
 \item{ind}{}
 }
 \description{
-Computes gen-wise pvals from DESeq2 method using observation-wise dispersion estimates
+Computes gene-wise p-values from DESeq2 method using observation-wise dispersion estimates
 }
 \examples{
 \dontrun{

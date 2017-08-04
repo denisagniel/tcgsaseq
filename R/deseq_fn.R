@@ -1,4 +1,4 @@
-#' Computes gen-wise pvals from DESeq2 method using observation-wise dispersion estimates
+#' Computes gene-wise p-values from DESeq2 method using observation-wise dispersion estimates
 #'
 #'@param y a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
 #'genes from \code{n} samples

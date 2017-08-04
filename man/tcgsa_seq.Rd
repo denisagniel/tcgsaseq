@@ -2,7 +2,7 @@
 % Please edit documentation in R/tcgsa_seq.R
 \name{tcgsa_seq}
 \alias{tcgsa_seq}
-\title{Time-course Gene Set Analyis}
+\title{Time-course Gene Set Analysis}
 \usage{
 tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
@@ -31,9 +31,9 @@ weights computation should be conditional on both the variable(s) to be tested
 in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.}
 
 \item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
-constitute the invesigated geneset. Can also be a \code{list} of index when several genesets are
+constitute the investigated geneset. Can also be a \code{list} of index when several gene sets are
 tested at once, such as the first element of a \code{\link[GSA:GSA.read.gmt]{gmt}} object.
-If \code{NULL}, then genewise p-values are returned.}
+If \code{NULL}, then gene-wise p-values are returned.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
@@ -49,7 +49,7 @@ the variance component score test, either \code{"permutation"} or \code{"asympto
 Default is \code{"permutation"}.}
 
 \item{which_weights}{a character string indicating which method to use to estimate
-the mean-variance relationship wheights. Possibilities are \code{"loclin"},
+the mean-variance relationship weights. Possibilities are \code{"loclin"},
 \code{"voom"} or \code{"none"} (in which case no weighting is performed).
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
@@ -81,7 +81,7 @@ corresponds to the loess method).}
 \item{exact}{a logical flag indicating whether the non-parametric weights accounting
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
-variance. Default is \code{FALSE}, which uses interporlation (faster computation).}
+variance. Default is \code{FALSE}, which uses interpolation (faster computation).}
 
 \item{transform}{a logical flag used for "loclin" weights, indicating whether values should be
 transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
@@ -89,7 +89,7 @@ observations are sparse and the specified bandwidth gives suboptimal performance
 Default is \code{FALSE}.}
 
 \item{padjust_methods}{multiple testing correction method used if \code{genesets}
-is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
+is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for controlling the FDR.
 Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).}
 
@@ -122,7 +122,7 @@ A list with the following elements:\itemize{
 }
 }
 \description{
-Wrapper function for performing gene set analysis of longitudinal RNA-seq data
+Wrapper function for performing gene set analysis of (potentially longitudinal) RNA-seq data
 }
 \examples{
 #rm(list=ls())

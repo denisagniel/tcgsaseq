@@ -26,8 +26,8 @@
 #'
 #'@param n_perm the number of perturbations. Default is \code{1000}.
 #'
-#'@param genewise_pvals a logical flag indicating whether genewise pvalues should be returned. Default
-#'is \code{FALSE} in which case geneset p-value is computed and returned instead.
+#'@param genewise_pvals a logical flag indicating whether gene-wise p-values should be returned. Default
+#'is \code{FALSE} in which case gene-set p-value is computed and returned instead.
 #'
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
@@ -36,9 +36,9 @@
 #'   \item \code{set_score_obs}: the approximation of the observed set score
 #'   \item \code{set_pval}: the associated set p-value
 #' }
-#' or a list with the following elements when genewise pvalues are computed:\itemize{
-#'   \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
-#'   \item \code{gene_pvals}: vector of associated genewise p-values
+#' or a list with the following elements when gene-wise p-values are computed:\itemize{
+#'   \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
+#'   \item \code{gene_pvals}: vector of associated gene-wise p-values
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}

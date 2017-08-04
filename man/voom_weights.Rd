@@ -30,7 +30,7 @@ Larger values give more smoothness. Default is \code{0.5}.}
 a vector of length \code{n} containing the computed precision weights
 }
 \description{
-Implementation of the procedure descibed in Law \emph{et al} for estimating precision
+Implementation of the procedure described in Law \emph{et al} for estimating precision
 weights from RNA-seq data.
 }
 \examples{
