@@ -23,7 +23,7 @@ Installation
 The easiest way to get `tcgsaseq` is to install it from [CRAN](https://cran.r-project.org/package=tcgsaseq):
 
 ``` r
-install.packages("ludic")
+install.packages("tcgsaseq")
 ```
 
 Or to get the development version from [GitHub](https://github.com/denisagniel/tcgsaseq):
