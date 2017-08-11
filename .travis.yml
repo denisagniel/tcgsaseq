@@ -18,6 +18,7 @@ r_packages:
 - KernSmooth
 - knitr
 - rmarkdown
+- testthat
 
 bioc_packages:
 - limma

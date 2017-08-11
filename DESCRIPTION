@@ -22,7 +22,8 @@ Suggests:
     DESeq2,
     S4Vectors,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 Description: Analyze RNA-seq data with variance component score test accounting 
     for data heteroscedasticity through precision weights. Perform both gene-wise and gene set
     analyses, and can deal with longitudinal data. Method is detailed in: Agniel D, Hejblum BP (2017) 
