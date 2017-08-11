@@ -19,6 +19,7 @@ r_packages:
 - knitr
 - rmarkdown
 - testthat
+- rex
 
 bioc_packages:
 - limma
