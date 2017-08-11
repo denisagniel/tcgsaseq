@@ -32,3 +32,6 @@ r_github_packages:
 r_build_args: "--html"
 
 r_check_args: "--as-cran --timings"
+
+after_success:
+  - Rscript -e 'covr::codecov()'

@@ -222,7 +222,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     n_perm <- NA
 
     if(nrow(x) < 10)
-    warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
+      warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
   }
 
 
@@ -257,14 +257,15 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
   }else if(is.list(genesets)){
     if(class(genesets[[1]])=="character"){
+      if(is.null(rownames(y_lcpm))){
+        stop("Gene sets specified as character but no rownames available for the expression matrix")
+      }
       gene_names_measured <- rownames(y_lcpm)
       prop_meas <- sapply(genesets, function(x){length(intersect(x, gene_names_measured))/length(x)})
       if(sum(prop_meas)!=length(prop_meas)){
-        warning("Some genes in the investigated gene sets were not measured:\nremoving those genes from the gene set  definition...")
+        warning("Some transcripts in the investigated gene sets were not measured:\nremoving those transcripts from the gene set definition...")
         genesets <- lapply(genesets, function(x){x[which(x %in% gene_names_measured)]})
       }
-    }else if(!is.vector(genesets)){
-      stop("'genesets' argument provided but is neither a list nor an atomic vector")
     }
 
     if(which_test == "asymptotic"){
@@ -272,10 +273,17 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
         indiv <- 1:nrow(x)
       }
 
-      rawPvals <- sapply(genesets, FUN = function(gs){
-        vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                     w = w[gs, ], Sigma_xi = Sigma_xi,
-                     genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
+      rawPvals <- sapply(seq_along(length(genesets)), FUN = function(i_gs){
+        gs <- genesets[[i_gs]]
+        e <- try(y_lcpm[gs, 1], silent = TRUE)
+        if(inherits(e, "try-error")){
+          warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
+          NA
+        }else{
+          vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
+      }
       )
     } else if(which_test == "permutation"){
       if(is.null(indiv)){
@@ -284,10 +292,17 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
       y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm))
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
-      rawPvals <- sapply(genesets, FUN = function(gs){
-        vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                     w = w[gs, ], Sigma_xi = Sigma_xi,
-                     n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
+      rawPvals <- sapply(seq_along(length(genesets)), FUN = function(i_gs){
+        gs <- genesets[[i_gs]]
+        e <- try(y_lcpm[gs, 1], silent = TRUE)
+        if(inherits(e, "try-error")){
+          warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
+          NA
+        }else{
+          vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj)$set_pval}
+      }
       )
     }
 
@@ -303,9 +318,12 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
 
     if(class(genesets)=="character"){
+      if(is.null(rownames(y_lcpm))){
+        stop("Gene sets specified as character but no rownames available for the expression matrix")
+      }
       gene_names_measured <- rownames(y_lcpm)
       if((length(intersect(genesets, gene_names_measured))/length(x)) != 1){
-        warning("Some genes in the investigated gene sets were not measured:\n removing those genes from the gene set  definition...")
+        warning("Some transcripts in the investigated gene sets were not measured:\n removing those transcripts from the gene set definition...")
         genesets <- genesets[which(genesets %in% gene_names_measured)]
       }
     }
