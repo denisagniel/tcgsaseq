@@ -27,6 +27,9 @@ on_failure:
   - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
 
+on_success:
+  - Rscript -e "covr::codecov(type ='all')"
+
 environment:
   global:
     WARNINGS_ARE_ERRORS: 1

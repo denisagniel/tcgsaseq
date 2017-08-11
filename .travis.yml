@@ -27,6 +27,7 @@ bioc_packages:
 
 r_github_packages:
 - hadley/ggplot2
+- jimhester/covr
 
 r_build_args: "--html"
 
