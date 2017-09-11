@@ -50,23 +50,24 @@
 #'########################
 #'n <- 100
 #'r <- 12
-#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'t <- matrix(rep(1:(r/4)), 4, ncol=1, nrow=r)
 #'sigma <- 0.4
 #'b0 <- 1
 #'
 #'#under the null:
 #'b1 <- 0
 #'#under the alternative:
-#'b1 <- 0.5
+#'#b1 <- 0.5
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 #'x <- matrix(1, ncol=1, nrow=r)
 #'
 #'#run test
-#'asymTestRes <- vc_test_asym(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
-#'asymTestRes$set_pval
+#'asymTestRes <- vc_test_asym(y, x, phi=cbind(t, t^2), w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+#'                            Sigma_xi=diag(2), indiv=1:r, genewise_pvals=TRUE)
+#'plot(density(asymTestRes$gene_pvals))
+#'quantile(asymTestRes$gene_pvals)
 #'
 #'@importFrom CompQuadForm davies
 #'@importFrom stats pchisq var
@@ -74,7 +75,6 @@
 #'@export
 vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
                          genewise_pvals=FALSE, homogen_traj=FALSE){
-
 
   if(homogen_traj){
     score_list <- vc_score_h(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
@@ -85,31 +85,50 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   }
 
   nindiv <- nrow(score_list$q_ext)
-  ng <- ncol(score_list$q_ext)
+  ng <- nrow(y)
+  nphi <- ncol(phi)
 
-  if (genewise_pvals) {
-    if (ng == 1 & nindiv > 1) {
-      gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
-      pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
-    }else if(ng > 1 & nindiv > 1){
-      gene_scores_obs <- score_list$gene_scores_unscaled
-      gene_lambda <- apply(X=score_list$q_ext, MARGIN=2, FUN=var)
-      pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
-      #pv <- stats::pchisq(gene_scores_obs/gene_lambda, df = 1, lower.tail = FALSE) # same result ? only if phi is univariate
-    }else if(ng == 1 & nindiv == 1){
+  if(ng*nindiv < 1){
+    stop("no gene measured/no sample included ...")
+  }
+
+  if (genewise_pvals){
+    if(nindiv == 1){
       gene_scores_obs <- score_list$gene_scores_unscaled
       pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
-    }else if(ng > 1 & nindiv == 1){
-      gene_scores_obs <- score_list$gene_scores_unscaled
-      pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
+    }else if(nphi == 1){
+      if(ng == 1){
+        gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
+        pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
+      }else{
+        gene_scores_obs <- score_list$gene_scores_unscaled
+        gene_lambda <- apply(X=score_list$q_ext, MARGIN=2, FUN=var)
+        pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
+        #pv <- stats::pchisq(gene_scores_obs/gene_lambda, df = 1, lower.tail = FALSE) # same result ? only if phi is univariate
+      }
     }else{
-      stop("no gene measured/no sample included ...")
+      gene_inds <- lapply(1:ng, function(x){x + (ng)*(0:(nphi-1))})
+      gene_lambda <- lapply(gene_inds, function(x){
+        Sig_q_gene <- cov(score_list$q_ext[, x, drop=FALSE])
+        lam <- try(svd(Sig_q_gene)$d)
+        if (inherits(lam, "try-error")){
+          lam <- try(svd(round(Sig_q_gene, 6))$d)
+          if (inherits(lam, "try-error")){
+            warning("Error in svd decomposition for at least one gene")
+            lam <- NA
+          }
+        }
+        return(lam)
+      }
+      )
+      gene_scores_obs <- score_list$gene_scores_unscaled
+      pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
     }
 
     names(pv) <- rownames(y)
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pv)
 
-  } else {
+  }else{
 
     if(nindiv == 1){
       Sig_q <- matrix(1, ng, ng)

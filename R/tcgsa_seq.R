@@ -120,8 +120,10 @@
 #'
 #'@examples
 #'#rm(list=ls())
+#'#res_quant <- list()
+#'#for(i in 1:200){
 #'n <- 200
-#'r <- 12
+#'r <- 12 #60
 #'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
 #'sigma <- 0.4
 #'b0 <- 1
@@ -136,13 +138,17 @@
 #'
 #'#run test
 #'res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
-#'                         Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+#'                         Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3), which_test="asymptotic",
 #'                         which_weights="none", preprocessed=TRUE)
-#'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
-#'                       Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+#'res_genes <- tcgsa_seq(y, x, phi=cbind(t, t^2), genesets=NULL,
+#'                       Sigma_xi=diag(2), indiv=rep(1:(r/3), each=3), which_test="asymptotic",
 #'                       which_weights="none", preprocessed=TRUE)
 #'length(res_genes$pvals[, "rawPval"])
 #'quantile(res_genes$pvals[, "rawPval"])
+#'#res_quant[[i]] <- res_genes$pvals[, "rawPval"]
+#'#}
+#'#round(rowMeans(sapply(res_quant, quantile)), 3)
+#'#plot(density(unlist(res_quant)))
 #'
 #'\dontrun{
 #'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
