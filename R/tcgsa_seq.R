@@ -18,9 +18,10 @@
 #'in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.
 #'
 #'@param genesets either a vector of index or subscripts that defines which columns of \code{y}
-#'constitute the investigated geneset. Can also be a \code{list} of index when several gene sets are
-#'tested at once, such as the first element of a \code{\link[GSA:GSA.read.gmt]{gmt}} object.
-#'If \code{NULL}, then gene-wise p-values are returned.
+#'constitute the investigated gene set (when only 1 gene set is being tested).
+#'Can also be a \code{list} of index (or \code{rownames} of \code{y}) when several
+#'gene sets are tested at once, such as the first element of a
+#'\code{\link[GSA:GSA.read.gmt]{gmt}} object. If \code{NULL}, then gene-wise p-values are returned.
 #'
 #'@param indiv a vector of length \code{n} containing the information for
 #'attributing each sample to one of the studied individuals. Coerced
@@ -121,10 +122,11 @@
 #'@examples
 #'#rm(list=ls())
 #'#res_quant <- list()
-#'#for(i in 1:200){
-#'n <- 200
-#'r <- 12 #60
-#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'#for(i in 1:500){
+#'n <- 200#0
+#'nr <- 3
+#'r <- 4*nr#100*nr
+#'t <- matrix(rep(1:nr), r/nr, ncol=1, nrow=r)
 #'sigma <- 0.4
 #'b0 <- 1
 #'
@@ -138,10 +140,11 @@
 #'
 #'#run test
 #'res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
-#'                         Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3), which_test="asymptotic",
+#'                         Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="asymptotic",
 #'                         which_weights="none", preprocessed=TRUE)
-#'res_genes <- tcgsa_seq(y, x, phi=cbind(t, t^2), genesets=NULL,
-#'                       Sigma_xi=diag(2), indiv=rep(1:(r/3), each=3), which_test="asymptotic",
+#'res_genes <- tcgsa_seq(y, x, phi=cbind(t, rnorm(r)), #t^2
+#'                       genesets=NULL,
+#'                       Sigma_xi=diag(2), indiv=rep(1:(r/nr), each=nr), which_test="asymptotic",
 #'                       which_weights="none", preprocessed=TRUE)
 #'length(res_genes$pvals[, "rawPval"])
 #'quantile(res_genes$pvals[, "rawPval"])
@@ -149,6 +152,7 @@
 #'#}
 #'#round(rowMeans(sapply(res_quant, quantile)), 3)
 #'#plot(density(unlist(res_quant)))
+#'#mean(unlist(res_quant)<0.05)
 #'
 #'\dontrun{
 #'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
