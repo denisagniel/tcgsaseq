@@ -13,6 +13,7 @@ os:
 - osx
 
 r_packages:
+- knitr
 - CompQuadForm
 - GSA
 - KernSmooth
