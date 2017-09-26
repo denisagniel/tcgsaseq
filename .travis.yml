@@ -13,8 +13,8 @@ os:
 - osx
 
 r_packages:
-- tools
 - stringr
+- rmarkdown
 - knitr
 - CompQuadForm
 - GSA
