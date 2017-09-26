@@ -13,11 +13,12 @@ os:
 - osx
 
 r_packages:
+- tools
+- stringr
 - knitr
 - CompQuadForm
 - GSA
 - KernSmooth
-- knitr
 - rmarkdown
 - testthat
 - rex
