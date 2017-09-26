@@ -236,7 +236,6 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   }
 
 
-
   if(is.null(genesets)){
     if(verbose){
       cat("'genesets' argument not provided => only gene-wise p-values are computed\n")
@@ -283,7 +282,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
         indiv <- 1:nrow(x)
       }
 
-      rawPvals <- sapply(seq_along(length(genesets)), FUN = function(i_gs){
+      rawPvals <- sapply(seq_along(genesets), FUN = function(i_gs){
         gs <- genesets[[i_gs]]
         e <- try(y_lcpm[gs, 1], silent = TRUE)
         if(inherits(e, "try-error")){
@@ -302,7 +301,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
       y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm))
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
-      rawPvals <- sapply(seq_along(length(genesets)), FUN = function(i_gs){
+      rawPvals <- sapply(seq_along(genesets), FUN = function(i_gs){
         gs <- genesets[[i_gs]]
         e <- try(y_lcpm[gs, 1], silent = TRUE)
         if(inherits(e, "try-error")){
