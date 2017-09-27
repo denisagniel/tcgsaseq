@@ -24,6 +24,9 @@
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
 #'of the \code{K} random effects on \code{phi}
 #'
+#'@param na_rm logical: should missing values (including \code{NA} and \code{NaN})
+#'be omitted from the calculations? Default is \code{FALSE}.
+#'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{score}: approximation of the set observed score
 #'   \item \code{q}: observation-level contributions to the score
@@ -62,7 +65,7 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
+vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE) {
   ## validity checks
   if(sum(!is.finite(w))>0){
     stop("At least 1 non-finite weight in 'w'")
@@ -99,10 +102,17 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   ## data formating ------
   indiv <- as.factor(indiv)
   nb_indiv <- length(levels(indiv))
-# browser()
-  y_T <- t(y)
-  yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T
 
+  ## OLS for conditional mean -----
+  y_T <- t(y)
+  if(na_rm){
+    y_T0 <- y_T
+    y_T0[is.na(y_T0)] <- 0
+    yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T0
+  }else{
+    yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T
+  }
+  rm(y_T0, y_T, y)
   # x_tilde_list <- y_tilde_list <- Phi_list <- list()
   # for (i in 1:nb_indiv) {
   #   select <- indiv==levels(indiv)[i]
@@ -173,18 +183,18 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   #temp <- m_dt[, lapply(.SD, sum), by=indiv]
 
   #those 2 by statements represent the longest AND more memory intensive part of this for genewise analysis:
-  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
+  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE, na.rm = na_rm))
   XT_fast <- t(x)%*%T_fast/nb_indiv
   avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
   U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
-  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE))
+  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE, na.rm = na_rm))
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
 
   gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
 
-  qq <- colSums(q)^2/nb_indiv # genewise scores
+  qq <- colSums(q, na.rm = na_rm)^2/nb_indiv # genewise scores
   gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # to be optimized
   #do.call(rbind, by(t(qq), rep(1:K, g), FUN=colSums, simplify=FALSE))
 

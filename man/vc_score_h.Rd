@@ -4,7 +4,7 @@
 \alias{vc_score_h}
 \title{Computes variance component test statistic for homogeneous trajectory}
 \usage{
-vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)))
+vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
@@ -25,6 +25,8 @@ samples, corresponding to the inverse of the diagonal of the estimated covarianc
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects corresponding to \code{phi}.}
+
+\item{na_rm}{logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements:\itemize{

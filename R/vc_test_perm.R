@@ -32,6 +32,9 @@
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
+#'@param na.rm logical: should missing values (including \code{NA} and \code{NaN})
+#'be omitted from the calculations? Default is \code{FALSE}.
+#'
 #'@return A list with the following elements when the set p-value is computed :\itemize{
 #'   \item \code{set_score_obs}: the approximation of the observed set score
 #'   \item \code{set_pval}: the associated set p-value
@@ -73,7 +76,8 @@
 #'
 #'@export
 vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         n_perm=1000, genewise_pvals=FALSE, homogen_traj=FALSE){
+                         n_perm=1000, genewise_pvals=FALSE, homogen_traj=FALSE,
+                         na.rm = FALSE){
 
   n_samples <- ncol(y)
   if(is.null(colnames(y))){
@@ -98,7 +102,8 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     return(res)
   }
 
-  score_list_obs <- vc_score_2use(y = y, x = x, indiv = indiv_fact, phi = phi, w = w, Sigma_xi = Sigma_xi)
+  score_list_obs <- vc_score_2use(y = y, x = x, indiv = indiv_fact, phi = phi, w = w, Sigma_xi = Sigma_xi, na_rm = na.rm)
+
 
   if(genewise_pvals){
     gene_scores_obs <- score_list_obs$gene_scores_unscaled
@@ -117,7 +122,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
       perm_index <- strat_sampling(indiv_fact)
       gene_scores_perm[[b]] <- vc_score_2use(y = y[, perm_index, drop=FALSE], x = x[perm_index, , drop=FALSE],
                              indiv = indiv_fact, phi = phi, w = w[, perm_index, drop = FALSE],
-                             Sigma_xi = Sigma_xi)$gene_scores_unscaled
+                             Sigma_xi = Sigma_xi, na_rm = na.rm)$gene_scores_unscaled
     }
     #pvals <- 1 - rowMeans(sapply(gene_scores_perm, function(x){x < gene_scores_obs}))
     pvals <- 1 - rowMeans(do.call(cbind, gene_scores_perm) < gene_scores_obs)
@@ -129,7 +134,8 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
       ## permute samples within indiv
       perm_index <- strat_sampling(indiv_fact)
       scores_perm[b] <- vc_score_2use(y = y[, perm_index, drop=FALSE], x = x[perm_index, , drop=FALSE],
-                                      indiv = indiv_fact, phi = phi, w = w[, perm_index, drop = FALSE], Sigma_xi = Sigma_xi)$score
+                                      indiv = indiv_fact, phi = phi, w = w[, perm_index, drop = FALSE],
+                                      Sigma_xi = Sigma_xi, na_rm = na.rm)$score
     }
     pval <- 1-sum(scores_perm < score_list_obs$score)/n_perm
     ans <- list("set_score_obs" = score_list_obs$score, "set_pval" = pval)

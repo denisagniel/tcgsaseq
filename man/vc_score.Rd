@@ -4,7 +4,7 @@
 \alias{vc_score}
 \title{Computes variance component test statistic for longitudinal}
 \usage{
-vc_score(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)))
+vc_score(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
@@ -25,6 +25,9 @@ samples.}
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects on \code{phi}}
+
+\item{na_rm}{logical: should missing values (including \code{NA} and \code{NaN})
+be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements:\itemize{

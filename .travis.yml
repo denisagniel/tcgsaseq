@@ -2,6 +2,7 @@
 
 language: r
 cache: packages
+warnings_are_errors: true
 sudo: false
 
 r:
@@ -11,6 +12,10 @@ r:
 os:
 - linux
 - osx
+
+before_deploy:
+  # so no overwrite of linux build
+  - if [[ "${TRAVIS_OS_NAME}" = "osx" ]]; then rm -f *.tar.gz; fi
 
 r_packages:
 - stringr

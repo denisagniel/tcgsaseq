@@ -30,6 +30,9 @@
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
+#'@param na.rm logical: should missing values (including \code{NA} and \code{NaN})
+#'be omitted from the calculations? Default is \code{FALSE}.
+#'
 #'@return A list with the following elements when the set p-value is computed :\itemize{
 #'   \item \code{set_score_obs}: the approximation of the observed set score
 #'   \item \code{set_pval}: the associated set p-value
@@ -74,14 +77,14 @@
 #'
 #'@export
 vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         genewise_pvals=FALSE, homogen_traj=FALSE){
+                         genewise_pvals=FALSE, homogen_traj=FALSE, na.rm = FALSE){
 
   if(homogen_traj){
     score_list <- vc_score_h(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
-                             Sigma_xi = Sigma_xi)
+                             Sigma_xi = Sigma_xi, na_rm = na.rm)
   }else{
     score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi, w = w,
-                           Sigma_xi = Sigma_xi)
+                           Sigma_xi = Sigma_xi, na_rm = na.rm)
   }
 
   nindiv <- nrow(score_list$q_ext)

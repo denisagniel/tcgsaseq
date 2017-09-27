@@ -12,7 +12,7 @@ tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
   "triangular", "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
   transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
   "hommel", "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
-  verbose = TRUE)
+  na.rm_tcgsaseq = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -102,8 +102,12 @@ Default is \code{0.5}.}
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 
-\item{verbose}{a logical flag indicating whether informative messages are printed
-during the computation. Default is \code{TRUE}.}
+\item{na.rm_tcgsaseq}{logical: should missing values in \code{y} (including
+\code{NA} and \code{NaN}) be omitted from the calculations?
+Default is \code{TRUE}.}
+
+\item{verbose}{logical: should informative messages be printed during the
+computation? Default is \code{TRUE}.}
 }
 \value{
 A list with the following elements:\itemize{

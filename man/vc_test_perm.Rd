@@ -6,7 +6,7 @@
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
   Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
-  homogen_traj = FALSE)
+  homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
@@ -35,6 +35,9 @@ is \code{FALSE} in which case gene-set p-value is computed and returned instead.
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
+
+\item{na.rm}{logical: should missing values (including \code{NA} and \code{NaN})
+be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements when the set p-value is computed :\itemize{

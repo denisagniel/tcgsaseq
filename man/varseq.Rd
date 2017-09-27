@@ -13,7 +13,7 @@ varseq(exprmat, covariates, variables2test, sample_group = NULL,
   "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine",
   "optcosine"), exact = FALSE, transform = FALSE,
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
-  lowess_span = 0.5, homogen_traj = FALSE)
+  lowess_span = 0.5, na.rm_varseq = TRUE, homogen_traj = FALSE)
 }
 \arguments{
 \item{exprmat}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -93,6 +93,10 @@ Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 the proportion of points in the plot which influence the smooth at each value.
 Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
 Default is \code{0.5}.}
+
+\item{na.rm_varseq}{logical: should missing values in \code{y} (including
+\code{NA} and \code{NaN}) be omitted from the calculations?
+Default is \code{FALSE}.}
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
