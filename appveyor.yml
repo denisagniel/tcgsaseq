@@ -16,12 +16,9 @@ cache:
 # Adapt as necessary starting from here
 
 build_script:
-  - Rscript -e "source('http://bioconductor.org/biocLite.R')"
+  - travis-tool.sh install_bioc limma edgeR DESeq2
   - travis-tool.sh install_deps
   - travis-tool.sh github_package jimhester/covr
-  - travis-tool.sh install_bioc limma
-  - travis-tool.sh install_bioc edgeR
-  - travis-tool.sh install_bioc DESeq2
 
 test_script:
   - travis-tool.sh run_tests
@@ -45,6 +42,7 @@ environment:
 
     - R_VERSION: devel
       PKGTYPE: source
+      BIOC_USE_DEVEL: TRUE
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
