@@ -97,6 +97,10 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
 
 
   observed <- which(rowSums(y) != 0) #removing genes never observed
+  nb_g_sum0 <- length(observed) - g
+  if(nb_g_sum0 > 0){
+    warning(paste(nb_g_sum0, " y rows sum to 0 (i.e. are never observed) and have been removed"))
+  }
 
   kernel <- match.arg(kernel)
   if(preprocessed){
@@ -216,11 +220,10 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   }else{
     stop("unknown kernel: 'kernel' argument must be among 'gaussian', 'rectangular', 'triangular', 'epanechnikov', 'biweight', 'cosine', 'optcosine'")
   }
-  if (gene_based) {
-    if(exact){
-      cat("'exact' is TRUE: the computation may take up to a couple minutes...", "\n",
-          "Set 'exact = FALSE' for quicker computation of the weights\n")
-    }
+
+
+  if(gene_based){
+
     w <- function(x){
       x_ctr <- (mu_avg-x)
       kernx <- kern_func(x_ctr, bw)
@@ -232,6 +235,10 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
 
     kern_fit <- NULL
     if(exact){
+
+      cat("'exact' is TRUE: the computation may take up to a couple minutes...", "\n",
+          "Set 'exact = FALSE' for quicker computation of the weights\n")
+
       weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol = n, nrow = p, byrow = FALSE))
       if(sum(!is.finite(weights))>0){
         warning("At least 1 non finite weight. Try to increase the bandwith")
@@ -244,7 +251,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     }
     #kern_fit <- sapply(mu_avg, w)
     #weights <- matrix(rep(1/kern_fit), ncol = ncol(y_lcpm), nrow = nrow(y_lcpm), byrow = TRUE)
-  } else {
+  }else{
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
                                 degree = 1, kernel = kernel, bandwidth = bw)
     w <- (1/stats::approx(reverse_trans(smth$x), smth$y, xout = mu, rule = 2)$y)
