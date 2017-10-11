@@ -40,9 +40,6 @@ environment:
   matrix:
     - R_VERSION: release
 
-    - R_VERSION: devel
-      PKGTYPE: both
-      BIOC_USE_DEVEL: TRUE
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
