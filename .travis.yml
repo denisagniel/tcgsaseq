@@ -27,6 +27,8 @@ r_packages:
 - rmarkdown
 - testthat
 - rex
+- Hmisc
+- shiny
 
 bioc_packages:
 - limma
