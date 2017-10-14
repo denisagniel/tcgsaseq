@@ -182,6 +182,8 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       verbose = TRUE){
 
   stopifnot(is.matrix(y))
+  stopifnot(is.matrix(x))
+  stopifnot(is.matrix(phi))
 
   if(sum(is.na(y))>1 & na.rm_tcgsaseq){
     warning(paste("\n\ny contains ", sum(is.na(y)), " NA values.\nThey will be ignored in the subsequent computation but you should think carefully about where does those NA come from...\nIf you don't want to ignore those NAs, set the 'na.rm_tcgsaseq' argument to FALSE."))
@@ -223,6 +225,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   }
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
+
+  # Computing the weights
+  if(which_weights != "none"){cat("Computing the weights... ")}
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi = phi, use_phi = weights_phi_condi,
                                    preprocessed = TRUE, doPlot = doPlot,
@@ -232,8 +237,15 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                voom = voom_weights(y = y_lcpm, x = if(weights_phi_condi){cbind(x, phi)}else{x},
                                    preprocessed = TRUE, doPlot = doPlot,
                                    lowess_span = lowess_span),
-               none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm))
+               none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm),
+                             dimnames = list(rownames(y_lcpm),
+                                             colnames(y_lcpm)
+                             )
+               )
   )
+  if(which_weights != "none"){cat("Done!\n")}
+
+
 
 
   if(which_test == "asymptotic"){
@@ -242,6 +254,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     if(nrow(x) < 10)
       warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
   }
+
 
 
   if(is.null(genesets)){
@@ -284,6 +297,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       rownames(pvals) <- rownames(y_lcpm)
     }
   }else if(is.list(genesets)){
+
     if(class(genesets[[1]])=="character"){
       if(is.null(rownames(y_lcpm))){
         stop("Gene sets specified as character but no rownames available for the expression matrix")
