@@ -7,3 +7,5 @@ ReproducibleForBiostat.R
 ^cran-comments\.md$
 ^appveyor\.yml$
 ^codecov\.yml$
+revdep
+vignettes

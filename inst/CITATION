@@ -3,15 +3,17 @@ citHeader("To cite tcgsaseq in publications, please use:")
 citEntry(entry = "Article",
    title  = "Variance component score test for time-course gene set analysis of longitudinal RNA-seq data",
    author = c(person("Denis Agniel"), person("Boris P Hejblum")),
-   journal = "submitted",
-   year   = "2016",
-   volume = "arxiv",
-   number = "1605.02351",
-   pages  = "1-22",
-   doi    = "",
-   url    = "http://arxiv.org/abs/1605.02351",
-   note   = "R package version 1.0.2",
-   textVersion = "Agniel D and Hejblum BP (2016) Variance component score test for time-course gene set analysis of longitudinal RNA-seq data. Submitted. arXiv:1605.02351."
+   journal = "Biostatistics",
+   year   = "2017",
+   volume = "18",
+   number = "4",
+   pages  = "589-604",
+   doi    = "10.1093/biostatistics/kxx005",
+   url    = "https://doi.org/10.1093/biostatistics/kxx005",
+   archivePrefix = "arXiv",
+   eprint        = "1605.02351",
+   note   = "R package version 1.6.2",
+   textVersion = "Agniel D and Hejblum BP (2017) Variance component score test for time-course gene set analysis of longitudinal RNA-seq data. Biostatistics, 18(4):589-604. 10.1093/biostatistics/kxx005. arXiv:1605.02351."
 )
 
 citFooter("We have invested a lot of time and effort in implementing tcgsaseq, ", "please cite it when using it for data analysis or research.")

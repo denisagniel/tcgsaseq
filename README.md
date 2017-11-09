@@ -15,7 +15,7 @@ Overview
 
 The method implemented in this package is detailed in the following article:
 
-> D Agniel, BP Hejblum, Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, [*Biostatistics*](https://doi.org/10.1093/biostatistics/kxx005). [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4) [DOI:10.1093/biostatistics/kxx005](https://doi.org/10.1093/biostatistics/kxx005)
+> Agniel D & Hejblum BP (2017). Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, [*Biostatistics*](https://academic.oup.com/biostatistics/article-abstract/18/4/589/3065599), 18(4):589-604. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4) [DOI: 10.1093/biostatistics/kxx005](https://doi.org/10.1093/biostatistics/kxx005)
 
 Installation
 ------------
