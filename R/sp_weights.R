@@ -107,7 +107,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     y_lcpm <- t(y[observed, ])
   }else{
     # transforming raw counts to log-counts per million (lcpm)
-    y_lcpm <- apply(y[observed, ], MARGIN = 2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
+    y_lcpm <- t(apply(y[observed, ], MARGIN = 2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)}))
   }
   rm(y)
   N <- length(y_lcpm)

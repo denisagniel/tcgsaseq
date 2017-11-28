@@ -1,5 +1,7 @@
 # News about the `tcgsaseq` R package
 
+### Main changes in Version 1.6.4 (2017-11-28) --- *this is only a minor release*:
+* bug fix in the log2-cpm transformation computation (for `preprocessed = FALSE`) in `sp_weights`
 
 ### Main changes in Version 1.6.3 (2017-11-09)
 * `WARNING` instead of `ERROR` when a gene set with no measured genes is tested
