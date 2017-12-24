@@ -188,7 +188,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   stopifnot(is.matrix(phi))
 
   if(sum(is.na(y))>1 & na.rm_tcgsaseq){
-    warning(paste("\n\ny contains ", sum(is.na(y)), " NA values.\nThey will be ignored in the subsequent computation but you should think carefully about where does those NA come from...\nIf you don't want to ignore those NAs, set the 'na.rm_tcgsaseq' argument to FALSE."))
+    warning(paste("\n\n!!!!!\n'y' contains", sum(is.na(y)), "NA values.",
+                  "\nCurrently they are ignored in the computations but you should think carefully about where do those NA/NaN come from...",
+                  "\nIf you don't want to ignore those NA/NaN values, set the 'na.rm_tcgsaseq' argument to 'FALSE' (this may lead to errors).\n!!!!!\n"))
   }
 
   if(!preprocessed){
@@ -235,7 +237,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                                    preprocessed = TRUE, doPlot = doPlot,
                                    gene_based = gene_based_weights,
                                    bw = bw, kernel = kernel,
-                                   exact = exact, transform = transform, verbose = verbose),
+                                   exact = exact, transform = transform, verbose = verbose, na.rm = na.rm_tcgsaseq),
                voom = voom_weights(y = y_lcpm, x = if(weights_phi_condi){cbind(x, phi)}else{x},
                                    preprocessed = TRUE, doPlot = doPlot,
                                    lowess_span = lowess_span),
@@ -256,8 +258,6 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     if(nrow(x) < 10)
       warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
   }
-
-
 
   if(is.null(genesets)){
     if(verbose){

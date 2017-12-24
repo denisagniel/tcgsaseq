@@ -8,7 +8,7 @@ sp_weights(y, x, phi, use_phi = TRUE, preprocessed = FALSE,
   doPlot = FALSE, gene_based = FALSE, bw = c("nrd", "ucv", "SJ", "nrd0",
   "bcv"), kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  transform = FALSE, verbose = TRUE)
+  transform = FALSE, verbose = TRUE, na.rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -57,6 +57,9 @@ the specified bandwidth gives suboptimal performance there. Default is \code{FAL
 
 \item{verbose}{a logical flag indicating whether informative messages are printed
 during the computation. Default is \code{TRUE}.}
+
+\item{na.rm}{logical: should missing values (including \code{NA} and \code{NaN})
+be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 a \code{n x G} matrix containing the computed precision weights.

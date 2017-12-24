@@ -47,8 +47,8 @@
 #' Default is \code{FALSE}.
 #'
 #'@param gene_based_weights a logical flag used for \code{"loclin"} weights, indicating whether to estimate
-#'weights at the gene-level, or rather at the observation-level. Default is \code{TRUE},
-#'and weights are then estimated at the gene-level.
+#'weights at the gene-level, or rather at the observation-level. Default is \code{FALSE},
+#'which is what it should be for gene-wise analysis.
 #'
 #'@param bw a character string indicating the smoothing bandwidth selection method to use. See
 #'\code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},
@@ -146,7 +146,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    which_test = c("permutation", "asymptotic"),
                    which_weights = c("loclin", "voom", "none"),
                    n_perm = 1000,
-                   preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
+                   preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
                    bw = "nrd",
                    kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                    exact = FALSE, transform = FALSE,

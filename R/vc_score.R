@@ -109,10 +109,11 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
     y_T0 <- y_T
     y_T0[is.na(y_T0)] <- 0
     yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T0
+    rm(y_T0)
   }else{
     yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T
   }
-  rm(y_T0, y_T, y)
+  rm(y_T, y)
   # x_tilde_list <- y_tilde_list <- Phi_list <- list()
   # for (i in 1:nb_indiv) {
   #   select <- indiv==levels(indiv)[i]

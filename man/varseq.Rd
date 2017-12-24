@@ -9,7 +9,7 @@ varseq(exprmat, covariates, variables2test, sample_group = NULL,
   cov_variables2test_eff = diag(ncol(variables2test)),
   which_test = c("permutation", "asymptotic"), which_weights = c("loclin",
   "voom", "none"), n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
-  gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",
+  gene_based_weights = FALSE, bw = "nrd", kernel = c("gaussian",
   "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine",
   "optcosine"), exact = FALSE, transform = FALSE,
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
@@ -61,8 +61,8 @@ log(counts) per million.}
 Default is \code{FALSE}.}
 
 \item{gene_based_weights}{a logical flag used for \code{"loclin"} weights, indicating whether to estimate
-weights at the gene-level, or rather at the observation-level. Default is \code{TRUE},
-and weights are then estimated at the gene-level.}
+weights at the gene-level, or rather at the observation-level. Default is \code{FALSE},
+which is what it should be for gene-wise analysis.}
 
 \item{bw}{a character string indicating the smoothing bandwidth selection method to use. See
 \code{\link[stats]{bandwidth}} for details. Possible values are \code{"ucv"}, \code{"SJ"},

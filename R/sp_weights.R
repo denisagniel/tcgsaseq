@@ -50,6 +50,9 @@
 #'@param verbose a logical flag indicating whether informative messages are printed
 #'during the computation. Default is \code{TRUE}.
 #'
+#'@param na.rm logical: should missing values (including \code{NA} and \code{NaN})
+#'be omitted from the calculations? Default is \code{FALSE}.
+#'
 #'@return a \code{n x G} matrix containing the computed precision weights.
 #'
 #'@seealso \code{\link[stats]{bandwidth}} \code{\link{density}}
@@ -78,7 +81,8 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
                        bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
                        kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
                        exact = FALSE, transform = FALSE,
-                       verbose = TRUE
+                       verbose = TRUE,
+                       na.rm = FALSE
 ){
 
 
@@ -96,7 +100,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   stopifnot(nrow(phi) == n)
 
 
-  observed <- which(rowSums(y) != 0) #removing genes never observed
+  observed <- which(rowSums(y, na.rm = TRUE) != 0) #removing genes never observed
   nb_g_sum0 <- length(observed) - g
   if(nb_g_sum0 > 0){
     warning(paste(nb_g_sum0, " y rows sum to 0 (i.e. are never observed) and have been removed"))
@@ -116,22 +120,30 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
 
   # fitting OLS to the lcpm
   xphi <- if(use_phi){cbind(x, phi)}else{x}
-  B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm
+  if(na.rm){
+    y_lcpm0 <- y_lcpm
+    y_lcpm0[is.na(y_lcpm0)] <- 0
+    B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm0
+    rm(y_lcpm0)
+  }else{
+    B_ols <- solve(crossprod(xphi))%*%t(xphi)%*%y_lcpm
+  }
   mu <- xphi%*%B_ols
 
   sq_err <- (y_lcpm - mu)^2
-  v <- colMeans(sq_err)
-  mu_avg <- colMeans(mu)
+  v <- colMeans(sq_err, na.rm = na.rm)
+  mu_avg <- colMeans(mu, na.rm = na.rm)
 
   if (gene_based) {
     mu_x <- mu_avg
   } else {
     mu_x <- mu
+    mu_x[is.na(y_lcpm)] <- NA
   }
   # transforming if necessary
   if (transform) {
-    sd_mu <- sd(mu_x)
-    mean_mu <- mean(mu_x)
+    sd_mu <- sd(mu_x, na.rm = na.rm)
+    mean_mu <- mean(mu_x, na.rm = na.rm)
     mu_x <- pnorm((mu_x-mean_mu)/sd_mu)
     reverse_trans <- function(x){qnorm(x)*sd_mu + mean_mu}
   } else {
@@ -252,6 +264,13 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     #kern_fit <- sapply(mu_avg, w)
     #weights <- matrix(rep(1/kern_fit), ncol = ncol(y_lcpm), nrow = nrow(y_lcpm), byrow = TRUE)
   }else{
+    if(!na.rm){
+      stop("Cannot compute the weights without ignoring NA/NaN values...
+           Try setting 'na.rm' or na.rm_tcgsaseq' to 'TRUE' to ignore NA/NaN values, but think carefully about where does those NA/NaN come from...")
+    }else if(sum(is.na(mu_x))>1){
+      mu_x <- mu_x[-which(is.na(mu_x))]
+      sq_err <- sq_err[-which(is.na(sq_err))]
+    }
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
                                 degree = 1, kernel = kernel, bandwidth = bw)
     w <- (1/stats::approx(reverse_trans(smth$x), smth$y, xout = mu, rule = 2)$y)
