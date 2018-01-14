@@ -48,7 +48,7 @@
 deseq_fn <- function(y, x, phi, indiv) {
 
   if(!requireNamespace("DESeq2", quietly=TRUE)){
-    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
+    stop("Package 'DESeq2' is not available.\n  -> Try installing it from Bioconductor\n")
   }else{
     requireNamespace("S4Vectors", quietly=TRUE)
 

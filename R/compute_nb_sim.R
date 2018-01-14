@@ -47,11 +47,11 @@ nb_sim_fn <- function(n = 250,
                       type){
 
   if(!requireNamespace("DESeq2", quietly=TRUE)){
-    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
+    stop("Package 'DESeq2' is not available.\n  -> Try installing it from Bioconductor\n")
   }else if(!requireNamespace("limma", quietly=TRUE)){
-    stop("Package 'limma' is not available.\n  -> Try running 'install.packages(\"limma\")'\n")
+    stop("Package 'limma' is not available.\n  -> Try installing it from Bioconductor\n")
   }else if(!requireNamespace("edgeR", quietly=TRUE)){
-    stop("Package 'edgeR' is not available.\n  -> Try running 'install.packages(\"edgeR\")'\n")
+    stop("Package 'edgeR' is not available.\n  -> Try installing it from Bioconductor\n")
   }else{
 
     sim_data <- sim_nb_data(n = n, n_t = n_t, re_sd = re_sd,
@@ -187,7 +187,7 @@ Kappa_j <- function(r, alpha_DEseq){
 deseq_fn_gs <- function(y, x, tt, indiv, ind) {
 
   if(!requireNamespace("DESeq2", quietly=TRUE)){
-    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
+    stop("Package 'DESeq2' is not available.\n  -> Try installing it from Bioconductor\n")
   }else{
     y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = t(y),
                                             colData = cbind.data.frame("indiv"=as.factor(indiv),

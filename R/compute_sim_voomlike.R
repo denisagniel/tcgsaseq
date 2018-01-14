@@ -30,11 +30,11 @@ compute_sim_voomlike <- function(counts, design, gs_keep, indiv, alternative=FAL
                                  rand_eff_sd = 0.25, RE_indiv_sd=NULL, eps_sd=0.05, alpha_DEseq=0.05){
 
   if(!requireNamespace("DESeq2", quietly=TRUE)){
-    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
+    stop("Package 'DESeq2' is not available.\n  -> Try installing it from Bioconductor\n")
   }else if(!requireNamespace("limma", quietly=TRUE)){
-    stop("Package 'limma' is not available.\n  -> Try running 'install.packages(\"limma\")'\n")
+    stop("Package 'limma' is not available.\n  -> Try installing it from Bioconductor\n")
   }else if(!requireNamespace("edgeR", quietly=TRUE)){
-    stop("Package 'edgeR' is not available.\n  -> Try running 'install.packages(\"edgeR\")'\n")
+    stop("Package 'edgeR' is not available.\n  -> Try installing it from Bioconductor\n")
   }else{
 
     logcoutspm <- apply(counts, MARGIN=2, function(v){log2((v + 0.5)/(sum(v) + 1)*10^6)})
