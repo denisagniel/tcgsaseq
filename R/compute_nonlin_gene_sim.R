@@ -34,11 +34,11 @@ nonlin_sim_fn <- function(n = 100,
                           re_sd = 1,
                           p0 = 0.9) {
   if(!requireNamespace("DESeq2", quietly=TRUE)){
-    stop("Package 'DESeq2' is not available.\n  -> Try running 'install.packages(\"DESeq2\")'\n")
+    stop("Package 'DESeq2' is not available.\n  -> Try installing it from Bioconductor\n")
   }else if(!requireNamespace("limma", quietly=TRUE)){
-    stop("Package 'limma' is not available.\n  -> Try running 'install.packages(\"limma\")'\n")
+    stop("Package 'limma' is not available.\n  -> Try installing it from Bioconductor\n")
   }else if(!requireNamespace("edgeR", quietly=TRUE)){
-    stop("Package 'edgeR' is not available.\n  -> Try running 'install.packages(\"edgeR\")'\n")
+    stop("Package 'edgeR' is not available.\n  -> Try installing it from Bioconductor\n")
   }else{
 
     # browser()
@@ -273,37 +273,41 @@ nonlin_sim_fn <- function(n = 100,
   }
 
   deseq_fn <- function(y, x, tt, indiv, ind) {
-    # browser()
-    y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = t(y),
-                                            colData = cbind.data.frame("indiv"=as.factor(indiv),
-                                                                       "grp"=tt,
-                                                                       "x"=as.numeric(x[,2])),
-                                            design = ~ x + grp)
-    res_dsq <- DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x)
-    pvals <- DESeq2::results(res_dsq)$pvalue
-    # library(DESeq2)
-    # y_dsq <- DESeq2::estimateSizeFactors(y_dsq)
-    # y_dsq <- DESeq2::estimateDispersionsGeneEst(y_dsq)
-    # DESeq2::dispersions(y_dsq) <- mcols(y_dsq)$dispGeneEst
-    # # res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x))
-    # res_dsq <- DESeq2::nbinomLRT(y_dsq, reduced = ~ x)
-    # # if (class(res_dsq) == 'try-error') res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean'))
-    # pvals <- DESeq2::results(res_dsq)$pvalue
-    #   if (length(ind) > 1) {
-    #     pmin <- min(pvals[ind], na.rm = TRUE)
-    #     Rij <- cor(y[,ind])
-    #     Rj <- sapply(1:ncol(Rij), function(j){max(abs(Rij[1:(j-1),j]), na.rm = TRUE)})
-    #     if(length(which(is.infinite(Rj)))>0){
-    #       Rj[which(is.infinite(Rj))] <- 0
-    #     }
-    #
-    #     Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
-    #     Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(0.05))))
-    #     Meff <- 1 + sum(1-cor(y[,ind])^2, na.rm = TRUE)/ncol(Rij) #Cheverud-Nyholt
-    #     cbind("minTest_exact" = 1-(1-pmin)^Keff,
-    #           "minTest_approx" = 1-(1-pmin)^Keff_approx,
-    #           "minTest_CN" = 1-(1-pmin)^Meff)
-    #   }
-    return(pvals)
+
+    if(!requireNamespace("DESeq2", quietly=TRUE)){
+      stop("Package 'DESeq2' is not available.\n  -> Try installing it from Bioconductor\n")
+    }else{
+      y_dsq <- DESeq2::DESeqDataSetFromMatrix(countData = t(y),
+                                              colData = cbind.data.frame("indiv"=as.factor(indiv),
+                                                                         "grp"=tt,
+                                                                         "x"=as.numeric(x[,2])),
+                                              design = ~ x + grp)
+      res_dsq <- DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x)
+      pvals <- DESeq2::results(res_dsq)$pvalue
+      # library(DESeq2)
+      # y_dsq <- DESeq2::estimateSizeFactors(y_dsq)
+      # y_dsq <- DESeq2::estimateDispersionsGeneEst(y_dsq)
+      # DESeq2::dispersions(y_dsq) <- mcols(y_dsq)$dispGeneEst
+      # # res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x))
+      # res_dsq <- DESeq2::nbinomLRT(y_dsq, reduced = ~ x)
+      # # if (class(res_dsq) == 'try-error') res_dsq <- try(DESeq2::DESeq(y_dsq, test="LRT", reduced = ~ x, fitType = 'mean'))
+      # pvals <- DESeq2::results(res_dsq)$pvalue
+      #   if (length(ind) > 1) {
+      #     pmin <- min(pvals[ind], na.rm = TRUE)
+      #     Rij <- cor(y[,ind])
+      #     Rj <- sapply(1:ncol(Rij), function(j){max(abs(Rij[1:(j-1),j]), na.rm = TRUE)})
+      #     if(length(which(is.infinite(Rj)))>0){
+      #       Rj[which(is.infinite(Rj))] <- 0
+      #     }
+      #
+      #     Keff <- 1 + sum(sapply(Rj[-1], Kappa_j, alpha_DEseq = 0.05))
+      #     Keff_approx <- 1 + sum(sqrt(1-Rj[-1]^(-1.31*log10(0.05))))
+      #     Meff <- 1 + sum(1-cor(y[,ind])^2, na.rm = TRUE)/ncol(Rij) #Cheverud-Nyholt
+      #     cbind("minTest_exact" = 1-(1-pmin)^Keff,
+      #           "minTest_approx" = 1-(1-pmin)^Keff_approx,
+      #           "minTest_CN" = 1-(1-pmin)^Meff)
+      #   }
+      return(pvals)
+    }
   }
 }

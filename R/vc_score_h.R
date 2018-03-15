@@ -6,7 +6,7 @@
 #'
 #'@keywords internal
 #'
-#'@param y a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
+#'@param y a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
 #'genes from \code{n} samples.
 #'
 #'@param x a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -25,10 +25,12 @@
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
 #'of the \code{K} random effects corresponding to \code{phi}.
 #'
+#'@param na_rm logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.
+#'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{score}: approximation of the set observed score
 #'   \item \code{q}: observation-level contributions to the score
-#'   \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
+#'   \item \code{q_ext}: pseudo-observations used to compute covariance taking into account the contributions of OLS estimates
 #'   \item \code{gene_scores}: approximation of the individual gene scores
 #' }
 #'
@@ -87,7 +89,7 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
+vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE) {
 
   ## validity checks
   if(sum(!is.finite(w))>0){
@@ -148,7 +150,7 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   # y_mu <- y_tilde - mu_new
 
 
-  alpha <- solve(crossprod(x))%*%t(x)%*%rowMeans(y_T)
+  alpha <- solve(crossprod(x))%*%t(x)%*%rowMeans(y_T, na.rm=na_rm)
   yt_mu <- y_T - do.call(cbind,replicate(g, x%*%alpha, simplify = FALSE))
 
 
@@ -183,17 +185,17 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi))) {
   T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*t(matrix(rep(t(phi_sig_xi_sqrt), each=g), nrow=g*K))
   q_fast <- do.call(cbind, replicate(K, yt_mu, simplify = FALSE))*T_fast
 
-  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE))
+  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE, na.rm = na_rm))
   XT_fast <- t(x)%*%T_fast/nb_indiv
   avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
   U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
-  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE))
+  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE, na.rm = na_rm))
   q_ext <-  q - U_XT_indiv
 
 
   gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
 
-  qq <- colSums(q)^2/nb_indiv
+  qq <- colSums(q, na.rm = na_rm)^2/nb_indiv
 
   gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # to be optimized
   QQ <- sum(qq)#nb_indiv=nrow(q) # set score

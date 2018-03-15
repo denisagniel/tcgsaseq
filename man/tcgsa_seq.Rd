@@ -2,9 +2,9 @@
 % Please edit documentation in R/tcgsa_seq.R
 \name{tcgsa_seq}
 \alias{tcgsa_seq}
-\title{Time-course Gene Set Analyis}
+\title{Time-course Gene Set Analysis}
 \usage{
-tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
+tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
   which_weights = c("loclin", "voom", "none"), n_perm = 1000,
   preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
@@ -12,7 +12,7 @@ tcgsa_seq(y, x, phi, genesets, indiv = rep(1, nrow(x)),
   "triangular", "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
   transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
   "hommel", "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
-  verbose = TRUE)
+  na.rm_tcgsaseq = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -25,14 +25,21 @@ preprocessed expressions from \code{n} samples for \code{G} genes.}
 \item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
 to be tested}
 
+\item{weights_phi_condi}{a logical flag indicating whether heteroscedasticity
+weights computation should be conditional on both the variable(s) to be tested
+\code{phi} and on covariate(s) \code{x}, or on \code{x} alone. #'Default is \code{TRUE}
+in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.}
+
 \item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
-constitute the invesigated geneset. Can also be a \code{list} of index when several genesets are
-tested at once, such as the first element of a \code{\link[GSA:GSA.read.gmt]{gmt}} object.
-If \code{NULL}, then genewise p-values are returned.}
+constitute the investigated gene set (when only 1 gene set is being tested).
+Can also be a \code{list} of index (or \code{rownames} of \code{y}) when several
+gene sets are tested at once, such as the first element of a
+\code{\link[GSA:GSA.read.gmt]{gmt}} object. If \code{NULL}, then gene-wise p-values are returned.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
-to be a \code{factor}.}
+to be a \code{factor}. Default is \code{NULL} in which case each sample is considered
+as coming from independent subjects.}
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects. Only used if \code{homogen_traj} is \code{FALSE}.
@@ -43,7 +50,7 @@ the variance component score test, either \code{"permutation"} or \code{"asympto
 Default is \code{"permutation"}.}
 
 \item{which_weights}{a character string indicating which method to use to estimate
-the mean-variance relationship wheights. Possibilities are \code{"loclin"},
+the mean-variance relationship weights. Possibilities are \code{"loclin"},
 \code{"voom"} or \code{"none"} (in which case no weighting is performed).
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
@@ -58,7 +65,7 @@ log(counts) per million.}
 \item{doPlot}{a logical flag indicating whether the mean-variance plot should be drawn.
 Default is \code{FALSE}.}
 
-\item{gene_based_weights}{a logical flag used for "loclin" weights, indicating whether to estimate
+\item{gene_based_weights}{a logical flag used for \code{"loclin"} weights, indicating whether to estimate
 weights at the gene-level, or rather at the observation-level. Default is \code{TRUE},
 and weights are then estimated at the gene-level.}
 
@@ -75,15 +82,15 @@ corresponds to the loess method).}
 \item{exact}{a logical flag indicating whether the non-parametric weights accounting
 for the mean-variance relationship should be computed exactly or extrapolated
 from the interpolation of local regression of the mean against the
-variance. Default is \code{FALSE}, which uses interporlation (faster computation).}
+variance. Default is \code{FALSE}, which uses interpolation (faster computation).}
 
-\item{transform}{a logical flag used for "loclin" weights, indicating whether values should be
+\item{transform}{a logical flag used for \code{"loclin"} weights, indicating whether values should be
 transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
 observations are sparse and the specified bandwidth gives suboptimal performance there.
 Default is \code{FALSE}.}
 
 \item{padjust_methods}{multiple testing correction method used if \code{genesets}
-is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for contolling the FDR.
+is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for controlling the FDR.
 Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"} or \code{"BY"} (for Benjamini-Yekutieli procedure).}
 
@@ -95,8 +102,12 @@ Default is \code{0.5}.}
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
 
-\item{verbose}{a logical flag indicating whether informative message are printed
-during the computation. Default is \code{TRUE}.}
+\item{na.rm_tcgsaseq}{logical: should missing values in \code{y} (including
+\code{NA} and \code{NaN}) be omitted from the calculations?
+Default is \code{TRUE}.}
+
+\item{verbose}{logical: should informative messages be printed during the
+computation? Default is \code{TRUE}.}
 }
 \value{
 A list with the following elements:\itemize{
@@ -107,22 +118,25 @@ A list with the following elements:\itemize{
   transformed into log-counts per million.
   \item \code{n_perm}: an integer carrying forward the value of the '\code{n_perm}' argument indicating
   the number of perturbations performed (\code{NA} if asymptotic test was performed).
-  \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the genesets
+  \item \code{genesets}: carrying forward the value of the '\code{genesets}' argument defining the gene sets
   of interest (\code{NULL} for gene-wise testing).
-  \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each geneset, or
+  \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
   contains the raw p-values, the second one '\code{adjPval}' contains the adjusted p-values (according to
   the '\code{padjust_methods}' argument).
 }
 }
 \description{
-Wrapper function for performing gene set analysis of longitudinal RNA-seq data
+Wrapper function for performing gene set analysis of (potentially longitudinal) RNA-seq data
 }
 \examples{
 #rm(list=ls())
-n <- 200
-r <- 12
-t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#res_quant <- list()
+#for(i in 1:500){
+n <- 200#0
+nr <- 3
+r <- 4*nr#100*nr
+t <- matrix(rep(1:nr), r/nr, ncol=1, nrow=r)
 sigma <- 0.4
 b0 <- 1
 
@@ -136,13 +150,19 @@ x <- matrix(1, ncol=1, nrow=r)
 
 #run test
 res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
-                        Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+                        Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="asymptotic",
                         which_weights="none", preprocessed=TRUE)
-res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
-                      Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
+res_genes <- tcgsa_seq(y, x, phi=cbind(t, rnorm(r)), #t^2
+                      genesets=NULL,
+                      Sigma_xi=diag(2), indiv=rep(1:(r/nr), each=nr), which_test="asymptotic",
                       which_weights="none", preprocessed=TRUE)
 length(res_genes$pvals[, "rawPval"])
 quantile(res_genes$pvals[, "rawPval"])
+#res_quant[[i]] <- res_genes$pvals[, "rawPval"]
+#}
+#round(rowMeans(sapply(res_quant, quantile)), 3)
+#plot(density(unlist(res_quant)))
+#mean(unlist(res_quant)<0.05)
 
 \dontrun{
 res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
@@ -151,8 +171,10 @@ res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
 }
 }
 \references{
-Agniel D, Hejblum BP, Variance component score test for
-time-course gene set analysis of longitudinal RNA-seq data, \emph{submitted}, 2016.
+Agniel D & Hejblum BP (2017). Variance component score test for
+time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
+18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
+\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 
 Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision
 weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome

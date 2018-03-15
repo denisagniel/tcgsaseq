@@ -4,3 +4,8 @@
 ReproducibleForBiostat.R
 ^README\.Rmd$
 ^README-.*\.png$
+^cran-comments\.md$
+^appveyor\.yml$
+^codecov\.yml$
+revdep
+vignettes

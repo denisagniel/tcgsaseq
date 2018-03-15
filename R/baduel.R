@@ -1,6 +1,6 @@
 #' Small portion of RNA-seq data from plant physiology study.
 #'
-#'A subsample of the RNA-seq data from Baduel et al. studying Arabidopsis Arenosa physiology.
+#'A subsample of the RNA-seq data from Baduel \emph{et al.} studying Arabidopsis Arenosa physiology.
 #'
 #'@name baduel_5gs
 #'@rdname baduel_5gs
@@ -8,11 +8,14 @@
 #'
 #'@usage data(baduel_5gs)
 #'
-#'@references Baduel P, Arnold B, Weisman CM, Hunter B & Bomblies K, Habitat-Associated Life
-#'History and Stress-Tolerance Variation in Arabidopsis Arenosa. \emph{Plant Physiology}: 01875, 2015.
-#'
-#'@references Agniel D, Hejblum BP, Variance component score test for
-#' time-course gene set analysis of longitudinal RNA-seq data, \emph{submitted}, 2016.
+#'@references Baduel P, Arnold B, Weisman CM, Hunter B & Bomblies K (2016).
+#'Habitat-Associated Life History and Stress-Tolerance Variation in Arabidopsis
+#'Arenosa. \emph{Plant Physiology}, 171(1):437-51. \href{https://doi.org/10.1104/pp.15.01875}{10.1104/pp.15.01875}.
+
+#'@references Agniel D & Hejblum BP (2017). Variance component score test for
+#'time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
+#'18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
+#'\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 #'
 #'@format 3 objects\itemize{
 #'\item{\code{design}:} a design matrix for the 48 measured samples, containing the following variables:\itemize{
@@ -35,7 +38,7 @@
 #'  \item \code{AgeWeeks_Vernalized_Population} interaction variable between the \code{AgeWeeks},
 #'  \code{Vernalized} and \code{Population} variables
 #'}
-#'\item{\code{baduel_gmt}:} a gmt object containing 5 gene sets of interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
+#'\item{\code{baduel_gmt}:} a \code{gmt} object containing 5 gene sets of interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
 #'\item{\code{expr_norm_corr}:} a numeric matrix containing the normalized batch corrected expression
 #'for the 2454 genes included in either of the 5 gene sets of interests
 #'}

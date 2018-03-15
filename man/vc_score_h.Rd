@@ -4,10 +4,10 @@
 \alias{vc_score_h}
 \title{Computes variance component test statistic for homogeneous trajectory}
 \usage{
-vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)))
+vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNAseq counts for g
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
 genes from \code{n} samples.}
 
 \item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -25,12 +25,14 @@ samples, corresponding to the inverse of the diagonal of the estimated covarianc
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects corresponding to \code{phi}.}
+
+\item{na_rm}{logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements:\itemize{
   \item \code{score}: approximation of the set observed score
   \item \code{q}: observation-level contributions to the score
-  \item \code{q_ext}: psuedo-observations used to compute covariance taking into account the contributions of OLS estimates
+  \item \code{q_ext}: pseudo-observations used to compute covariance taking into account the contributions of OLS estimates
   \item \code{gene_scores}: approximation of the individual gene scores
 }
 }

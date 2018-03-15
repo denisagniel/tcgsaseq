@@ -1,7 +1,7 @@
 #' Gene abundance proportion distribution of RNA-seq data.
 #'
 #' An example of gene abundance proportion distribution function of RNA-seq data,
-#' generated from a real dataset. See supplmenetary material of Law \emph{et al}.
+#' generated from a real dataset. See supplementary material of Law \emph{et al.}
 #'
 #'@name qAbundanceDist
 #'@rdname qAbundanceDist

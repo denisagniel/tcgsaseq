@@ -6,10 +6,10 @@
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
   Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
-  homogen_traj = FALSE)
+  homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNAseq counts for g
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
 genes from \code{n} samples.}
 
 \item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -30,20 +30,23 @@ of the \code{K} random effects.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}.}
 
-\item{genewise_pvals}{a logical flag indicating whether genewise pvalues should be returned. Default
-is \code{FALSE} in which case geneset p-value is computed and returned instead.}
+\item{genewise_pvals}{a logical flag indicating whether gene-wise p-values should be returned. Default
+is \code{FALSE} in which case gene-set p-value is computed and returned instead.}
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
+
+\item{na.rm}{logical: should missing values (including \code{NA} and \code{NaN})
+be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements when the set p-value is computed :\itemize{
   \item \code{set_score_obs}: the approximation of the observed set score
   \item \code{set_pval}: the associated set p-value
 }
-or a list with the following elements when genewise pvalues are computed:\itemize{
-  \item \code{gene_scores_obs}: vector of approximating the observed genewise scores
-  \item \code{gene_pvals}: vector of associated genewise p-values
+or a list with the following elements when gene-wise p-values are computed:\itemize{
+  \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
+  \item \code{gene_pvals}: vector of associated gene-wise p-values
 }
 }
 \description{

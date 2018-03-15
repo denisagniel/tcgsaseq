@@ -30,7 +30,7 @@ Larger values give more smoothness. Default is \code{0.5}.}
 a vector of length \code{n} containing the computed precision weights
 }
 \description{
-Implementation of the procedure descibed in Law \emph{et al} for estimating precision
+Implementation of the procedure described in Law \emph{et al.} for estimating precision
 weights from RNA-seq data.
 }
 \examples{
@@ -40,13 +40,15 @@ set.seed(123)
 G <- 10000
 n <- 12
 p <- 2
-y <- t(sapply(1:G, FUN=function(x){rnbinom(n=n, size=0.07, mu=200)}))
 
+y <- sapply(1:n, FUN=function(x){rnbinom(n=G, size=0.07, mu=200)})
 x <- sapply(1:p, FUN=function(x){rnorm(n=n, mean=n, sd=1)})
 
 my_w <-  voom_weights(y, x, doPlot=TRUE)
-w_voom <- limma::voom(counts=y, design=x, plot=TRUE) #slightly faster than us. Same results
-all.equal(my_w, w_voom$weights)
+if (requireNamespace("limma", quietly = TRUE)) {
+ w_voom <- limma::voom(counts=y, design=x, plot=TRUE) #slightly faster - same results
+ all.equal(my_w, w_voom$weights)
+}
 
 \dontrun{
 microbenchmark::microbenchmark(limma::voom(counts=t(y), design=x, plot=FALSE),
