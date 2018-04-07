@@ -212,5 +212,5 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   QQ <- sum(qq) #nb_indiv=nrow(q) # set score
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled" = gene_Q))
+              "gene_scores_unscaled" = gene_Q[1,]))
 }
