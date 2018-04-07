@@ -44,7 +44,7 @@
 #'########################
 #'n <- 100
 #'r <- 12
-#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'t <- matrix(rep(1:3), r/3, ncol=1, nrow=r)
 #'sigma <- 0.4
 #'b0 <- 1
 #'
@@ -59,7 +59,7 @@
 #'
 #'#run test
 #'scoreTest <- vc_score(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                     Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
+#'                     Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3))
 #'scoreTest$score
 #'
 #'@importFrom CompQuadForm davies
@@ -166,7 +166,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   sig_eps_inv_T <- t(w)
   phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
 
-  T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*t(matrix(rep(t(phi_sig_xi_sqrt), each=g), nrow=g*K))
+  T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*matrix(apply(phi_sig_xi_sqrt, 2, rep, g), ncol = g*K)
   ###---------------------
   ## the structure of T_fast is time_basis_1*gene_1, time_basis_1*gene_2, ...,
   ## time_basis_1*gene_p, ..., time_basis_K*gene_1, ..., time_basis_K*gene_p
@@ -207,10 +207,11 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   #unlist(by(data=matrix(qq, ncol=1), INDICES=rep(1:g, K), FUN=sum, simplify = FALSE)) # veryslow
   #gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
   #gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # old computation
-  gene_Q <- qq%*%matrix(diag(g), nrow=g*K, ncol=g, byrow = TRUE) # faster
+  #gene_Q <- tcrossprod(qq, matrix(diag(g), nrow=g, ncol=g*K))[1, ] # faster
+  gene_Q <- rowSums(matrix(qq, ncol=K)) # even faster
 
   QQ <- sum(qq) #nb_indiv=nrow(q) # set score
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled" = gene_Q[1,]))
+              "gene_scores_unscaled" = gene_Q))
 }
