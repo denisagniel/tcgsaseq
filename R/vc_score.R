@@ -105,7 +105,7 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
 
   ## OLS for conditional mean -----
   y_T <- t(y)
-  if(na_rm){
+  if(na_rm & sum(is.na(y_T))>0){
     y_T0 <- y_T
     y_T0[is.na(y_T0)] <- 0
     yt_mu <- y_T - x%*%solve(crossprod(x))%*%t(x)%*%y_T0
@@ -183,25 +183,34 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   #m_dt <- data.table("indiv"=factor(rep(c(1:20), each=5)), mbig)
   #temp <- m_dt[, lapply(.SD, sum), by=indiv]
 
-  #those 2 by statements represent the longest AND more memory intensive part of this for genewise analysis:
-  q <- do.call(rbind, by(q_fast, indiv, FUN=colSums, simplify=FALSE, na.rm = na_rm))
-  XT_fast <- t(x)%*%T_fast/nb_indiv
-  avg_xtx_inv_tx <- nb_indiv*solve(t(x)%*%x)%*%t(x)
-  U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*t(avg_xtx_inv_tx)%*%XT_fast
-  U_XT_indiv <- do.call(rbind, by(U_XT, indiv, FUN=colSums, simplify=FALSE, na.rm = na_rm))
+  #the 2 by statements below used to represent the longest AND most memory intensive part of this for genewise analysis:
+  indiv_mat <- model.matrix(~0 + factor(indiv))
+
+  if(na_rm & sum(is.na(q_fast))>0){
+    q_fast[is.na(q_fast)] <- 0
+  }
+  q <- crossprod(indiv_mat, q_fast)
+  XT_fast <- crossprod(x, T_fast)/nb_indiv
+  avg_xtx_inv_tx <- nb_indiv*tcrossprod(solve(crossprod(x, x)), x)
+  U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*crossprod(avg_xtx_inv_tx, XT_fast)
+  if(na_rm & sum(is.na(U_XT))>0){
+    U_XT[is.na(U_XT)] <- 0
+  }
+  U_XT_indiv <- crossprod(indiv_mat, U_XT)
   q_ext <-  q - U_XT_indiv
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
 
-  gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
 
   qq <- colSums(q, na.rm = na_rm)^2/nb_indiv # genewise scores
-  gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # to be optimized
-  #do.call(rbind, by(t(qq), rep(1:K, g), FUN=colSums, simplify=FALSE))
+
+  #unlist(by(data=matrix(qq, ncol=1), INDICES=rep(1:g, K), FUN=sum, simplify = FALSE)) # veryslow
+  #gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
+  #gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # old computation
+  gene_Q <- qq%*%matrix(diag(g), nrow=g*K, ncol=g, byrow = TRUE) # faster
 
   QQ <- sum(qq) #nb_indiv=nrow(q) # set score
 
   return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled" = gene_Q,
-              "gene_inds" = gene_inds))
+              "gene_scores_unscaled" = gene_Q))
 }
