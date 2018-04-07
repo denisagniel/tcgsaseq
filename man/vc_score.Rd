@@ -49,7 +49,7 @@ set.seed(123)
 ########################
 n <- 100
 r <- 12
-t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+t <- matrix(rep(1:3), r/3, ncol=1, nrow=r)
 sigma <- 0.4
 b0 <- 1
 
@@ -64,7 +64,7 @@ x <- matrix(1, ncol=1, nrow=r)
 
 #run test
 scoreTest <- vc_score(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                    Sigma_xi=matrix(1), indiv=rep(1:4, each=3))
+                    Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3))
 scoreTest$score
 
 }
