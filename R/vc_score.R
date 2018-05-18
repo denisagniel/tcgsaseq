@@ -63,6 +63,7 @@
 #'scoreTest$score
 #'
 #'@importFrom CompQuadForm davies
+#'@importFrom stats model.matrix
 #'
 #'@export
 vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE) {
@@ -72,7 +73,6 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   }
 
   ## dimensions check------
-# browser()
   stopifnot(is.matrix(y))
   stopifnot(is.matrix(x))
   stopifnot(is.matrix(phi))
@@ -184,7 +184,12 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   #temp <- m_dt[, lapply(.SD, sum), by=indiv]
 
   #the 2 by statements below used to represent the longest AND most memory intensive part of this for genewise analysis:
-  indiv_mat <- model.matrix(~0 + factor(indiv))
+
+  if(length(levels(indiv))>1){
+    indiv_mat <- stats::model.matrix(~0 + factor(indiv))
+  }else{
+    indiv_mat <- matrix(as.numeric(indiv), ncol=1)
+  }
 
   if(na_rm & sum(is.na(q_fast))>0){
     q_fast[is.na(q_fast)] <- 0

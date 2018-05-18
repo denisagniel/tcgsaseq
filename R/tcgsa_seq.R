@@ -250,8 +250,6 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   if(which_weights != "none"){cat("Done!\n")}
 
 
-
-
   if(which_test == "asymptotic"){
     n_perm <- NA
 
@@ -320,7 +318,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       rawPvals <- sapply(seq_along(genesets), FUN = function(i_gs){
         gs <- genesets[[i_gs]]
         e <- try(y_lcpm[gs, 1], silent = TRUE)
-        if(inherits(e, "try-error")){
+        if(inherits(e, "try-error") | length(e)==0){
           warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
           NA
         }else{

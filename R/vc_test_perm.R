@@ -104,6 +104,11 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
 
   score_list_obs <- vc_score_2use(y = y, x = x, indiv = indiv_fact, phi = phi, w = w, Sigma_xi = Sigma_xi, na_rm = na.rm)
 
+  # res <- matrix(nrow=n_samples, ncol=n_perm)
+  # for(l in levels(indiv_fact)){
+  #   original_index <- which(indiv_fact==l)
+  #   res[original_index, ] <- replicate(n=n_perm, sample(original_index, replace = FALSE))
+  # }
 
   if(genewise_pvals){
     gene_scores_obs <- score_list_obs$gene_scores_unscaled
