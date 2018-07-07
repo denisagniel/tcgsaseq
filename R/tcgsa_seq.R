@@ -211,7 +211,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   }
 
   if(det(crossprod(cbind(x, phi)))==0){
-    stop("crossprod(x, phi) cannot be inversed. x and phi are likely colinear...")
+    stop("crossprod(cbind(x, phi)) cannot be inversed. x and phi are likely colinear...")
   }
 
   if(length(padjust_methods)>1){
