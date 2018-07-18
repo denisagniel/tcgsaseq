@@ -2,7 +2,7 @@
 % Please edit documentation in R/vc_test_perm.R
 \name{vc_test_perm}
 \alias{vc_test_perm}
-\title{Permutation-based variance component test statistic for longitudinal RNA-seq data}
+\title{Permutation-based variance component test statistic}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
   Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
@@ -52,7 +52,7 @@ or a list with the following elements when gene-wise p-values are computed:\item
 \description{
 This function computes an approximation of the Variance Component test for a
 mixture of \eqn{\chi^{2}}s using permutations. This is preferable to the
-asymptotic approximation for small sample sizes
+asymptotic approximation for small sample sizes.
 }
 \examples{
 #rm(list=ls())

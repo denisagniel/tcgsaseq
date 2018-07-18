@@ -113,9 +113,14 @@
 #'
 #'@examples
 #'#rm(list=ls())
-#'n <- 200
-#'r <- 12
-#'t <- matrix(rep(1:3), 4, ncol=1, nrow=r)
+#'nsims=100
+#'res <- numeric(nsims)
+#'for(i in 1:nsims){
+#'n <- 1000
+#'nr=5
+#'ni=50
+#'r <- nr*ni
+#'t <- matrix(rep(1:nr), ni, ncol=1, nrow=r)
 #'sigma <- 0.5
 #'b0 <- 1
 #'
@@ -128,11 +133,15 @@
 #'x <- matrix(1, ncol=1, nrow=r)
 #'
 #'#run test
-#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:4, each=3),
+#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
 #'                    which_test="asymptotic",
 #'                    which_weights="none", preprocessed=TRUE)
-#'length(res_genes$pvals[, "rawPval"])
+#'mean(res_genes$pvals[, "rawPval"]>0.05)
 #'quantile(res_genes$pvals[, "rawPval"])
+#'res[i] <- mean(res_genes$pvals[, "rawPval"]<0.05)
+#'cat(i,"\n")
+#'}
+#'mean(res)
 #'
 #'\dontrun{
 #'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:4, each=3),

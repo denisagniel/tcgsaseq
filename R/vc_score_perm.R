@@ -1,4 +1,4 @@
-#'Computes variance component test statistic for longitudinal
+#'Computes variance component test statistic and its permuted distribution
 #'
 #'This function computes an approximation of the Variance Component test for a
 #'mixture of \eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
@@ -27,12 +27,16 @@
 #'@param na_rm logical: should missing values (including \code{NA} and \code{NaN})
 #'be omitted from the calculations? Default is \code{FALSE}.
 #'
+#'@param n_perm the number of permutation to perform. Default is \code{1000}.
+#'
 #'@return A list with the following elements:\itemize{
-#'   \item \code{score}: approximation of the set observed score
+#'   \item \code{score}: an approximation of the observed set score
+#'   \item \code{scores_perm}: a vector containing the permuted set scores
 #'   \item \code{q}: observation-level contributions to the score
 #'   \item \code{q_ext}: pseudo-observations used to compute the covariance,
 #'    taking into account the contributions of OLS estimates
-#'   \item \code{gene_scores_unscaled}: a vector of the approximations of the individual gene scores
+#'   \item \code{gene_scores_unscaled}: approximation of the individual gene scores
+#'   \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -67,7 +71,7 @@
 #'@importFrom stats model.matrix
 #'
 #'@export
-vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE) {
+vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE, n_perm=1000) {
   ## validity checks
   if(sum(!is.finite(w))>0){
     stop("At least 1 non-finite weight in 'w'")
@@ -165,14 +169,20 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   # browser()
   sig_xi_sqrt <- (Sigma_xi*diag(K))%^% (-0.5)
   sig_eps_inv_T <- t(w)
-  phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
 
-  T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*matrix(apply(phi_sig_xi_sqrt, 2, rep, g), ncol = g*K)
+  perm_mat <- matrix(1:n, ncol=n_perm, nrow=n)
+  perm_mat <- cbind(1:n, apply(perm_mat, 2, function(v){unlist(lapply(split(x = v, f = indiv),
+                                                                      FUN = sample))}))
+  phi_perm <- lapply(1:(n_perm+1), function(index){phi[perm_mat[, index], , drop=FALSE]})
+  phi_sig_xi_sqrt <- lapply(phi_perm, function(m){m%*%sig_xi_sqrt})
+
+  T_fast <- lapply(phi_sig_xi_sqrt, function(m){
+                   do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*matrix(apply(m, 2, rep, g), ncol = g*K)})
   ###---------------------
   ## the structure of T_fast is time_basis_1*gene_1, time_basis_1*gene_2, ...,
   ## time_basis_1*gene_p, ..., time_basis_K*gene_1, ..., time_basis_K*gene_p
   ##----------------------------
-  q_fast <- matrix(yt_mu, ncol=g*n_t, nrow=n)*T_fast
+  q_fast <- lapply(T_fast, function(m){matrix(yt_mu, ncol=g*n_t, nrow=n)*m})
 
   #dplyr seems to be less efficient here
   #q_fast_tb <- tibble::as_tibble(cbind.data.frame(indiv, q_fast))
@@ -187,37 +197,38 @@ vc_score <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FA
   #the 2 by statements below used to represent the longest AND most memory intensive part of this for genewise analysis:
 
   if(length(levels(indiv))>1){
-    indiv_mat <- stats::model.matrix(~0 + factor(indiv))
+    indiv_mat <- stats::model.matrix(~0 + indiv)
   }else{
     indiv_mat <- matrix(as.numeric(indiv), ncol=1)
   }
 
-  if(na_rm & sum(is.na(q_fast))>0){
-    q_fast[is.na(q_fast)] <- 0
+  if(na_rm & sum(sapply(q_fast, function(m){sum(is.na(m))}))>0){
+    q_fast <- lapply(q_fast, function(m){m[is.na(m)] <- 0})
   }
-  q <- crossprod(indiv_mat, q_fast)
-  XT_fast <- crossprod(x, T_fast)/nb_indiv
+
+  q <- lapply(q_fast, function(m){crossprod(indiv_mat, m)})
+  XT_fast <- lapply(T_fast, function(m){crossprod(x, m)/nb_indiv})
   avg_xtx_inv_tx <- nb_indiv*tcrossprod(solve(crossprod(x, x)), x)
-  U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*crossprod(avg_xtx_inv_tx, XT_fast)
-  if(na_rm & sum(is.na(U_XT))>0){
-    U_XT[is.na(U_XT)] <- 0
+  U_XT <- lapply(XT_fast, function(m){matrix(yt_mu, ncol=g*n_t, nrow=n)*crossprod(avg_xtx_inv_tx, m)})
+  if(na_rm & sum(sapply(U_XT, function(m){sum(is.na(m))}))>0){
+    U_XT <- lapply(U_XT, function(m){m[is.na(m)] <- 0})
   }
-  U_XT_indiv <- crossprod(indiv_mat, U_XT)
-  q_ext <-  q - U_XT_indiv
+  U_XT_indiv <- lapply(U_XT, function(m){crossprod(indiv_mat, m)})
+  q_ext <-  mapply("-", q, U_XT_indiv, SIMPLIFY=FALSE)
   #sapply(1:6, function(i){(q_ext[i,] - q_ext_fast_indiv[i,])})
 
 
 
-  qq <- colSums(q, na.rm = na_rm)^2/nb_indiv # genewise scores
+  qq <- lapply(q, function(m){colSums(m, na.rm = na_rm)^2/nb_indiv}) # genewise scores
 
   #unlist(by(data=matrix(qq, ncol=1), INDICES=rep(1:g, K), FUN=sum, simplify = FALSE)) # veryslow
   #gene_inds <- lapply(1:g, function(x){x + (g)*(0:(K-1))})
   #gene_Q <- sapply(gene_inds, function(x) sum(qq[x])) # old computation
   #gene_Q <- tcrossprod(qq, matrix(diag(g), nrow=g, ncol=g*K))[1, ] # faster
-  gene_Q <- rowSums(matrix(qq, ncol=K)) # even faster
+  gene_Q <- lapply(qq, function(m){rowSums(matrix(m, ncol=K))}) # even faster
 
-  QQ <- sum(qq) #nb_indiv=nrow(q) # set score
+  QQ <- sapply(qq, sum) #nb_indiv=nrow(q) # set score
 
-  return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled" = gene_Q))
+  return(list("score"=QQ[1], "scores_perm"=QQ[-1], "q" = q[[1]], "q_ext"=q_ext[[1]],
+              "gene_scores_unscaled" = gene_Q[[1]], "gene_scores_unscaled_perm" = gene_Q[-1]))
 }

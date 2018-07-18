@@ -19,7 +19,7 @@
 #'@export
 data_sim_voomlike <- function(seed = NULL, maxGSsize = 400, minGSsize = 30, beta = 0, do_gs = TRUE,
                               longitudinal = TRUE, mixed_hypothesis = FALSE,
-                              n = 18, nindiv = 6, ntime = 3){
+                              n = 18, nindiv = 6, ntime = 3, propH1=0.1){
 
 
   ############################################################################
@@ -65,14 +65,14 @@ data_sim_voomlike <- function(seed = NULL, maxGSsize = 400, minGSsize = 30, beta
   }
 
   # Set seed ----
-  if(!is.null(seed)){set.seed(seed*54321)}
+  if(!is.null(seed)){set.seed(seed)}
   u <- stats::runif(100)
 
   # Expected counts, group basis ----
   i <- sample(1:ngenes, 200)
   i1 <- i[1:100]
   i2 <- i[101:200]
-  fc <- 2
+  fc <- 1
   baselineprop1 <- baselineprop
   baselineprop2 <- baselineprop
   baselineprop1[i1] <- baselineprop1[i1]*fc
@@ -84,9 +84,9 @@ data_sim_voomlike <- function(seed = NULL, maxGSsize = 400, minGSsize = 30, beta
   # Biological variation ----
   mu0_null <- mu0
   if(longitudinal){
-    mu0 <- exp(log(mu0) + matrix(beta*time, ncol = n, nrow = ngenes))
+    mu0 <- exp(log(mu0) + matrix(beta*time, ncol = n, nrow = ngenes, byrow = TRUE))
   }else{
-    mu0 <- exp(log(mu0) + matrix(beta*group, ncol = n, nrow = ngenes))
+    mu0 <- exp(log(mu0) + matrix(beta*group, ncol = n, nrow = ngenes, byrow = TRUE))
   }
 
   BCV0 <- 0.2+1/sqrt(mu0)
@@ -153,12 +153,15 @@ data_sim_voomlike <- function(seed = NULL, maxGSsize = 400, minGSsize = 30, beta
 
   # Adding 90% null hypotheses under H0 (beta = 0)
   if(mixed_hypothesis){
-    select_alt <- sample(x = 1:nrow(counts2), size = floor(ngenes/10))
+    select_alt <- sample(x = 1:nrow(counts2), size = floor(ngenes*propH1))
     countsfin <- rbind(counts2[select_alt, ], counts2_null[!(1:nrow(counts2_null) %in% select_alt), ])
+    H1_ind <- 1:length(select_alt)
   }else{
+    select_alt <- NULL
     countsfin <- counts2
+    H1_ind <- NULL
   }
 
-  return(list("counts" = countsfin, "design" = design, "gs_keep" = gs_keep, "indiv" = indiv))
+  return(list("counts" = countsfin, "design" = design, "gs_keep" = gs_keep, "indiv" = indiv, "H1_index" = H1_ind))
 }
 

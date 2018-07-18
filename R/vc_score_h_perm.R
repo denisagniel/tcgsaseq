@@ -27,12 +27,18 @@
 #'
 #'@param na_rm logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.
 #'
+#'@param n_perm the number of permutation to perform. Default is \code{1000}.
+#'
 #'@return A list with the following elements:\itemize{
-#'   \item \code{score}: approximation of the set observed score
+#'   \item \code{score}: an approximation of the observed set score
+#'   \item \code{scores_perm}: a vector containing the permuted set scores
 #'   \item \code{q}: observation-level contributions to the score
-#'   \item \code{q_ext}: pseudo-observations used to compute covariance taking into account the contributions of OLS estimates
-#'   \item \code{gene_scores}: approximation of the individual gene scores
+#'   \item \code{q_ext}: pseudo-observations used to compute the covariance,
+#'    taking into account the contributions of OLS estimates
+#'   \item \code{gene_scores_unscaled}: approximation of the individual gene scores
+#'   \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
 #' }
+#'
 #'
 #'
 #'@examples
@@ -89,7 +95,7 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE) {
+vc_score_h_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE, n_perm=1000) {
 
   ## validity checks
   if(sum(!is.finite(w))>0){
@@ -181,35 +187,42 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = 
   # q_ext <- q - U %*% XT
 
   sig_eps_inv_T <- t(w)
-  phi_sig_xi_sqrt <- phi%*%sig_xi_sqrt
-  T_fast <- do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*matrix(apply(phi_sig_xi_sqrt, 2, rep, g), ncol = g*K)
-  q_fast <- do.call(cbind, replicate(K, yt_mu, simplify = FALSE))*T_fast
+
+  perm_mat <- matrix(1:n, ncol=n_perm, nrow=n)
+  perm_mat <- cbind(1:n, apply(perm_mat, 2, function(v){unlist(lapply(split(x = v, f = indiv),
+                                                                      FUN = sample))}))
+  phi_perm <- lapply(1:(n_perm+1), function(index){phi[perm_mat[, index], , drop=FALSE]})
+  phi_sig_xi_sqrt <- lapply(phi_perm, function(m){m%*%sig_xi_sqrt})
+
+  T_fast <- lapply(phi_sig_xi_sqrt, function(m){
+    do.call(cbind, replicate(K, sig_eps_inv_T, simplify = FALSE))*matrix(apply(m, 2, rep, g), ncol = g*K)})
+  q_fast <- lapply(T_fast, function(m){matrix(yt_mu, ncol=g*n_t, nrow=n)*m})
+
+  if(na_rm & sum(sapply(q_fast, function(m){sum(is.na(m))}))>0){
+    q_fast <- lapply(q_fast, function(m){m[is.na(m)] <- 0})
+  }
 
   if(length(levels(indiv))>1){
     indiv_mat <- stats::model.matrix(~0 + factor(indiv))
   }else{
     indiv_mat <- matrix(as.numeric(indiv), ncol=1)
   }
-
-  if(na_rm & sum(is.na(q_fast))>0){
-    q_fast[is.na(q_fast)] <- 0
-  }
-  q <- crossprod(indiv_mat, q_fast)
-  XT_fast <- t(x)%*%T_fast/nb_indiv
+  q <- lapply(q_fast, function(m){crossprod(indiv_mat, m)})
+  XT_fast <- lapply(T_fast, function(m){crossprod(x, m)/nb_indiv})
   avg_xtx_inv_tx <- nb_indiv*tcrossprod(solve(crossprod(x, x)), x)
-  U_XT <- matrix(yt_mu, ncol=g*n_t, nrow=n)*crossprod(avg_xtx_inv_tx, XT_fast)
-  if(na_rm & sum(is.na(U_XT))>0){
-    U_XT[is.na(U_XT)] <- 0
+  U_XT <- lapply(XT_fast, function(m){matrix(yt_mu, ncol=g*n_t, nrow=n)*crossprod(avg_xtx_inv_tx, m)})
+  if(na_rm & sum(sapply(U_XT, function(m){sum(is.na(m))}))>0){
+    U_XT <- lapply(U_XT, function(m){m[is.na(m)] <- 0})
   }
-  U_XT_indiv <- crossprod(indiv_mat, U_XT)
-  q_ext <-  q - U_XT_indiv
+  U_XT_indiv <- lapply(U_XT, function(m){crossprod(indiv_mat, m)})
+  q_ext <-  mapply("-", q, U_XT_indiv, SIMPLIFY=FALSE)
 
-  qq <- colSums(q, na.rm = na_rm)^2/nb_indiv
+  qq <- lapply(q, function(m){colSums(m, na.rm = na_rm)^2/nb_indiv}) # genewise scores
 
-  gene_Q <- rowSums(matrix(qq, ncol=K))
+  gene_Q <- lapply(qq, function(m){rowSums(matrix(m, ncol=K))})
+  QQ <- sapply(qq, sum) # set score
 
-  QQ <- sum(qq)#nb_indiv=nrow(q) # set score
-
-  return(list("score"=QQ, "q" = q, "q_ext"=q_ext,
-              "gene_scores_unscaled" = gene_Q))
+  return(list("score"=QQ[1], "scores_perm"=QQ[-1], "q" = q[[1]], "q_ext"=q_ext[[1]],
+              "gene_scores_unscaled" = gene_Q[[1]], "gene_scores_unscaled_perm" = gene_Q[-1])
+  )
 }
