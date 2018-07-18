@@ -99,7 +99,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     gene_scores_obs <- score_list_res$gene_scores_unscaled
     gene_scores_perm <- score_list_res$gene_scores_unscaled_perm
     #pvals <- 1 - rowMeans(sapply(gene_scores_perm, function(x){x < gene_scores_obs}))
-    pvals <- 1 - rowMeans(do.call(cbind, gene_scores_perm) < gene_scores_obs)
+    pvals <- 1 - rowMeans(gene_scores_perm < gene_scores_obs)
     #hist(pvals)
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals)
   }else{

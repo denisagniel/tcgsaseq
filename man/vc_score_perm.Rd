@@ -36,9 +36,6 @@ be omitted from the calculations? Default is \code{FALSE}.}
 A list with the following elements:\itemize{
   \item \code{score}: an approximation of the observed set score
   \item \code{scores_perm}: a vector containing the permuted set scores
-  \item \code{q}: observation-level contributions to the score
-  \item \code{q_ext}: pseudo-observations used to compute the covariance,
-   taking into account the contributions of OLS estimates
   \item \code{gene_scores_unscaled}: approximation of the individual gene scores
   \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
 }
@@ -69,7 +66,7 @@ y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 x <- matrix(1, ncol=1, nrow=r)
 
 #run test
-scoreTest <- vc_score(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+scoreTest <- vc_score_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                     Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3))
 scoreTest$score
 

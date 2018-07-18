@@ -35,9 +35,6 @@ of the \code{K} random effects corresponding to \code{phi}.}
 A list with the following elements:\itemize{
   \item \code{score}: an approximation of the observed set score
   \item \code{scores_perm}: a vector containing the permuted set scores
-  \item \code{q}: observation-level contributions to the score
-  \item \code{q_ext}: pseudo-observations used to compute the covariance,
-   taking into account the contributions of OLS estimates
   \item \code{gene_scores_unscaled}: approximation of the individual gene scores
   \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
 }
@@ -80,11 +77,11 @@ x <- cbind(1, myindiv/2==floor(myindiv/2))
 myw <- matrix(rnorm(nsample*ng, sd=0.1), ncol=nsample, nrow=ng)
 
 #run test
-score_homogen <- vc_score_h(y, x, phi=tim, indiv=myindiv,
-                           w=myw, Sigma_xi=cov(tim))
+score_homogen <- vc_score_h_perm(y, x, phi=tim, indiv=myindiv,
+                                w=myw, Sigma_xi=cov(tim))
 score_homogen$score
 
-score_heterogen <- vc_score(y, x, phi=tim, indiv=myindiv,
+score_heterogen <- vc_score_perm(y, x, phi=tim, indiv=myindiv,
                            w=myw, Sigma_xi=cov(tim))
 score_heterogen$score
 
