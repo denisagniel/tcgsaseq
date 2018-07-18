@@ -170,9 +170,9 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm
   sig_xi_sqrt <- (Sigma_xi*diag(K))%^% (-0.5)
   sig_eps_inv_T <- t(w)
 
-  perm_mat <- matrix(1:n, ncol=n_perm, nrow=n)
-  perm_mat <- cbind(1:n, apply(perm_mat, 2, function(v){unlist(lapply(split(x = v, f = indiv),
-                                                                      FUN = sample))}))
+  perm_mat <- matrix(as.character(1:n), ncol=n_perm, nrow=n)
+  perm_mat <- cbind(1:n, apply(perm_mat, 2, function(v){as.numeric(unlist(lapply(split(x = v, f = indiv),
+                                                                      FUN = sample)))}))
   phi_perm <- lapply(1:(n_perm+1), function(index){phi[perm_mat[, index], , drop=FALSE]})
   phi_sig_xi_sqrt <- lapply(phi_perm, function(m){m%*%sig_xi_sqrt})
 
