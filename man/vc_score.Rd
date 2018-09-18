@@ -4,7 +4,8 @@
 \alias{vc_score}
 \title{Computes variance component test statistic for longitudinal}
 \usage{
-vc_score(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE)
+vc_score(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
+  na_rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g

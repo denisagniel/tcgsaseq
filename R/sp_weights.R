@@ -173,7 +173,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }
     if(verbose){
-      cat("\nBandwith computed.\n")
+      message("\nBandwith computed.\n")
     }
   }
 
@@ -248,7 +248,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     kern_fit <- NULL
     if(exact){
 
-      cat("'exact' is TRUE: the computation may take up to a couple minutes...", "\n",
+      message("'exact' is TRUE: the computation may take up to a couple minutes...", "\n",
           "Set 'exact = FALSE' for quicker computation of the weights\n")
 
       weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol = n, nrow = p, byrow = FALSE))

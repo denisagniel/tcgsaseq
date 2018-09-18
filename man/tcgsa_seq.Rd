@@ -5,13 +5,14 @@
 \title{Time-course Gene Set Analysis}
 \usage{
 tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
-  Sigma_xi = diag(ncol(phi)), which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
-  preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
-  bw = "nrd", kernel = c("gaussian", "epanechnikov", "rectangular",
-  "triangular", "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  transform = FALSE, padjust_methods = c("BH", "BY", "holm", "hochberg",
-  "hommel", "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
+  Sigma_xi = diag(ncol(phi)), which_test = c("permutation",
+  "asymptotic"), which_weights = c("loclin", "voom", "none"),
+  n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
+  gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",
+  "epanechnikov", "rectangular", "triangular", "biweight", "tricube",
+  "cosine", "optcosine"), exact = FALSE, transform = FALSE,
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel",
+  "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
   na.rm_tcgsaseq = TRUE, verbose = TRUE)
 }
 \arguments{

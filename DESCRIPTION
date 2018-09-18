@@ -33,4 +33,4 @@ Description: Analyze RNA-seq data with variance component score test accounting
 LazyData: true
 License: GPL-2 | file LICENSE
 BugReports: https://github.com/denisagniel/tcgsaseq/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

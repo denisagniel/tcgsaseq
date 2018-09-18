@@ -239,7 +239,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
 
   # Computing the weights
-  if(which_weights != "none"){cat("Computing the weights... ")}
+  if(which_weights != "none"){message("Computing the weights... ")}
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi = phi, use_phi = weights_phi_condi,
                                    preprocessed = TRUE, doPlot = doPlot,
@@ -255,7 +255,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                              )
                )
   )
-  if(which_weights != "none"){cat("Done!\n")}
+  if(which_weights != "none"){message("Done!\n")}
 
 
   if(which_test == "asymptotic"){
@@ -267,7 +267,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
   if(is.null(genesets)){
     if(verbose){
-      cat("'genesets' argument not provided => only gene-wise p-values are computed\n")
+      message("'genesets' argument not provided => only gene-wise p-values are computed\n")
     }
     if(which_test == "asymptotic"){
       if(is.null(indiv)){
