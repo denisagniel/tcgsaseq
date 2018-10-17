@@ -325,13 +325,13 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
       rawPvals <- sapply(seq_along(genesets), FUN = function(i_gs){
         gs <- genesets[[i_gs]]
-        e <- try(y_lcpm[gs, 1], silent = TRUE)
+        e <- try(y_lcpm[gs, 1, drop=FALSE], silent = TRUE)
         if(inherits(e, "try-error") | length(e)==0){
           warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
           NA
         }else{
-          vc_test_asym(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi,
+          vc_test_asym(y = y_lcpm[gs, , drop=FALSE], x = x, indiv = indiv, phi = phi,
+                       w = w[gs, , drop=FALSE], Sigma_xi = Sigma_xi,
                        genewise_pvals = FALSE, homogen_traj = homogen_traj,
                        na.rm = na.rm_tcgsaseq)$set_pval
         }
@@ -360,7 +360,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
           NA
         }else{
           vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
-                       w = w[gs, ], Sigma_xi = Sigma_xi,
+                       w = w[gs, , drop=FALSE], Sigma_xi = Sigma_xi,
                        n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj,
                        na.rm = na.rm_tcgsaseq)$set_pval
         }
