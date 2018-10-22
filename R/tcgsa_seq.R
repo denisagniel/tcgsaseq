@@ -192,8 +192,8 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       verbose = TRUE){
 
   stopifnot(is.matrix(y))
-  stopifnot(is.matrix(x))
-  stopifnot(is.matrix(phi))
+  stopifnot(is.matrix(x) | is.data.frame(x))
+  stopifnot(is.matrix(phi) | is.data.frame(phi))
 
   if(sum(is.na(y))>1 & na.rm_tcgsaseq){
     warning(paste("\n\n!!!!!\n'y' contains", sum(is.na(y)), "NA values.",
@@ -219,7 +219,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   }
 
   if(det(crossprod(cbind(x, phi)))==0){
-    stop("crossprod(cbind(x, phi)) cannot be inversed. x and phi are likely colinear...")
+    stop("crossprod(cbind(x, phi)) cannot be inversed. 'x' and 'phi' are likely colinear...")
   }
 
   if(length(padjust_methods)>1){
@@ -238,8 +238,36 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   stopifnot(which_test %in% c("asymptotic", "permutation"))
 
 
+  if(which_test == "asymptotic"){
+    n_perm <- NA
+
+    if(nrow(x) < 10)
+      warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
+  }
+
+
+
+  if(which_test == "permutation"){
+    if(is.null(indiv)){
+      options(warn = -1)
+        N_possible_perms <- factorial(ncol(y_lcpm))
+      options(warn = 0)
+    }else{
+      options(warn = -1)
+        N_possible_perms <- prod(sapply(table(indiv), factorial))
+      options(warn = 0)
+    }
+
+    if(n_perm > N_possible_perms){
+      stop(paste("The number of permutations requested 'n_perm' is larger than the total number of existing permutations", N_possible_perms,
+                 ". Try a lower number for 'n_perm'"))
+    }
+  }
+
+
+
   # Computing the weights
-  if(which_weights != "none"){message("Computing the weights... ")}
+  if(which_weights != "none" & verbose){message("Computing the weights... ")}
   w <-  switch(which_weights,
                loclin = sp_weights(y = y_lcpm, x = x, phi = phi, use_phi = weights_phi_condi,
                                    preprocessed = TRUE, doPlot = doPlot,
@@ -255,15 +283,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                              )
                )
   )
-  if(which_weights != "none"){message("Done!\n")}
+  if(which_weights != "none" & verbose){message("Done!\n")}
 
 
-  if(which_test == "asymptotic"){
-    n_perm <- NA
-
-    if(nrow(x) < 10)
-      warning("Less than 10 samples: asymptotics likely not reached \nYou should probably run permutation test instead...")
-  }
 
   if(is.null(genesets)){
     if(verbose){
