@@ -47,6 +47,7 @@ A list with the following elements when the set p-value is computed :\itemize{
 or a list with the following elements when gene-wise p-values are computed:\itemize{
   \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
   \item \code{gene_pvals}: vector of associated gene-wise p-values
+  \item \code{gene_pvals}: vector of associated gene-wise discrete false discovery rates
 }
 }
 \description{
