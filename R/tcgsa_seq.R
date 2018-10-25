@@ -315,16 +315,13 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       }
       rm(y_lcpm0)
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
+      perm_result <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
+                                  w = w, Sigma_xi = Sigma_xi,
+                                  n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
+                                  na.rm = na.rm_tcgsaseq)
+      rawPvals <- perm_result$gene_pvals
 
-      rawPvals <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
-                               w = w, Sigma_xi = Sigma_xi,
-                               n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
-                               na.rm = na.rm_tcgsaseq)$gene_pvals
-
-      ds_fdr <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
-                               w = w, Sigma_xi = Sigma_xi,
-                               n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
-                               na.rm = na.rm_tcgsaseq)$fdr
+      ds_fdr <- perm_result$fdr
     }
 
     if (which_test == "permutation"){
