@@ -142,7 +142,7 @@ sigma <- 0.4
 b0 <- 1
 
 #under the null:
-b1 <- 2
+b1 <- 0
 
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
