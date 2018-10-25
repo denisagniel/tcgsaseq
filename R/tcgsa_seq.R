@@ -320,9 +320,20 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                                w = w, Sigma_xi = Sigma_xi,
                                n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
                                na.rm = na.rm_tcgsaseq)$gene_pvals
+
+      ds_fdr <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
+                               w = w, Sigma_xi = Sigma_xi,
+                               n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
+                               na.rm = na.rm_tcgsaseq)$fdr
     }
 
-    pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
+    if (which_test == "permutation"){
+      pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods), "FDR"= ds_fdr)
+    }
+    else if (which_test == "asymptotic"){
+      pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
+    }
+
     if(!is.null(rownames(y_lcpm))){
       rownames(pvals) <- rownames(y_lcpm)
     }
