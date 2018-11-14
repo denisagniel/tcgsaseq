@@ -328,7 +328,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
 
     if (which_test == "permutation"){
-      pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods), "FDR"= ds_fdr)
+      pvals <- data.frame("rawPval" = rawPvals, "FDR"= ds_fdr)
     }
     else if (which_test == "asymptotic"){
       pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))

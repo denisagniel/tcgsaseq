@@ -60,7 +60,7 @@ dsFDR <- function(gene_scores_perm, gene_scores_obs, n_perm, doPlot=FALSE, use_m
   FDR <- rep(NA,length(gene_scores_obs))
 
   for (c in 1:length(gene_scores_obs)){
-    V[c] <- sum(gene_scores_perm >= gene_scores_obs[c])/n_perm
+    V[c] <- sum(gene_scores_perm[c,] >= gene_scores_obs[c])
     R[c] <- sum(gene_scores_obs >= gene_scores_obs[c])
     FDR[c] <- min(1, pi_0_hat*V[c]/R[c])
   }
