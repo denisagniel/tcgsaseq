@@ -21,7 +21,7 @@
 #'
 #'@return A vector of estimating discrete false discovery rates
 #'
-#'@references Jun Li and Robert Tibshirani (2011). Finding consistent patterns: A nonparametric approach
+#'@references J. Li and R. Tibshirani (2013). Finding consistent patterns: A nonparametric approach
 #'for identifying differential expression in RNA-seq data, \emph{Statistical Methods in Medical Research},
 #'0(0) 1–18.
 #'
