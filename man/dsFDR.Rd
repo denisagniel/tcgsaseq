@@ -30,10 +30,10 @@ A vector of estimating discrete false discovery rates
 This function uses the permutation plug-in method to estimate the FDR.
 }
 \references{
-Jun Li and Robert Tibshirani (2011). Finding consistent patterns: A nonparametric approach
+J. Li and R. Tibshirani (2013). Finding consistent patterns: A nonparametric approach
 for identifying differential expression in RNA-seq data, \emph{Statistical Methods in Medical Research},
-0(0) 1–18.
+22(5): 519-536
 
-Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genomewide studies.
-\emph{Proceedings of the National Academy of Sciences}, 100(16), 9440-9445.
+J.D. Storey & R. Tibshirani (2003) Statistical significance for genomewide studies.
+\emph{Proceedings of the National Academy of Sciences} 100(&6): 9440–9445.
 }

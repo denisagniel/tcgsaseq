@@ -23,7 +23,7 @@
 #'
 #'@references J. Li and R. Tibshirani (2013). Finding consistent patterns: A nonparametric approach
 #'for identifying differential expression in RNA-seq data, \emph{Statistical Methods in Medical Research},
-#'0(0) 1–18.
+#'22(5): 519-536
 #'
 #'@references Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genomewide studies.
 #' \emph{Proceedings of the National Academy of Sciences}, 100(16), 9440-9445.
