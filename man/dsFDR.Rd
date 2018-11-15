@@ -4,7 +4,8 @@
 \alias{dsFDR}
 \title{Estimating the False Discovery Rate}
 \usage{
-dsFDR(gene_scores_perm, gene_scores_obs, n_perm)
+dsFDR(gene_scores_perm, gene_scores_obs, n_perm, doPlot = FALSE,
+  use_median = TRUE)
 }
 \arguments{
 \item{gene_scores_perm}{a numeric matrix of size \code{G x n} containing the permuted gene-wise scores
@@ -13,6 +14,14 @@ for \code{G} genes with \code{n_perm} permutations.}
 \item{gene_scores_obs}{a vector of length \code{n} containing the observed gene-wise scores.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}.}
+
+\item{doPlot}{a logical flag indicating whether the plot of the natural cubic spline fit should be drawn.
+Default is \code{FALSE}.}
+
+\item{use_median}{a logical flag indicating whether the median should be used to estimate
+the true proportion of null features. If not, we use a range of quantiles of the permuted gene-wise scores
+and the  true proportion of null features is estimated using the natural cubic spline.
+Default is \code{TRUE}.}
 }
 \value{
 A vector of estimating discrete false discovery rates
