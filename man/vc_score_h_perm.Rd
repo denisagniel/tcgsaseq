@@ -77,12 +77,14 @@ x <- cbind(1, myindiv/2==floor(myindiv/2))
 myw <- matrix(rnorm(nsample*ng, sd=0.1), ncol=nsample, nrow=ng)
 
 #run test
+#We only use few permutations (10) to keep example running time low
+#Otherwise one can use n_perm = 1000
 score_homogen <- vc_score_h_perm(y, x, phi=tim, indiv=myindiv,
-                                w=myw, Sigma_xi=cov(tim))
+                                w=myw, Sigma_xi=cov(tim), n_perm = 10)
 score_homogen$score
 
 score_heterogen <- vc_score_perm(y, x, phi=tim, indiv=myindiv,
-                           w=myw, Sigma_xi=cov(tim))
+                           w=myw, Sigma_xi=cov(tim), n_perm = 10)
 score_heterogen$score
 
 scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),

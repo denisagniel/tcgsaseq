@@ -71,12 +71,14 @@
 #'myw <- matrix(rnorm(nsample*ng, sd=0.1), ncol=nsample, nrow=ng)
 #'
 #'#run test
+#'#We only use few permutations (10) to keep example running time low
+#'#Otherwise one can use n_perm = 1000
 #'score_homogen <- vc_score_h_perm(y, x, phi=tim, indiv=myindiv,
-#'                                 w=myw, Sigma_xi=cov(tim))
+#'                                 w=myw, Sigma_xi=cov(tim), n_perm = 10)
 #'score_homogen$score
 #'
 #'score_heterogen <- vc_score_perm(y, x, phi=tim, indiv=myindiv,
-#'                            w=myw, Sigma_xi=cov(tim))
+#'                            w=myw, Sigma_xi=cov(tim), n_perm = 10)
 #'score_heterogen$score
 #'
 #'scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
@@ -92,7 +94,7 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_score_h_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE, n_perm=1000) {
+vc_score_h_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE, n_perm = 1000) {
 
   ## validity checks
   if(sum(!is.finite(w))>0){

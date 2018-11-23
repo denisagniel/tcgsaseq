@@ -123,8 +123,9 @@ A list with the following elements:\itemize{
   of interest (\code{NULL} for gene-wise testing).
   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
-  contains the raw p-values, the second one '\code{adjPval}' contains the adjusted p-values (according to
-  the '\code{padjust_methods}' argument).
+  contains the raw p-values, the second one contains the FDR adjusted p-values and is either named
+  '\code{adjPval}' (according to the '\code{padjust_methods}' argument) in the \code{asymptotic} case
+  or '\code{FDR}' in the \code{permutation} case.
 }
 }
 \description{
@@ -132,8 +133,9 @@ Wrapper function for performing gene set analysis of (potentially longitudinal) 
 }
 \examples{
 #rm(list=ls())
+nsims <- 2 #100
 res_quant <- list()
-for(i in 1:100){
+for(i in 1:2){
 n <- 2000#0
 nr <- 3
 r <- nr*20#4*nr#100*nr
@@ -170,13 +172,8 @@ res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
                       Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="permutation",
                       which_weights="none", preprocessed=TRUE, n_perm=1000)
 
-res_genes <- varseq(exprmat=y, covariates=x, variables2test=t,
-                   sample_group=rep(1:(r/nr), each=nr),
-                   which_test="asymptotic",
-                    which_weights="none",
-                    preprocessed=TRUE,
-                    n_perm=1000)
-hist(res_genes$pvals$rawPval)
+mean(res_genes$pvals$rawPval < 0.05)
+summary(res_genes$pvals$FDR)
 }
 }
 \references{

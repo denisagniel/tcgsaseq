@@ -3,21 +3,20 @@
 #'This function uses the permutation plug-in method to estimate the FDR.
 #'
 #'
-#'@param gene_scores_perm a numeric matrix of size \code{G x n} containing the permuted gene-wise scores
+#'@param gene_scores_perm a numeric matrix of size \code{G x n_perm} containing the permuted gene-wise scores
 #'for \code{G} genes with \code{n_perm} permutations.
 #'
 #'@param gene_scores_obs a vector of length \code{n} containing the observed gene-wise scores.
 #'
 #'@param n_perm the number of perturbations. Default is \code{1000}.
 #'
-#'@param doPlot a logical flag indicating whether the plot of the natural cubic spline fit should be drawn.
-#' Default is \code{FALSE}.
-#'
 #'@param use_median a logical flag indicating whether the median should be used to estimate
 #' the true proportion of null features. If not, we use a range of quantiles of the permuted gene-wise scores
-#' and the  true proportion of null features is estimated using the natural cubic spline.
-#' Default is \code{TRUE}.
+#' and the true proportion of null features is extrapolated from the limit of a smoothed estimate using the natural cubic spline.
+#' Default is \code{TRUE}. See \emph{Storey et al.} for details
 #'
+#'@param doPlot a logical flag indicating whether the plot of the natural cubic spline fit should be drawn.
+#' Default is \code{FALSE}. Ignored if \code{use_median} is \code{TRUE}.
 #'
 #'@return A vector of estimating discrete false discovery rates
 #'
@@ -28,10 +27,27 @@
 #'@references Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genomewide studies.
 #' \emph{Proceedings of the National Academy of Sciences}, 100(16), 9440-9445.
 #'
-#'@importFrom stats median
+#'@importFrom stats median quantile lm predict.lm
+#'@importFrom graphics abline lines plot
 #'@export
+#'
+#'@examples
+#'#rm(list=ls())
+#'G <- 1000
+#'nperm <- 100
+#'G1 <- 300
+#'G0 <- G-G1
+#'
+#'gene_scores_perm <- matrix(rchisq(G*nperm, df=1), ncol=nperm, nrow=G)
+#'gene_scores_obs <- c(rchisq(G1, df=10), rchisq(G0, df=1))
+#'
+#'qvals <- dsFDR(gene_scores_perm, gene_scores_obs, nperm, use_median = FALSE, doPlot = TRUE)
+#'summary(qvals)
+#'eFDR_5pct <- mean(qvals[-(1:G1)]<0.05)
+#'eTDR_5pct <- mean(qvals[1:G1]<0.05)
+#'cat("FDR:", eFDR_5pct, " TDR:", eTDR_5pct, "\n")
 
-dsFDR <- function(gene_scores_perm, gene_scores_obs, n_perm, doPlot=FALSE, use_median=TRUE){
+dsFDR <- function(gene_scores_perm, gene_scores_obs, n_perm, use_median = TRUE, doPlot = FALSE){
 
   # estimating pi_0 the proportion of true null hypothesis
   if(use_median){
@@ -54,6 +70,9 @@ dsFDR <- function(gene_scores_perm, gene_scores_obs, n_perm, doPlot=FALSE, use_m
       abline(h=pi_0_hat, col="red", lty=2)
     }
   }
+
+  #FFDR <- pmin(1, sapply(gene_scores_obs, function(x){sum(gene_scores_perm >= x)/sum(gene_scores_obs>= x )})*pi_0_hat/nperm)
+  #this is not faster - see microbenchmark::microbenchmark
 
   V <- rep(NA,length(gene_scores_obs))
   R <- rep(NA,length(gene_scores_obs))

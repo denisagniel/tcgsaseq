@@ -100,8 +100,9 @@
 #'   of interest (\code{NULL} for gene-wise testing).
 #'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
 #'   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
-#'   contains the raw p-values, the second one '\code{adjPval}' contains the adjusted p-values (according to
-#'   the '\code{padjust_methods}' argument).
+#'   contains the raw p-values, the second one contains the FDR adjusted p-values and is either named
+#'   '\code{adjPval}' (according to the '\code{padjust_methods}' argument) in the \code{asymptotic} case
+#'   or '\code{FDR}' in the \code{permutation} case.
 #' }
 #'
 #'@seealso \code{\link{sp_weights}} \code{\link{vc_test_perm}} \code{\link{vc_test_asym}} \code{\link{p.adjust}}
@@ -113,7 +114,7 @@
 #'
 #'@examples
 #'#rm(list=ls())
-#'nsims=100
+#'nsims <- 2 #100
 #'res <- numeric(nsims)
 #'for(i in 1:nsims){
 #'n <- 1000
@@ -144,9 +145,14 @@
 #'mean(res)
 #'
 #'\dontrun{
-#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:4, each=3),
-#'                    which_weights="none", preprocessed=TRUE, n_perm=100)
-#'res_genes
+#'b0 <- 1
+#'b1 <- 0
+#'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
+#'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
+#'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
+#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
+#'                    which_weights="none", preprocessed=TRUE, n_perm=1000)
+#'summary(res_genes$pvals)
 #'}
 #'@export
 varseq <- function(exprmat, covariates, variables2test,
