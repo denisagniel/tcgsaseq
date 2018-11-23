@@ -14,6 +14,7 @@ Depends:
 Imports:
     CompQuadForm,
     ggplot2,
+    graphics,
     GSA,
     KernSmooth,
     stats,

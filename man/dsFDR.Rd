@@ -50,6 +50,6 @@ J. Li and R. Tibshirani (2013). Finding consistent patterns: A nonparametric app
 for identifying differential expression in RNA-seq data, \emph{Statistical Methods in Medical Research},
 22(5): 519-536
 
-Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genomewide studies.
+Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genome-wide studies.
 \emph{Proceedings of the National Academy of Sciences}, 100(16), 9440-9445.
 }

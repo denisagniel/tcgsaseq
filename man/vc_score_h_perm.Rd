@@ -36,7 +36,7 @@ A list with the following elements:\itemize{
   \item \code{score}: an approximation of the observed set score
   \item \code{scores_perm}: a vector containing the permuted set scores
   \item \code{gene_scores_unscaled}: approximation of the individual gene scores
-  \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
+  \item \code{gene_scores_unscaled_perm}: a list of approximation of the permuted individual gene scores
 }
 }
 \description{

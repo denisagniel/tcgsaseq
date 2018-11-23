@@ -24,7 +24,7 @@
 #'for identifying differential expression in RNA-seq data, \emph{Statistical Methods in Medical Research},
 #'22(5): 519-536
 #'
-#'@references Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genomewide studies.
+#'@references Storey, J. D., & Tibshirani, R. (2003). Statistical significance for genome-wide studies.
 #' \emph{Proceedings of the National Academy of Sciences}, 100(16), 9440-9445.
 #'
 #'@importFrom stats median quantile lm predict.lm
