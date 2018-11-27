@@ -1,5 +1,11 @@
 # News about the `tcgsaseq` R package
 
+
+### Main changes in Version 1.8.0 (2017-11-23):
+* dsFDR function for accurate discrete FDR control when using permutation test. This 
+changes the column names of the `$pvals` output when `which_test = permutations`
+
+
 ### Main changes in Version 1.7.2 (2017-07-18):
 * faster permutations
 

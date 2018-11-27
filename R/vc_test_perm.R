@@ -42,7 +42,7 @@
 #' or a list with the following elements when gene-wise p-values are computed:\itemize{
 #'   \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
 #'   \item \code{gene_pvals}: vector of associated gene-wise p-values
-#'   \item \code{gene_pvals}: vector of associated gene-wise discrete false discovery rates
+#'   \item \code{ds_fdr}: vector of associated gene-wise discrete false discovery rates
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -102,7 +102,7 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     #pvals <- 1 - rowMeans(sapply(gene_scores_perm, function(x){x < gene_scores_obs}))
     pvals <- 1 - rowMeans(gene_scores_perm < gene_scores_obs)
     #hist(pvals)
-    ds_fdr <- DS_FDR(gene_scores_perm, gene_scores_obs, n_perm)
+    ds_fdr <- dsFDR(gene_scores_perm, gene_scores_obs, n_perm, doPlot=FALSE, use_median=TRUE)
     ans <- list("gene_scores_obs" = gene_scores_obs,"gene_pvals" = pvals, "fdr" = ds_fdr)
   }else{
     pval <- 1-sum(score_list_res$scores_perm < score_list_res$score)/n_perm
