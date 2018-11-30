@@ -26,7 +26,7 @@
 #' \emph{Proceedings of the National Academy of Sciences}, 100(16), 9440-9445.
 #'
 #'@importFrom stats median quantile lm predict.lm
-#'@importFrom graphics abline lines plot
+#'@importFrom graphics abline lines plot legend
 #'@export
 #'
 #'@examples

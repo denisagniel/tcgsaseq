@@ -42,7 +42,7 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).
+#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(y)}).
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -202,6 +202,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     y_lcpm <- apply(y, MARGIN=2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }else{
     y_lcpm <- y
+  }
+  if(which_test == "permutation"){
+    n_perm <- n_perm
   }
   rm(y)
 

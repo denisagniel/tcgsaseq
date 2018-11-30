@@ -13,15 +13,16 @@ test_that("Gene sets with no genes measure trigger warnings", {
   y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
            matrix(rep(y.tilde, n), ncol=n, nrow=r))
   x <- matrix(1, ncol=1, nrow=r)
-  expect_warning(tcgsa_seq(y, x, phi=t, genesets=list(nrow(y) + 1:10),
+  gs <- list(nrow(y) + 1:10)
+  expect_warning(tcgsa_seq(y, x, phi=t, genesets=gs,
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="permutation",
                            which_weights="none", preprocessed=TRUE))
-  expect_warning(tcgsa_seq(y, x, phi=t, genesets=list(nrow(y) + 1:10),
+  expect_warning(tcgsa_seq(y, x, phi=t, genesets=gs,
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
                            which_weights="none", preprocessed=TRUE))
 })
 
-test_that("Returned as many p-avlues as there are genesets", {
+test_that("Returned as many p-values as there are genesets", {
   rm(list = ls())
   n <- 200
   r <- 12

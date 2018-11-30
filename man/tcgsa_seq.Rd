@@ -56,7 +56,7 @@ the mean-variance relationship weights. Possibilities are \code{"loclin"},
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
-\item{n_perm}{the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).}
+\item{n_perm}{the number of perturbations. Default is \code{G} (\code{nrow(y)}).}
 
 \item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
