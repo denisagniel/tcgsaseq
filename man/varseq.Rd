@@ -8,7 +8,7 @@ varseq(exprmat, covariates, variables2test, sample_group = NULL,
   weights_var2test_condi = TRUE,
   cov_variables2test_eff = diag(ncol(variables2test)),
   which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
+  which_weights = c("loclin", "voom", "none"), n_perm = nrow(exprmat),
   preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
   bw = "nrd", kernel = c("gaussian", "epanechnikov", "rectangular",
   "triangular", "biweight", "tricube", "cosine", "optcosine"),
@@ -51,7 +51,7 @@ the mean-variance relationship weights. Possibilities are \code{"loclin"},
 Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
-\item{n_perm}{the number of perturbations. Default is \code{1000}.}
+\item{n_perm}{the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).}
 
 \item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in

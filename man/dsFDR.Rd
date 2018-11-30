@@ -4,7 +4,7 @@
 \alias{dsFDR}
 \title{Estimating the False Discovery Rate}
 \usage{
-dsFDR(gene_scores_perm, gene_scores_obs, n_perm, use_median = TRUE,
+dsFDR(gene_scores_perm, gene_scores_obs, use_median = TRUE,
   doPlot = FALSE)
 }
 \arguments{
@@ -12,8 +12,6 @@ dsFDR(gene_scores_perm, gene_scores_obs, n_perm, use_median = TRUE,
 for \code{G} genes with \code{n_perm} permutations.}
 
 \item{gene_scores_obs}{a vector of length \code{n} containing the observed gene-wise scores.}
-
-\item{n_perm}{the number of perturbations. Default is \code{1000}.}
 
 \item{use_median}{a logical flag indicating whether the median should be used to estimate
 the true proportion of null features. If not, we use a range of quantiles of the permuted gene-wise scores
@@ -32,13 +30,14 @@ This function uses the permutation plug-in method to estimate the FDR.
 \examples{
 #rm(list=ls())
 G <- 1000
-nperm <- 4/5*G
+nperm <- G
 G1 <- 30*G/100
 G0 <- G-G1
 gene_scores_perm <- matrix(rchisq(G*nperm, df=1), ncol=nperm, nrow=G)
 gene_scores_obs <- c(rchisq(G1, df=10), rchisq(G0, df=1))
 
-qvals <- dsFDR(gene_scores_perm, gene_scores_obs, nperm, use_median = FALSE, doPlot = TRUE)
+qvals <- dsFDR(gene_scores_perm, gene_scores_obs, use_median = FALSE, doPlot = TRUE)
+abline(a = 0, b = 1, lty = 2)
 summary(qvals)
 eFDR_5pct <- mean(qvals[-(1:G1)]<0.05)
 eTDR_5pct <- mean(qvals[1:G1]<0.05)

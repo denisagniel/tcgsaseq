@@ -5,11 +5,11 @@
 \title{Permutation-based variance component test statistic}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
-  homogen_traj = FALSE, na.rm = FALSE)
+  Sigma_xi = diag(ncol(phi)), n_perm = nrow(y),
+  genewise_pvals = FALSE, homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
+\item{y}{a numeric matrix of dim \code{G x n} containing the raw RNA-seq counts for G
 genes from \code{n} samples.}
 
 \item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -28,7 +28,7 @@ samples.}
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects.}
 
-\item{n_perm}{the number of perturbations. Default is \code{1000}.}
+\item{n_perm}{the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).}
 
 \item{genewise_pvals}{a logical flag indicating whether gene-wise p-values should be returned. Default
 is \code{FALSE} in which case gene-set p-value is computed and returned instead.}

@@ -36,7 +36,7 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations. Default is \code{1000}.
+#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -160,7 +160,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    cov_variables2test_eff = diag(ncol(variables2test)),
                    which_test = c("permutation", "asymptotic"),
                    which_weights = c("loclin", "voom", "none"),
-                   n_perm = 1000,
+                   n_perm = nrow(exprmat),
                    preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
                    bw = "nrd",
                    kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),

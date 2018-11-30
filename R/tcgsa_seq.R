@@ -42,7 +42,7 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations. Default is \code{1000}.
+#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -177,7 +177,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       Sigma_xi = diag(ncol(phi)),
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom", "none"),
-                      n_perm = 1000,
+                      n_perm = nrow(y),
                       preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
                       bw = "nrd",
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
@@ -319,11 +319,11 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       rawPvals <- perm_result$gene_pvals
 
 
-      ds_fdr <- perm_result$fdr
+      FDR <- perm_result$FDR
     }
 
     if (which_test == "permutation"){
-      pvals <- data.frame("rawPval" = rawPvals, "FDR"= ds_fdr)
+      pvals <- data.frame("rawPval" = rawPvals, "FDR"= FDR)
     }
     else if (which_test == "asymptotic"){
       pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))

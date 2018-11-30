@@ -5,7 +5,7 @@
 #'asymptotic approximation for small sample sizes.
 #'
 #'
-#'@param y a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
+#'@param y a numeric matrix of dim \code{G x n} containing the raw RNA-seq counts for G
 #'genes from \code{n} samples.
 #'
 #'@param x a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
@@ -24,7 +24,7 @@
 #'@param Sigma_xi a matrix of size \code{K x K} containing the covariance matrix
 #'of the \code{K} random effects.
 #'
-#'@param n_perm the number of perturbations. Default is \code{1000}.
+#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).
 #'
 #'@param genewise_pvals a logical flag indicating whether gene-wise p-values should be returned. Default
 #'is \code{FALSE} in which case gene-set p-value is computed and returned instead.
@@ -76,8 +76,8 @@
 #'@importFrom CompQuadForm davies
 #'
 #'@export
-vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         n_perm=1000, genewise_pvals=FALSE, homogen_traj=FALSE,
+vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
+                         n_perm = nrow(y), genewise_pvals = FALSE, homogen_traj = FALSE,
                          na.rm = FALSE){
 
   n_samples <- ncol(y)
@@ -95,18 +95,16 @@ vc_test_perm <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
   score_list_res <- vc_score_2use(y = y, x = x, indiv = indiv_fact, phi = phi, w = w,
                                   Sigma_xi = Sigma_xi, na_rm = na.rm, n_perm = n_perm)
 
-
   if(genewise_pvals){
     gene_scores_obs <- score_list_res$gene_scores_unscaled
     gene_scores_perm <- score_list_res$gene_scores_unscaled_perm
     #pvals <- 1 - rowMeans(sapply(gene_scores_perm, function(x){x < gene_scores_obs}))
-    pvals <- 1 - rowMeans(gene_scores_perm < gene_scores_obs)
+    pvals <- rowMeans(gene_scores_perm >= gene_scores_obs)
     #hist(pvals)
-    ds_fdr <- dsFDR(gene_scores_perm, gene_scores_obs, n_perm, doPlot=FALSE, use_median=TRUE)
-    ans <- list("gene_scores_obs" = gene_scores_obs,"gene_pvals" = pvals, "fdr" = ds_fdr)
+    FDR <- dsFDR(gene_scores_perm, gene_scores_obs, doPlot=FALSE, use_median=TRUE)
+    ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals, "FDR" = FDR)
   }else{
     pval <- 1-sum(score_list_res$scores_perm < score_list_res$score)/n_perm
     ans <- list("set_score_obs" = score_list_res$score, "set_pval" = pval)
   }
-
 }

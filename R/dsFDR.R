@@ -8,8 +8,6 @@
 #'
 #'@param gene_scores_obs a vector of length \code{n} containing the observed gene-wise scores.
 #'
-#'@param n_perm the number of perturbations. Default is \code{1000}.
-#'
 #'@param use_median a logical flag indicating whether the median should be used to estimate
 #' the true proportion of null features. If not, we use a range of quantiles of the permuted gene-wise scores
 #' and the true proportion of null features is extrapolated from the limit of a smoothed estimate using the natural cubic spline.
@@ -34,13 +32,14 @@
 #'@examples
 #'#rm(list=ls())
 #'G <- 1000
-#'nperm <- 4/5*G
+#'nperm <- G
 #'G1 <- 30*G/100
 #'G0 <- G-G1
 #'gene_scores_perm <- matrix(rchisq(G*nperm, df=1), ncol=nperm, nrow=G)
 #'gene_scores_obs <- c(rchisq(G1, df=10), rchisq(G0, df=1))
 #'
-#'qvals <- dsFDR(gene_scores_perm, gene_scores_obs, nperm, use_median = FALSE, doPlot = TRUE)
+#'qvals <- dsFDR(gene_scores_perm, gene_scores_obs, use_median = FALSE, doPlot = TRUE)
+#'abline(a = 0, b = 1, lty = 2)
 #'summary(qvals)
 #'eFDR_5pct <- mean(qvals[-(1:G1)]<0.05)
 #'eTDR_5pct <- mean(qvals[1:G1]<0.05)
@@ -51,7 +50,7 @@
 #'     ylim = c(0,1))
 #'abline(a = 0, b = 1, lty = 2)
 
-dsFDR <- function(gene_scores_perm, gene_scores_obs, n_perm, use_median = TRUE, doPlot = FALSE){
+dsFDR <- function(gene_scores_perm, gene_scores_obs, use_median = TRUE, doPlot = FALSE){
 
   # estimating pi_0 the proportion of true null hypothesis
   if(use_median){
@@ -72,22 +71,14 @@ dsFDR <- function(gene_scores_perm, gene_scores_obs, n_perm, use_median = TRUE, 
       lines(y=fm$fitted.values, col="red", x=lambda)
       lines(pi_0_hat, x=0, type="p", pch="*", col="red")
       abline(h=pi_0_hat, col="red", lty=2)
+      legend("bottomright", c("estimate", "spline fit"), lty=c(2,1), col="red", pch=c("*", ""))
     }
   }
 
-  #FFDR <- pmin(1, sapply(gene_scores_obs, function(x){sum(gene_scores_perm >= x)/sum(gene_scores_obs>= x )})*pi_0_hat/nperm)
-  #this is not faster - see microbenchmark::microbenchmark
+  V <- rowSums(gene_scores_perm >= gene_scores_obs)
+  R <- sapply(gene_scores_obs, function(x){sum(gene_scores_obs >= x)})
+  FDR <- pmin(1, pi_0_hat*V/R)
+  pval <- V/ncol(gene_scores_perm)
 
-  V <- rep(NA,length(gene_scores_obs))
-  R <- rep(NA,length(gene_scores_obs))
-  FDR <- rep(NA,length(gene_scores_obs))
-  #pval <- rep(NA,length(gene_scores_obs))
-
-  for (c in 1:length(gene_scores_obs)){
-    V[c] <- sum(gene_scores_perm[c,] >= gene_scores_obs[c])
-    R[c] <- sum(gene_scores_obs >= gene_scores_obs[c])
-    FDR[c] <- min(1, pi_0_hat*V[c]/R[c])
-    #pval[c] <- V[c]/length(gene_scores_obs)
-  }
   return(FDR)
 }
