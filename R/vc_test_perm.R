@@ -104,7 +104,7 @@ vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(n
     FDR <- dsFDR(gene_scores_perm, gene_scores_obs, doPlot=FALSE, use_median=TRUE)
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals, "FDR" = FDR)
   }else{
-    pval <- 1-sum(score_list_res$scores_perm < score_list_res$score)/n_perm
+    pval <- sum(score_list_res$scores_perm >= score_list_res$score)/n_perm
     ans <- list("set_score_obs" = score_list_res$score, "set_pval" = pval)
   }
 }
