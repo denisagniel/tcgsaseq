@@ -114,6 +114,7 @@ vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(n
   if(genewise_pvals){
     gene_scores_obs <- score_list_res$gene_scores_unscaled
     gene_scores_perm <- score_list_res$gene_scores_unscaled_perm
+
     nprem_supobs <- rowSums(gene_scores_perm >= gene_scores_obs)
 
     #pvals_naive <- nprem_supobs/n_perm
@@ -123,5 +124,6 @@ vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(n
   }else{
     pvals_u <- (sum(score_list_res$scores_perm >= score_list_res$score) + 1)/(n_perm + 1)
     ans <- list("set_score_obs" = score_list_res$score, "set_pval" = pvals_u)
+
   }
 }

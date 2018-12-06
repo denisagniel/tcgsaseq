@@ -92,6 +92,7 @@ dsFDR <- function(gene_scores_perm, gene_scores_obs, use_median = TRUE, doPlot =
     }
   }
 
+
   #V_li <- sapply(gene_scores_obs, function(threshold){sum(rowMeans(gene_scores_perm > threshold))})
   #R_li <- sapply(gene_scores_obs, function(threshold){sum(gene_scores_obs > threshold)})
   #FDR_li <- pmin(1, pi_0_hat*V_li/R_li)
@@ -104,6 +105,7 @@ dsFDR <- function(gene_scores_perm, gene_scores_obs, use_median = TRUE, doPlot =
   #V_scaled <- rowMeans(gene_scores_perm >= gene_scores_obs)
   #R_scaled <- sapply(gene_scores_obs, function(x){mean(gene_scores_obs >= x)})
   #FDR <- pmin(1, pi_0_hat*V_scaled/R_scaled)
+
 
   return(FDR_li)
 }

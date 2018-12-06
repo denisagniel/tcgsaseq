@@ -320,6 +320,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
 
       pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
 
+
     if(!is.null(rownames(y_lcpm))){
       rownames(pvals) <- rownames(y_lcpm)
     }
