@@ -10,7 +10,8 @@
 #'
 #'@references Phipson B, and Smyth GK (2010). Permutation p-values should never be zero:
 #'calculating exact p-values when permutations are randomly drawn. \emph{Statistical Applications
-#'in Genetics and Molecular Biology}, Volume 9, Issue 1, Article 39. http://www.statsci.org/smyth/pubs/PermPValuesPreprint.pdf
+#'in Genetics and Molecular Biology}, Volume 9, Issue 1, Article 39.
+#'\url{http://www.statsci.org/smyth/pubs/PermPValuesPreprint.pdf}
 #'
 #'@importFrom statmod gauss.quad.prob
 #'@importFrom stats pbinom

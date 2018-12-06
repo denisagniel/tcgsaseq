@@ -38,7 +38,8 @@
 #'
 #'@references Phipson B, and Smyth GK (2010). Permutation p-values should never be zero:
 #'calculating exact p-values when permutations are randomly drawn. \emph{Statistical Applications
-#'in Genetics and Molecular Biology}, Volume 9, Issue 1, Article 39. http://www.statsci.org/smyth/pubs/PermPValuesPreprint.pdf
+#'in Genetics and Molecular Biology}, Volume 9, Issue 1, Article 39.
+#'\url{http://www.statsci.org/smyth/pubs/PermPValuesPreprint.pdf}
 #'
 #'@return A list with the following elements when the set p-value is computed :\itemize{
 #'   \item \code{set_score_obs}: the approximation of the observed set score
