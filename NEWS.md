@@ -1,15 +1,22 @@
 # News about the `tcgsaseq` R package
 
 
-### Main changes in Version 1.8.0 (2017-11-23):
+### Main changes in Version 1.8.1 (2018-12-06):
+* perm_pe function for exact p-values and accurate FDR control when using permutation test. 
+The column names of the `$pvals` output are back to being the same regardless of the test 
+chosen being `asympotic` or `permutation`
+* dsFDR is not used anymore
+
+
+### Main changes in Version 1.8.0 (2018-11-23):
 * dsFDR function for accurate discrete FDR control when using permutation test. This 
 changes the column names of the `$pvals` output when `which_test = permutations`
 
 
-### Main changes in Version 1.7.2 (2017-07-18):
+### Main changes in Version 1.7.2 (2018-07-18):
 * faster permutations
 
-### Main changes in Version 1.7.1 (2017-07-07):
+### Main changes in Version 1.7.1 (2018-07-07):
 * faster implementation
 
 ### Main changes in Version 1.6.5 (2017-12-24) --- *this is only a minor release*:
