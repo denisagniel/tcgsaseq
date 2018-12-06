@@ -42,7 +42,7 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(y)}).
+#'@param n_perm the number of perturbations. Default is \code{1000}.
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -108,9 +108,8 @@
 #'   of interest (\code{NULL} for gene-wise testing).
 #'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
 #'   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
-#'   contains the raw p-values, the second one contains the FDR adjusted p-values and is either named
-#'   '\code{adjPval}' (according to the '\code{padjust_methods}' argument) in the \code{asymptotic} case
-#'   or '\code{FDR}' in the \code{permutation} case.
+#'   contains the raw p-values, the second one contains the FDR adjusted p-values (according to
+#'   the '\code{padjust_methods}' argument) and is named '\code{adjPval}'.
 #' }
 #'
 #'@seealso \code{\link{sp_weights}} \code{\link{vc_test_perm}} \code{\link{vc_test_asym}} \code{\link{p.adjust}}
@@ -177,7 +176,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       Sigma_xi = diag(ncol(phi)),
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom", "none"),
-                      n_perm = nrow(y),
+                      n_perm = 1000,
                       preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
                       bw = "nrd",
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
@@ -202,9 +201,6 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     y_lcpm <- apply(y, MARGIN=2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }else{
     y_lcpm <- y
-  }
-  if(which_test == "permutation"){
-    n_perm <- n_perm
   }
   rm(y)
 
@@ -320,17 +316,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                                   n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
                                   na.rm = na.rm_tcgsaseq)
       rawPvals <- perm_result$gene_pvals
+      }
 
-
-      FDR <- perm_result$FDR
-    }
-
-    if (which_test == "permutation"){
-      pvals <- data.frame("rawPval" = rawPvals, "FDR"= FDR)
-    }
-    else if (which_test == "asymptotic"){
       pvals <- data.frame("rawPval" = rawPvals, "adjPval" = stats::p.adjust(rawPvals, padjust_methods))
-    }
 
     if(!is.null(rownames(y_lcpm))){
       rownames(pvals) <- rownames(y_lcpm)

@@ -5,8 +5,8 @@
 \title{Permutation-based variance component test statistic}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = nrow(y),
-  genewise_pvals = FALSE, homogen_traj = FALSE, na.rm = FALSE)
+  Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
+  homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{G x n} containing the raw RNA-seq counts for G
@@ -28,7 +28,7 @@ samples.}
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects.}
 
-\item{n_perm}{the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).}
+\item{n_perm}{the number of perturbations. Default is \code{1000}.}
 
 \item{genewise_pvals}{a logical flag indicating whether gene-wise p-values should be returned. Default
 is \code{FALSE} in which case gene-set p-value is computed and returned instead.}
@@ -53,7 +53,8 @@ or a list with the following elements when gene-wise p-values are computed:\item
 \description{
 This function computes an approximation of the Variance Component test for a
 mixture of \eqn{\chi^{2}}s using permutations. This is preferable to the
-asymptotic approximation for small sample sizes.
+asymptotic approximation for small sample sizes. We rely on exact p-values following
+Phipson and Smyth, 2010 (see References).
 }
 \examples{
 #rm(list=ls())
@@ -81,6 +82,11 @@ permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y))
                            indiv=rep(1:4, each=3), n_perm=50) #1000)
 permTestRes$set_pval
 
+}
+\references{
+Phipson B, and Smyth GK (2010). Permutation p-values should never be zero:
+calculating exact p-values when permutations are randomly drawn. \emph{Statistical Applications
+in Genetics and Molecular Biology}, Volume 9, Issue 1, Article 39. http://www.statsci.org/smyth/pubs/PermPValuesPreprint.pdf
 }
 \seealso{
 \code{\link[CompQuadForm]{davies}}

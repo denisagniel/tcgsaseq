@@ -68,7 +68,8 @@
 #'@importFrom stats model.matrix
 #'
 #'@export
-vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE, n_perm=1000) {
+vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
+                          na_rm = FALSE, n_perm = 1000) {
   ## validity checks
   if(sum(!is.finite(w))>0){
     stop("At least 1 non-finite weight in 'w'")

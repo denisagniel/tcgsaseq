@@ -95,22 +95,21 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
     stop("no gene measured/no sample included ...")
   }
 
-  if (genewise_pvals){
+  if(genewise_pvals){
+    gene_scores_obs <- score_list$gene_scores_unscaled
     if(nindiv == 1){
-      gene_scores_obs <- score_list$gene_scores_unscaled
       pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
     }else if(nphi == 1){
+      gene_lambda <- apply(X=score_list$q_ext, MARGIN = 2, FUN = stats::var)
       if(ng == 1){
-        gene_scores_obs <- score_list$gene_scores_unscaled/apply(score_list$q_ext, 2, stats::var)
-        pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
+        pv <- stats::pchisq(gene_scores_obs/gene_lambda, df = 1, lower.tail = FALSE)
       }else{
-        gene_scores_obs <- score_list$gene_scores_unscaled
-        gene_lambda <- apply(X=score_list$q_ext, MARGIN=2, FUN=var)
         pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
         #pv <- stats::pchisq(gene_scores_obs/gene_lambda, df = 1, lower.tail = FALSE) # same result ? only if phi is univariate
       }
     }else{
       gene_inds <- lapply(1:ng, function(x){x + (ng)*(0:(nphi-1))})
+
       gene_lambda <- lapply(gene_inds, function(x){
         Sig_q_gene <- cov(score_list$q_ext[, x, drop=FALSE])
         lam <- try(svd(Sig_q_gene)$d)
@@ -122,9 +121,8 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
           }
         }
         return(lam)
-      }
-      )
-      gene_scores_obs <- score_list$gene_scores_unscaled
+      })
+
       pv <- unlist(mapply(FUN=CompQuadForm::davies, q=gene_scores_obs, lambda=gene_lambda, lim=15000, acc=0.0005)["Qq",])
     }
 

@@ -13,8 +13,8 @@ test accounting for data heteroscedasticity through precision weights.
 \tabular{ll}{
 Package: \tab tcgsaseq\cr
 Type: \tab Package\cr
-Version: \tab 1.8.0\cr
-Date: \tab 2018-11-23\cr
+Version: \tab 1.8.1\cr
+Date: \tab 2018-12-06\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
 The two main functions of the \code{tcgsaseq} package are \code{\link{varseq}} and \code{\link{tcgsa_seq}}.

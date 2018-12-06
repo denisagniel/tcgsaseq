@@ -26,19 +26,21 @@ A vector of estimating discrete false discovery rates
 }
 \description{
 This function uses the permutation plug-in method to estimate the FDR.
+It requires scaled-test statistics so that permutation are comparable from one test to another.
 }
 \examples{
+\dontrun{
 #rm(list=ls())
-G <- 10000
+G <- 1000
 nperm <- 500
 G1 <- 0.3*G
 G0 <- G-G1
 gene_scores_perm <- matrix(rchisq(G*nperm, df=1), ncol=nperm, nrow=G)
-gene_scores_obs <- c(rchisq(G1, df=10), rchisq(G0, df=1))
+gene_scores_obs <- c(rchisq(G1, df=1), rchisq(G0, df=1))
 
 qvals <- dsFDR(gene_scores_perm, gene_scores_obs, use_median = FALSE, doPlot = TRUE)
 summary(qvals)
-qvals <- lFDR
+
 qvals <- qvals[!is.na(qvals)]
 eFDR_5pct <- sum(qvals[-(1:G1)]<0.05)/sum(qvals < 0.05)
 eTDR_5pct <- sum(qvals[1:G1]<0.05)/sum(qvals < 0.05)
@@ -48,6 +50,20 @@ plot(y = sapply(seq(0, 1, by=0.001), function(x){sum(qvals[-(1:G1)] < x)/sum(qva
     type = "l", xlab = "Nominal FDR level", ylab = "Empirical FDR", col = "red", lwd = 2,
     ylim = c(0,1))
 abline(a = 0, b = 1, lty = 2)
+
+res <- list()
+G <- 1000
+nperm <- 1000
+G1 <- 0.3*G
+G0 <- G-G1
+for(i in 1:100){
+cat(i, "/100\\n", sep="")
+gene_scores_obs <- c(rchisq(G1, df=1), rchisq(G0, df=1))
+gene_scores_perm <- matrix(rchisq(G*nperm, df=1), ncol=nperm, nrow=G)
+qvals <- dsFDR(gene_scores_perm, gene_scores_obs, use_median = TRUE, doPlot = FALSE)
+res[[i]] <- sapply(seq(0, 1, by=0.01), function(x){sum(qvals < x)})
+}
+}
 }
 \references{
 J. Li and R. Tibshirani (2013). Finding consistent patterns: A nonparametric approach

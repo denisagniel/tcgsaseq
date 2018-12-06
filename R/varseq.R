@@ -36,7 +36,7 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations. Default is \code{G} (\code{nrow(exprmat)}).
+#'@param n_perm the number of perturbations. Default is \code{1000}
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -100,9 +100,8 @@
 #'   of interest (\code{NULL} for gene-wise testing).
 #'   \item \code{pval}: computed p-values. A \code{data.frame} with one raw for each each gene set, or
 #'   for each gene if \code{genesets} argument is \code{NULL}, and with 2 columns: the first one '\code{rawPval}'
-#'   contains the raw p-values, the second one contains the FDR adjusted p-values and is either named
-#'   '\code{adjPval}' (according to the '\code{padjust_methods}' argument) in the \code{asymptotic} case
-#'   or '\code{FDR}' in the \code{permutation} case.
+#'   contains the raw p-values, the second one contains the FDR adjusted p-values (according to
+#'   the '\code{padjust_methods}' argument) and is named '\code{adjPval}'.
 #' }
 #'
 #'@seealso \code{\link{sp_weights}} \code{\link{vc_test_perm}} \code{\link{vc_test_asym}} \code{\link{p.adjust}}
@@ -160,7 +159,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    cov_variables2test_eff = diag(ncol(variables2test)),
                    which_test = c("permutation", "asymptotic"),
                    which_weights = c("loclin", "voom", "none"),
-                   n_perm = nrow(exprmat),
+                   n_perm = 1000,
                    preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
                    bw = "nrd",
                    kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
