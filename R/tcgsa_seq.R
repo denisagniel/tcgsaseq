@@ -255,8 +255,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
 
     if(n_perm > N_possible_perms){
-      stop(paste("The number of permutations requested 'n_perm' is larger than the total number of existing permutations", N_possible_perms,
-                 ". Try a lower number for 'n_perm'"))
+      warning(paste("The number of permutations requested 'n_perm' is larger than the total number of existing permutations", N_possible_perms,
+                 ". Try a lower number for 'n_perm' (currently running with 'nperm=", N_possible_perms, "')."))
+      n_perm <- N_possible_perms
     }
   }
 
