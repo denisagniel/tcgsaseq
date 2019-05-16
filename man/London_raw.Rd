@@ -15,7 +15,7 @@ data(London_raw)
 A RNA-seq dataset of raw counts
 }
 \examples{
-data("London_raw")
+data('London_raw')
 
 }
 \references{

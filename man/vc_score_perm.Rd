@@ -8,18 +8,18 @@ vc_score_perm(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
   na_rm = FALSE, n_perm = 1000)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g
-genes from \code{n} samples}
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq
+counts for g genes from \code{n} samples}
 
-\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
-to be adjusted for}
+\item{x}{a numeric design matrix of dim \code{n x p} containing the
+\code{p} covariates to be adjusted for}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}}
 
-\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
-to be tested}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the
+\code{K} variables to be tested.}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}
 samples.}
@@ -27,8 +27,8 @@ samples.}
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects on \code{phi}}
 
-\item{na_rm}{logical: should missing values (including \code{NA} and \code{NaN})
-be omitted from the calculations? Default is \code{FALSE}.}
+\item{na_rm}{logical: should missing values (including \code{NA} and
+\code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 
 \item{n_perm}{the number of permutation to perform. Default is \code{1000}.}
 }
@@ -36,13 +36,16 @@ be omitted from the calculations? Default is \code{FALSE}.}
 A list with the following elements:\itemize{
   \item \code{score}: an approximation of the observed set score
   \item \code{scores_perm}: a vector containing the permuted set scores
-  \item \code{gene_scores_unscaled}: approximation of the individual gene scores
-  \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
+  \item \code{gene_scores_unscaled}: approximation of the individual gene
+  scores
+  \item \code{gene_scores_unscaled_perm}: a list of approximationq of the
+  permuted individual gene scores
 }
 }
 \description{
 This function computes an approximation of the Variance Component test for a
-mixture of \eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
+mixture of \eqn{\chi^{2}}s using Davies method from
+\code{\link[CompQuadForm]{davies}}
 }
 \examples{
 #rm(list=ls())
@@ -66,7 +69,8 @@ y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 x <- matrix(1, ncol=1, nrow=r)
 
 #run test
-scoreTest <- vc_score_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+scoreTest <- vc_score_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y),
+                                                nrow=nrow(y)),
                     Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3))
 scoreTest$score
 

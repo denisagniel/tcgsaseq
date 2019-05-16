@@ -23,21 +23,29 @@
 #'@importFrom stats pbinom
 #'@seealso statmod::permp
 #'
+#'@return a vector (or an array, similar to \code{nperm_supobs})
+#'of exact p-values
+#'
+#'@examples
+#'perm_pe(10, 100, 1000)
+#'
 #'@export
 
-perm_pe <- function(nperm_supobs, nperm_eff, total_possible_nperm){
+perm_pe <- function(nperm_supobs, nperm_eff, total_possible_nperm) {
 
-  # (slightly) adapted from the implementation by Belinda Phipson and Gordon Smyth
-  # from the R package statmod
+    ## (slightly) adapted from the implementation by Belinda Phipson and
+    ## Gordon Smyth from the R package statmod
 
-  z <- statmod::gauss.quad.prob(n = 128, l = 0, u = 0.5/total_possible_nperm)
-  npvals <- length(nperm_supobs)
-  prob <- rep(z$nodes, npvals)
-  x2 <- rep(nperm_supobs, each = 128)
-  Y <- matrix(data = stats::pbinom(x2, prob = prob, size = nperm_eff), nrow = 128, ncol = npvals)
-  int <- 0.5/total_possible_nperm * colSums(z$weights * Y)
+    z <- statmod::gauss.quad.prob(n = 128, l = 0, u = 0.5/total_possible_nperm)
+    npvals <- length(nperm_supobs)
+    prob <- rep(z$nodes, npvals)
+    x2 <- rep(nperm_supobs, each = 128)
+    Y <- matrix(data = stats::pbinom(x2, prob = prob, size = nperm_eff),
+                nrow = 128,
+                ncol = npvals)
+    int <- 0.5/total_possible_nperm * colSums(z$weights * Y)
 
-  pe <- (nperm_supobs + 1)/(nperm_eff + 1) - int
+    pe <- (nperm_supobs + 1)/(nperm_eff + 1) - int
 
-  return(pe)
+    return(pe)
 }

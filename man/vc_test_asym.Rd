@@ -9,48 +9,55 @@ vc_test_asym(y, x, indiv = rep(1, nrow(x)), phi, w,
   homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
-genes from \code{n} samples.}
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized
+RNA-seq counts for g genes from \code{n} samples.}
 
-\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
-to be adjusted for}
+\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p}
+covariates to be adjusted for}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}.}
 
-\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} longitudinal variables
-to be tested (typically a vector of time points or functions of time)}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the
+\code{K} longitudinal variables to be tested (typically a vector of time
+points or functions of time)}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}
-samples, corresponding to the inverse of the diagonal of the estimated covariance matrix of y.}
+samples, corresponding to the inverse of the diagonal of the estimated
+covariance matrix of y.}
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects corresponding to \code{phi}.}
 
-\item{genewise_pvals}{a logical flag indicating whether gene-wise p-values should be returned. Default
-is \code{FALSE} in which case gene set p-value is computed and returned instead.}
+\item{genewise_pvals}{a logical flag indicating whether gene-wise p-values
+should be returned. Default is \code{FALSE} in which case gene set p-value is
+computed and returned instead.}
 
-\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
-Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
+\item{homogen_traj}{a logical flag indicating whether trajectories should be
+considered homogeneous. Default is \code{FALSE} in which case trajectories
+are not only tested for trend, but also for heterogeneity.}
 
-\item{na.rm}{logical: should missing values (including \code{NA} and \code{NaN})
-be omitted from the calculations? Default is \code{FALSE}.}
+\item{na.rm}{logical: should missing values (including \code{NA} and
+\code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
-A list with the following elements when the set p-value is computed :\itemize{
+A list with the following elements when the set p-value is computed:
+\itemize{
   \item \code{set_score_obs}: the approximation of the observed set score
   \item \code{set_pval}: the associated set p-value
 }
-or a list with the following elements when gene-wise p-values are computed:\itemize{
-  \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
+or a list with the following elements when gene-wise p-values are computed:
+\itemize{
+  \item \code{gene_scores_obs}: vector of approximating the observed
+  gene-wise scores
   \item \code{gene_pvals}: vector of associated gene-wise p-values
 }
 }
 \description{
-This function computes an approximation of the variance component test based on the asymptotic
-distribution of a mixture of \eqn{\chi^{2}}s using Davies method
-from \code{\link[CompQuadForm]{davies}}
+This function computes an approximation of the variance component test based
+on the asymptotic distribution of a mixture of \eqn{\chi^{2}}s using Davies
+method from \code{\link[CompQuadForm]{davies}}
 }
 \examples{
 #rm(list=ls())
@@ -74,7 +81,8 @@ y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 x <- matrix(1, ncol=1, nrow=r)
 
 #run test
-asymTestRes <- vc_test_asym(y, x, phi=cbind(t, t^2), w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+asymTestRes <- vc_test_asym(y, x, phi=cbind(t, t^2),
+                           w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                            Sigma_xi=diag(2), indiv=1:r, genewise_pvals=TRUE)
 plot(density(asymTestRes$gene_pvals))
 quantile(asymTestRes$gene_pvals)

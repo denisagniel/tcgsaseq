@@ -9,18 +9,18 @@ vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
   homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{G x n} containing the raw RNA-seq counts for G
-genes from \code{n} samples.}
+\item{y}{a numeric matrix of dim \code{G x n} containing the raw RNA-seq
+counts for G genes from \code{n} samples.}
 
-\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
-to be adjusted for}
+\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p}
+covariates to be adjusted for.}
 
 \item{indiv}{a vector of length \code{n} containing the information for
-attributing each sample to one of the studied individuals. Coerced
-to be a \code{factor}.}
+attributing each sample to one of the studied individuals. Coerced to be a
+\code{factor}.}
 
-\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} variables
-to be tested}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the
+\code{K} variables to be tested}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}
 samples.}
@@ -30,21 +30,25 @@ of the \code{K} random effects.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}.}
 
-\item{genewise_pvals}{a logical flag indicating whether gene-wise p-values should be returned. Default
-is \code{FALSE} in which case gene-set p-value is computed and returned instead.}
+\item{genewise_pvals}{a logical flag indicating whether gene-wise p-values
+should be returned. Default is \code{FALSE} in which case gene-set p-value is
+computed and returned instead.}
 
-\item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
-Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}
+\item{homogen_traj}{a logical flag indicating whether trajectories should be
+considered homogeneous. Default is \code{FALSE} in which case trajectories are
+not only tested for trend, but also for heterogeneity.}
 
-\item{na.rm}{logical: should missing values (including \code{NA} and \code{NaN})
-be omitted from the calculations? Default is \code{FALSE}.}
+\item{na.rm}{logical: should missing values (including \code{NA} and
+\code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
-A list with the following elements when the set p-value is computed :\itemize{
+A list with the following elements when the set p-value is computed:
+\itemize{
   \item \code{set_score_obs}: the approximation of the observed set score
   \item \code{set_pval}: the associated set p-value
 }
-or a list with the following elements when gene-wise p-values are computed:\itemize{
+or a list with the following elements when gene-wise p-values are computed:
+\itemize{
   \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
   \item \code{gene_pvals}: vector of associated gene-wise p-values
   \item \code{ds_fdr}: vector of associated gene-wise discrete false discovery rates
@@ -53,8 +57,8 @@ or a list with the following elements when gene-wise p-values are computed:\item
 \description{
 This function computes an approximation of the Variance Component test for a
 mixture of \eqn{\chi^{2}}s using permutations. This is preferable to the
-asymptotic approximation for small sample sizes. We rely on exact p-values following
-Phipson and Smyth, 2010 (see References).
+asymptotic approximation for small sample sizes. We rely on exact p-values
+following Phipson and Smyth, 2010 (see References).
 }
 \examples{
 #rm(list=ls())
@@ -78,15 +82,17 @@ y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 x <- matrix(1, ncol=1, nrow=r)
 
 #run test
-permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+permTestRes <- vc_test_perm(y, x, phi=t,
+                           w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
                            indiv=rep(1:4, each=3), n_perm=50) #1000)
 permTestRes$set_pval
 
 }
 \references{
-Phipson B, and Smyth GK (2010). Permutation p-values should never be zero:
-calculating exact p-values when permutations are randomly drawn. \emph{Statistical Applications
-in Genetics and Molecular Biology}, Volume 9, Issue 1, Article 39.
+Phipson B, and Smyth GK (2010). Permutation p-values should
+never be zero: calculating exact p-values when permutations are randomly
+drawn. \emph{Statistical Applications in Genetics and Molecular Biology},
+Volume 9, Issue 1, Article 39.
 \url{http://www.statsci.org/smyth/pubs/PermPValuesPreprint.pdf}
 }
 \seealso{

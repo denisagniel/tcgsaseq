@@ -35,7 +35,7 @@ Tuberculosis (TB) is a disease caused by a bacterium called Mycobacterium tuberc
 
 *Berry et al.* first identified a whole blood 393 transcript signature for active TB using microarray analysis. Then, *Singhania et al.* found a 373-genes signature of active tuberculosis using RNA-Seq, confirming microarray results, that discriminates active tuberculosis from latently infected and healthy individuals.
 
-We sought to investigate how many of the 373 genes *Singhania et al.* found using edgeR might actually be false positives. As a quick example, we propose a partial re-analysis (see *Gauthier et al.* for the complete analysis) of the *Singhania et al.* dataset : we proceed to the Differential Expression Analysis (DEA) of the Active TB group against the Control one, omitting LTBI/Control and ActiveTB/LTBI comparisons. We focused on the Berry London dataset.
+We sought to investigate how many of the 373 genes *Singhania et al.* found using edgeR might actually be false positives. As a quick example, we propose a partial re-analysis (see *Gauthier et al.* for the complete analysis) of the *Singhania et al.* dataset:  we proceed to the Differential Expression Analysis (DEA) of the Active TB group against the Control one, omitting LTBI/Control and ActiveTB/LTBI comparisons. We focused on the Berry London dataset.
 
 It results in 54 patients of whom 21 are active TB patients, 21 are latent TB patients and 12 are healthy control particiants.
 
@@ -52,30 +52,32 @@ The data are publicly available on [GEO website](https://www.ncbi.nlm.nih.gov/ge
 
 ### Design data matrix
 
-In this example, we need to import the supplementary file available on GEO with the  `getGEO` function to obtain the group of each patient (TB, LTBI, Control) :
+In this example, we need to import the supplementary file available: 
 
 ```{r GEOquery, message=FALSE}
 if (!requireNamespace("GEOquery", quietly = TRUE)) {
-	if (!requireNamespace("BiocManager", quietly = TRUE)){
-    	install.packages("BiocManager")
-	}
-	BiocManager::install("GEOquery")
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {
+        install.packages("BiocManager")
+    }
+    BiocManager::install("GEOquery")
 }
 ```
 
 ```{r import, message=FALSE, results='hide'}
-GSE107991_metadata <- GEOquery::getGEO("GSE107991", GSEMatrix = FALSE)
+library(GEOquery)
+GSE107991_metadata <- getGEO("GSE107991", GSEMatrix = FALSE)
 
 get_info <- function(i){
-  name <- GSE107991_metadata@gsms[[i]]@header$source_name_ch1
-  name <- gsub("Active_TB", "ActiveTB", name)
-  name <- gsub("Test_set", "TestSet", name)
-  unlist(strsplit(name, split="_"))
+    name <- Meta(GSMList(GSE107991_metadata)[[i]])$source_name_ch1
+    name <- gsub("Active_TB", "ActiveTB", name)
+    name <- gsub("Test_set", "TestSet", name)
+    unlist(strsplit(name, split="_"))
 }
 
-infos <- sapply(1:length(GSE107991_metadata@gsms), FUN=get_info)
-infos_df <- cbind.data.frame("SampleID" = names(GSE107991_metadata@gsms), t(infos))
-rownames(infos_df) <- names(GSE107991_metadata@gsms)
+infos <- vapply(1:length(GSMList(GSE107991_metadata)), FUN=get_info,
+                FUN.VALUE = c("a", "b", "c", "d"))
+infos_df <- cbind.data.frame("SampleID" = names(GSMList(GSE107991_metadata)), t(infos))
+rownames(infos_df) <- names(GSMList(GSE107991_metadata))
 colnames(infos_df)[-1] <- c("Cohort", "Location", "Set", "Status")
 
 group_London_TB <- which(infos_df$Status=="ActiveTB") # 21
@@ -83,10 +85,8 @@ group_London_LTBI <- which(infos_df$Status=="LTBI") # 21
 group_London_Control <- which(infos_df$Status=="Control") # 12
 
 group <- rep(NA,length(infos_df$Status[-group_London_LTBI]))
-group[which(infos_df$Status[-group_London_LTBI]=="ActiveTB")] <- 
-  rep(1,length(which(infos_df$Status[-group_London_LTBI]=="ActiveTB")))
-group[which(infos_df$Status[-group_London_LTBI]=="Control")] <-
-  rep(0,length(which(infos_df$Status[-group_London_LTBI]=="Control")))
+group[which(infos_df$Status[-group_London_LTBI]=="ActiveTB")] <- rep(1,length(which(infos_df$Status[-group_London_LTBI]=="ActiveTB")))
+group[which(infos_df$Status[-group_London_LTBI]=="Control")] <- rep(0,length(which(infos_df$Status[-group_London_LTBI]=="Control")))
 
 ```
 
@@ -104,11 +104,19 @@ The gene expression matrix (called `London`) is including in the package `dearse
 
 NB: The data is already normalized using `edgeR`.
 
-```{r, message=FALSE}
-library(dearseq)
-data("London")
+```{r readxl, message=FALSE}
+if (!requireNamespace("readxl", quietly = TRUE)) {
+    install.packages("readxl")
+}
+```
+
+```{r London-download, message=FALSE}
+library(readxl)
+GEOquery::getGEOSuppFiles('GSE107991', filter_regex="edgeR_normalized_Berry_London")
+London <- readxl::read_excel("GSE107991/GSE107991_edgeR_normalized_Berry_London.xlsx")
 genes <- London$Genes
-London <- as.matrix(London[,-c(1:3)])
+London <- as.matrix(London[, -c(1:3)])
+rownames(London) <- genes
 ```
 
 We have:
@@ -123,7 +131,7 @@ The vector `genes` contains all the gene identifiers.
 The entire matrix contains $14,150$ genes and $54$ samples.
 
 
-## Variance component score test : identifying differentially expressed (DE) genes
+## Variance component score test:  identifying differentially expressed (DE) genes
 
 This function provides the result of variance component score test for each gene.
 `dearseq` function requires:
@@ -139,10 +147,10 @@ We use the permutation test due to the low sample size (=33).
 
 ```{r LR_ST}
 res_dearseq <- dearseq::dear_seq(exprmat = London[,-group_London_LTBI], 
-                               covariates = matrix(rep(1,ncol(London[,-group_London_LTBI])),ncol=1),
-                               variables2test = matrix(group, ncol=1),
-                               which_test='asymptotic', doPlot = FALSE,
-                               preprocessed=TRUE)
+                                 covariates = matrix(rep(1, ncol(London[, -group_London_LTBI])), ncol=1),
+                                 variables2test = matrix(group, ncol=1),
+                                 which_test='asymptotic', doPlot = FALSE,
+                                 preprocessed=TRUE)
 ```
 
 Now `res_dearseq` is a list object containing, in addition to the parameters summary: 
@@ -158,24 +166,39 @@ had both:
 
 ### log FC with edgeR
 
-To be sure to be comparable with the edgeR analysis, we calculated the log fold-change using the edgeR procedure from the `London_raw` dataset.
+To guaranty comparable results with the original edgeR analysis, we computed the log fold-changes using the `edgeR` procedure from the raw data.
+
+```{r London-raw}
+GEOquery::getGEOSuppFiles('GSE107991', filter_regex="GSE107991_Raw_counts_Berry_London.xlsx")
+London_raw <- readxl::read_excel("GSE107991/GSE107991_Raw_counts_Berry_London.xlsx")
+genes_raw <- London_raw$Genes
+London_raw <- as.matrix(London_raw[, -c(1:3)])
+rownames(London_raw) <- genes_raw
+```
+
+
+```{r edgeR, message=FALSE}
+if (!requireNamespace("edgeR", quietly = TRUE)) {
+    install.packages("edgeR")
+}
+```
 
 ```{r logFC, message=FALSE}
 library(edgeR)
 Y <- rep(NA,length(infos_df$Status))
-Y[which(infos_df$Status=="ActiveTB")] <- rep(1,length(which(infos_df$Status=="ActiveTB")))
-Y[which(infos_df$Status=="LTBI")] <- rep(0,length(which(infos_df$Status=="LTBI")))
-Y[which(infos_df$Status=="Control")] <- rep(0,length(which(infos_df$Status=="Control")))
+Y[which(infos_df$Status == "ActiveTB")] <- rep(1, length(which(infos_df$Status == "ActiveTB")))
+Y[which(infos_df$Status == "LTBI")] <- rep(0, length(which(infos_df$Status == "LTBI")))
+Y[which(infos_df$Status == "Control")] <- rep(0, length(which(infos_df$Status == "Control")))
 
-dgList <- DGEList(counts=London_raw,group=Y)
+dgList <- DGEList(counts=London_raw, group=Y)
 cpm <- cpm(dgList)
 countCheck <- cpm > 2
 keep <- which(rowSums(countCheck) >= 5)
-dgList <- dgList[keep,]
-dgList <- calcNormFactors(dgList, method="TMM")
-dgList_group <- dgList[,-group_London_LTBI]
-design <- model.matrix(~group)
-dgList_group <- estimateGLMTrendedDisp(dgList_group, design=design) 
+dgList <- dgList[keep, ]
+dgList <- calcNormFactors(dgList, method = "TMM")
+dgList_group <- dgList[, -group_London_LTBI]
+design <- model.matrix( ~ group)
+dgList_group <- estimateGLMTrendedDisp(dgList_group, design = design) 
 fit <- glmFit(dgList_group, design)
 lrt <- glmLRT(fit)
 ```
@@ -191,6 +214,15 @@ genes_dearseq <- genes[as.numeric(rownames(res))]
 ```
 
 After applying the filtering, `genes_dearseq` returns the DE gene identifiers.
+
+```{r singhania-373}
+# Singhania et al. 373 genes signature
+download.file("https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6008327/bin/41467_2018_4579_MOESM3_ESM.xlsx", destfile = "GSE107991/41467_2018_4579_MOESM3_ESM.xlsx")
+TB373 <- as.data.frame(readxl::read_excel("GSE107991/41467_2018_4579_MOESM3_ESM.xlsx"))
+genes_373 <- TB373[-c(1:2),1]
+
+```
+
 
 # How to use dearseq for a longitudinal gene-set analysis ? 
 
@@ -209,10 +241,10 @@ In case the data you want to analyze is publicly available through [Gene Express
 
 ```{r dl_GEOquery, warning=FALSE, message=FALSE, eval=FALSE}
 if (!requireNamespace("GEOquery", quietly = TRUE)) {
-	if (!requireNamespace("BiocManager", quietly = TRUE)){
-		install.packages("BiocManager")
-	}
-	BiocManager::install("GEOquery")
+    if (!requireNamespace("BiocManager", quietly = TRUE)){
+        install.packages("BiocManager")
+    }
+    BiocManager::install("GEOquery")
 }
 ```
 

@@ -8,39 +8,43 @@ vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
   na_rm = FALSE)
 }
 \arguments{
-\item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
-genes from \code{n} samples.}
+\item{y}{a numeric matrix of dim \code{g x n} containing the raw or
+normalized RNA-seq counts for g genes from \code{n} samples.}
 
-\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p} covariates
-to be adjusted for}
+\item{x}{a numeric design matrix of dim \code{n x p} containing the \code{p}
+covariates to be adjusted for}
 
 \item{indiv}{a vector of length \code{n} containing the information for
 attributing each sample to one of the studied individuals. Coerced
 to be a \code{factor}.}
 
-\item{phi}{a numeric design matrix of size \code{n x K} containing the \code{K} longitudinal variables
-to be tested (typically a vector of time points or functions of time)}
+\item{phi}{a numeric design matrix of size \code{n x K} containing the
+\code{K} longitudinal variables to be tested (typically a vector of time
+points or functions of time)}
 
 \item{w}{a vector of length \code{n} containing the weights for the \code{n}
-samples, corresponding to the inverse of the diagonal of the estimated covariance matrix of y.}
+samples, corresponding to the inverse of the diagonal of the estimated
+covariance matrix of y.}
 
 \item{Sigma_xi}{a matrix of size \code{K x K} containing the covariance matrix
 of the \code{K} random effects corresponding to \code{phi}.}
 
-\item{na_rm}{logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
+\item{na_rm}{logical: should missing values (including \code{NA} and
+\code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements:\itemize{
   \item \code{score}: approximation of the set observed score
   \item \code{q}: observation-level contributions to the score
-  \item \code{q_ext}: pseudo-observations used to compute covariance taking into account the contributions of OLS estimates
+  \item \code{q_ext}: pseudo-observations used to compute covariance
+  taking into account the contributions of OLS estimates
   \item \code{gene_scores}: approximation of the individual gene scores
 }
 }
 \description{
-This function computes an approximation of the variance component test for homogeneous trajectory
-based on the asymptotic distribution of a mixture of \eqn{\chi^{2}}s using Davies method
-from \code{\link[CompQuadForm]{davies}}
+This function computes an approximation of the variance component test for
+homogeneous trajectory based on the asymptotic distribution of a mixture of
+\eqn{\chi^{2}}s using Davies method from \code{\link[CompQuadForm]{davies}}
 }
 \examples{
 rm(list=ls())
@@ -66,9 +70,10 @@ beta1 <- rnorm(n=ng, 0.06, sd=0)
 
 y.tilde <- b0 + rnorm(ng, sd = sigma)
 y <- t(matrix(rep(y.tilde, nsample), ncol=ng, nrow=nsample, byrow=TRUE) +
-      matrix(rep(beta1, each=nsample), ncol=ng, nrow=nsample, byrow=FALSE)*matrix(rep(tim, ng),
-                                                            ncol=ng, nrow=nsample, byrow=FALSE) +
-      matrix(rnorm(ng*nsample, sd = sigma), ncol=ng, nrow=nsample, byrow=FALSE)
+      matrix(rep(beta1, each=nsample), ncol=ng, nrow=nsample, byrow=FALSE)*
+          matrix(rep(tim, ng), ncol=ng, nrow=nsample, byrow=FALSE) +
+      matrix(rnorm(ng*nsample, sd = sigma), ncol=ng, nrow=nsample,
+             byrow=FALSE)
       )
 myindiv <- rep(1:nindiv, each=nt)
 x <- cbind(1, myindiv/2==floor(myindiv/2))
@@ -84,11 +89,14 @@ score_heterogen <- vc_score(y, x, phi=tim, indiv=myindiv,
 score_heterogen$score
 
 scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
-                                 w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=cov(tim),
+                                 w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+                                 Sigma_xi=cov(tim),
                                  homogen_traj = TRUE)
 scoreTest_homogen$set_pval
-scoreTest_heterogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
-                                   w=matrix(1, ncol=ncol(y), nrow=nrow(y)), Sigma_xi=cov(tim),
+scoreTest_heterogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv,
+                                                         each=nt),
+                                   w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
+                                   Sigma_xi=cov(tim),
                                    homogen_traj = FALSE)
 scoreTest_heterogen$set_pval
 

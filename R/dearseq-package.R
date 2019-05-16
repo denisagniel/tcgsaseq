@@ -12,21 +12,23 @@
 #'Date: \tab 2019-04-29\cr
 #'License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 #'}
-#'The two main functions of the \code{dearseq} package are \code{\link{dearseq}} and \code{\link{gsa_seq}}.
+#'The two main functions of the \code{dearseq} package are \code{\link{dearseq}}
+#'and \code{\link{gsa_seq}}.
 #'
 #'
 #'@author Boris P. Hejblum, Denis Agniel
 #'--- Maintainer: Boris P. Hejblum
 #'
 #'@references Agniel D & Hejblum BP (2017). Variance component score test for
-#'time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
-#'18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
+#'time-course gene set analysis of longitudinal RNA-seq data,
+#'\emph{Biostatistics}, 18(4):589-604.
+#'\href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
 #'\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 #'
 #'@aliases dearseq-package
 #'
 #'@docType package
-#'@name dearseq-package
+#'@name dearseq
 #'@importFrom GSA GSA.read.gmt
 #'
 NULL

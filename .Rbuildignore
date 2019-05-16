@@ -8,4 +8,5 @@ ReproducibleForBiostat.R
 ^appveyor\.yml$
 ^codecov\.yml$
 revdep
-vignettes
+^doc$
+^Meta$

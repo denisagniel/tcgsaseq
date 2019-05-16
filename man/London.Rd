@@ -15,7 +15,7 @@ data(London)
 A RNA-seq dataset preprocessed using edgeR
 }
 \examples{
-data("London")
+data('London')
 
 }
 \references{

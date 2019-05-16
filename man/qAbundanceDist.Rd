@@ -19,8 +19,8 @@ generated from a real dataset. See supplementary material of Law \emph{et al.}
 \dontrun{
 # Get distribution function of abundance proportions
 # This distribution was generated from a real dataset
-#load(url("http://bioinf.wehi.edu.au/voom/qAbundanceDist.RData"))
-data("qAbundanceDist")
+#load(url('http://bioinf.wehi.edu.au/voom/qAbundanceDist.RData'))
+data('qAbundanceDist')
 curve(qAbundanceDist, from=0, to =0.99)
 
 # Generate baseline proportions for desired number of genes
@@ -33,7 +33,7 @@ baselineprop <- baselineprop/sum(baselineprop)
 }
 \references{
 Law CW, Chen Y, Shi W & Smyth GK, voom: Precision
-weights unlock linear model analysis tools for RNA-seq read counts, \emph{Genome
-Biology}, 15(2), R29, 2014.
+weights unlock linear model analysis tools for RNA-seq read counts,
+\emph{Genome Biology}, 15(2), R29, 2014.
 }
 \keyword{datasets}

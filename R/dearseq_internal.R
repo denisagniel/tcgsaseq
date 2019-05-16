@@ -1,13 +1,16 @@
-#'Power for matrix elements
+#'Power for covaroances matrices
 #'
-#'Set each element of matrix \code{x} to the power \code{n}
+#'Compute the power of a positive definite symmetric
 #'
-#'@param x a matrix
+#'@param x a positive definite symmetric matrix
 #'
 #'@param n a real number
 #'
+#'@return a matrix of the same dimensions as \code{x}
+#'
 #'@keywords internal
 
-"%^%" <- function(x, n){
-  with(eigen(x), vectors %*% (values^n * t(vectors)))
+"%^%" <- function(x, n) {
+    x_pow <- eigen(x)
+    x_pow$vectors %*% (x_pow$values^n * t(x_pow$vectors))
 }

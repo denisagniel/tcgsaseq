@@ -2,16 +2,19 @@
 % Please edit documentation in R/dearseq_internal.R
 \name{\%^\%}
 \alias{\%^\%}
-\title{Power for matrix elements}
+\title{Power for covaroances matrices}
 \usage{
 x \%^\% n
 }
 \arguments{
-\item{x}{a matrix}
+\item{x}{a positive definite symmetric matrix}
 
 \item{n}{a real number}
 }
+\value{
+a matrix of the same dimensions as \code{x}
+}
 \description{
-Set each element of matrix \code{x} to the power \code{n}
+Compute the power of a positive definite symmetric
 }
 \keyword{internal}

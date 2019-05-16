@@ -14,11 +14,19 @@ least as extreme as the observed data. Can be a vector or an array of values.}
 
 \item{total_possible_nperm}{total number of permutations possible.}
 }
+\value{
+a vector (or an array, similar to \code{nperm_supobs})
+of exact p-values
+}
 \description{
 Calculates exact p-values for permutation tests when permutations are randomly
 drawn with replacement. This implementation is based on
 (slightly adapted) the implementation by Belinda Phipson and Gordon Smyth
 from the R package \code{statmod}
+}
+\examples{
+perm_pe(10, 100, 1000)
+
 }
 \references{
 Phipson B, and Smyth GK (2010). Permutation p-values should never

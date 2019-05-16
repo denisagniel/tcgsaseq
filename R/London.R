@@ -14,7 +14,7 @@
 #' @format A dataset: \code{London} containing 14,150 genes and 54 samples
 #'
 #' @examples
-#' data("London")
+#' data('London')
 #'
 #' @source \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE107991}
 #'
