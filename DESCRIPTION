@@ -1,41 +1,32 @@
-Package: tcgsaseq
+Package: dearseq
 Type: Package
-Title: Time-Course Gene Set Analysis for RNA-Seq Data
-Version: 1.8.1
-Date: 2018-12-06
+Title: Differential Expression Analysis for RNA-seq data
+Version: 1.0.0
+Date: 2019-05-16
 Authors@R: c(person("Denis", "Agniel", role = c("aut"),
                     email = "denis.agniel@gmail.com"),
 	           person("Boris P.", "Hejblum", role = c("aut", "cre"),
 	                  email = "boris.hejblum@u-bordeaux.fr"),
 	           person("Marine", "Gauthier", role = c("aut"),
 	                  email = "marine.gauthier@u-bordeaux.fr"))
-Depends:
-    R (>= 3.0.2)
-Imports:
-    CompQuadForm,
-    ggplot2,
-    graphics,
-    GSA,
-    KernSmooth,
-    stats,
-    statmod,
-    utils
-Suggests:
-    limma,
-    edgeR,
-    DESeq2,
-    S4Vectors,
-    knitr,
-    rmarkdown,
-    testthat,
-    covr
-Description: Analyze RNA-seq data with variance component score test accounting 
+Maintainer: Boris P. Hejblum <boris.hejblum@u-bordeaux.fr>
+Depends: R (>= 3.5.0)
+Imports: CompQuadForm, ggplot2, graphics, GSA, KernSmooth, stats,
+        statmod, utils
+Suggests: BiocManager, edgeR, DESeq2, GEOquery, knitr, limma, rmarkdown, S4Vectors, testthat,
+        covr
+Description: Differential Expression Analysis RNA-seq data with variance component score test accounting 
     for data heteroscedasticity through precision weights. Perform both gene-wise and gene set
-    analyses, and can deal with longitudinal data. Method is detailed in: Agniel D & Hejblum BP (2017) 
+    analyses, and can deal with repeated or longitudinal data. Methods are detailed in: Agniel D & Hejblum BP (2017) 
     Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 
     Biostatistics, 18(4):589-604.
 LazyData: true
 License: GPL-2 | file LICENSE
-BugReports: https://github.com/denisagniel/tcgsaseq/issues
+biocViews: GeneExpression, Transcription, DifferentialExpression,
+        GeneSetEnrichment, Regression, TimeCourse, Sequencing, RNASeq,
+        BiomedicalInformatics, CellBiology, Genetics, ImmunoOncology,
+        SystemsBiology, Transcriptomics
+BugReports: https://github.com/borishejblum/dearseq/issues
 Encoding: UTF-8
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr

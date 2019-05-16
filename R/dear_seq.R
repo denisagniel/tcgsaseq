@@ -1,4 +1,4 @@
-#'Variance component testing for RNA-seq data analysis
+#'Differential expression analyis through a variance component testing for RNA-seq data analysis
 #'
 #'Wrapper function for gene-by-gene association testing of RNA-seq data
 #'
@@ -83,7 +83,7 @@
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
-#'@param na.rm_varseq logical: should missing values in \code{y} (including
+#'@param na.rm_dearseq logical: should missing values in \code{y} (including
 #'\code{NA} and \code{NaN}) be omitted from the calculations?
 #'Default is \code{FALSE}.
 #'
@@ -133,7 +133,7 @@
 #'x <- matrix(1, ncol=1, nrow=r)
 #'
 #'#run test
-#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
+#'res_genes <- dearseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
 #'                    which_test="asymptotic",
 #'                    which_weights="none", preprocessed=TRUE)
 #'mean(res_genes$pvals[, "rawPval"]>0.05)
@@ -149,42 +149,42 @@
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
-#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
+#'res_genes <- dearseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
 #'                    which_weights="none", preprocessed=TRUE, n_perm=1000)
 #'summary(res_genes$pvals)
 #'}
 #'@export
-varseq <- function(exprmat, covariates, variables2test,
-                   sample_group = NULL, weights_var2test_condi = TRUE,
-                   cov_variables2test_eff = diag(ncol(variables2test)),
-                   which_test = c("permutation", "asymptotic"),
-                   which_weights = c("loclin", "voom", "none"),
-                   n_perm = 1000,
-                   preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
-                   bw = "nrd",
-                   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-                   exact = FALSE, transform = FALSE,
-                   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
-                   lowess_span = 0.5,
-                   na.rm_varseq = TRUE,
-                   homogen_traj = FALSE){
+dear_seq <- function(exprmat, covariates, variables2test,
+                     sample_group = NULL, weights_var2test_condi = TRUE,
+                     cov_variables2test_eff = diag(ncol(variables2test)),
+                     which_test = c("permutation", "asymptotic"),
+                     which_weights = c("loclin", "voom", "none"),
+                     n_perm = 1000,
+                     preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
+                     bw = "nrd",
+                     kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
+                     exact = FALSE, transform = FALSE,
+                     padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+                     lowess_span = 0.5,
+                     na.rm_dearseq = TRUE,
+                     homogen_traj = FALSE){
 
-  return(tcgsa_seq(y = exprmat, x = covariates, phi = variables2test,
-                   weights_phi_condi = weights_var2test_condi,
-                   genesets = NULL,
-                   indiv = sample_group,
-                   Sigma_xi = cov_variables2test_eff,
-                   which_test = which_test,
-                   which_weights = which_weights,
-                   n_perm = n_perm,
-                   preprocessed = preprocessed, doPlot = doPlot, gene_based_weights = gene_based_weights,
-                   bw = bw,
-                   kernel = kernel,
-                   exact = exact, transform = transform,
-                   padjust_methods = padjust_methods,
-                   lowess_span = lowess_span,
-                   homogen_traj = homogen_traj,
-                   na.rm_tcgsaseq = na.rm_varseq,
-                   verbose = FALSE))
+  return(gsa_seq(y = exprmat, x = covariates, phi = variables2test,
+                 weights_phi_condi = weights_var2test_condi,
+                 genesets = NULL,
+                 indiv = sample_group,
+                 Sigma_xi = cov_variables2test_eff,
+                 which_test = which_test,
+                 which_weights = which_weights,
+                 n_perm = n_perm,
+                 preprocessed = preprocessed, doPlot = doPlot, gene_based_weights = gene_based_weights,
+                 bw = bw,
+                 kernel = kernel,
+                 exact = exact, transform = transform,
+                 padjust_methods = padjust_methods,
+                 lowess_span = lowess_span,
+                 homogen_traj = homogen_traj,
+                 na.rm_gsaseq = na.rm_dearseq,
+                 verbose = FALSE))
 
 }

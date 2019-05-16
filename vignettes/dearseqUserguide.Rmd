@@ -1,0 +1,219 @@
+---
+title: "User guide to the `dearseq` R package"
+author: "Marine Gauthier, Denis Agniel, Boris Hejblum"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    number_sections: yes
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{dearseqUserguide} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r knitrsetup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  tidy = TRUE)
+knitr::knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar = c(0, 0, 0, 0))  # no margin
+})
+```
+
+# Overview of dearseq
+
+The `dearseq` (Differential Expression Analysis that Robustly controls the FDR *Gauthier et al., 2019*) `R` package tests gene expression for significance. `dearseq` relies on variance component score test accounting for data heteroscedasticity through precision weights. It performs both gene-wise and gene set analyses, and can deal with various experimental designs such as multiple biological conditions, repeated or longitudinal measurements. For more details, check the TODO [BioRxiv](lien).
+
+
+# How to use dearseq for a non-longitudinal gene-wise analysis ? 
+
+## A real dataset
+
+Tuberculosis (TB) is a disease caused by a bacterium called Mycobacterium tuberculosis. Bacteria typically infect the lungs, but they can also affect other parts of the body. Tuberculosis can remain in a quiescent state in the body. It is called latent tuberculosis infection (LTBI). It is an infection without clinical signs, bacteriological and radiological disease.
+
+*Berry et al.* first identified a whole blood 393 transcript signature for active TB using microarray analysis. Then, *Singhania et al.* found a 373-genes signature of active tuberculosis using RNA-Seq, confirming microarray results, that discriminates active tuberculosis from latently infected and healthy individuals.
+
+We sought to investigate how many of the 373 genes *Singhania et al.* found using edgeR might actually be false positives. As a quick example, we propose a partial re-analysis (see *Gauthier et al.* for the complete analysis) of the *Singhania et al.* dataset : we proceed to the Differential Expression Analysis (DEA) of the Active TB group against the Control one, omitting LTBI/Control and ActiveTB/LTBI comparisons. We focused on the Berry London dataset.
+
+It results in 54 patients of whom 21 are active TB patients, 21 are latent TB patients and 12 are healthy control particiants.
+
+For more details, check the article from *Berry  et al., 2010* [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3492754/).
+
+The data are publicly available on [GEO website](https://www.ncbi.nlm.nih.gov/geo/) with GEO access number 'GSE107995'. We will be using the `GEOquery` package to get the data files from GEO website (see appendix for more details on `GEOquery`)
+
+3 inputs are required to run `dearseq`:
+
+* The gene expression matrix
+* The matrix/vector of covariates that needs to be adjusted
+* The matrix/vector of variables to be tested
+
+
+### Design data matrix
+
+In this example, we need to import the supplementary file available on GEO with the  `getGEO` function to obtain the group of each patient (TB, LTBI, Control) :
+
+```{r GEOquery, message=FALSE}
+if (!requireNamespace("GEOquery", quietly = TRUE)) {
+	if (!requireNamespace("BiocManager", quietly = TRUE)){
+    	install.packages("BiocManager")
+	}
+	BiocManager::install("GEOquery")
+}
+```
+
+```{r import, message=FALSE, results='hide'}
+GSE107991_metadata <- GEOquery::getGEO("GSE107991", GSEMatrix = FALSE)
+
+get_info <- function(i){
+  name <- GSE107991_metadata@gsms[[i]]@header$source_name_ch1
+  name <- gsub("Active_TB", "ActiveTB", name)
+  name <- gsub("Test_set", "TestSet", name)
+  unlist(strsplit(name, split="_"))
+}
+
+infos <- sapply(1:length(GSE107991_metadata@gsms), FUN=get_info)
+infos_df <- cbind.data.frame("SampleID" = names(GSE107991_metadata@gsms), t(infos))
+rownames(infos_df) <- names(GSE107991_metadata@gsms)
+colnames(infos_df)[-1] <- c("Cohort", "Location", "Set", "Status")
+
+group_London_TB <- which(infos_df$Status=="ActiveTB") # 21
+group_London_LTBI <- which(infos_df$Status=="LTBI") # 21
+group_London_Control <- which(infos_df$Status=="Control") # 12
+
+group <- rep(NA,length(infos_df$Status[-group_London_LTBI]))
+group[which(infos_df$Status[-group_London_LTBI]=="ActiveTB")] <- 
+  rep(1,length(which(infos_df$Status[-group_London_LTBI]=="ActiveTB")))
+group[which(infos_df$Status[-group_London_LTBI]=="Control")] <-
+  rep(0,length(which(infos_df$Status[-group_London_LTBI]=="Control")))
+
+```
+
+We excluded the LTBI patients to focus on the comparison between Active TB patients and Control patients.
+
+
+### Gene expression matrix
+
+This matrix contains the gene expression (in cells) for each gene (in rows) of 
+each sample (in columns) gathered from RNA-seq measurements. The gene expression 
+could already be normalized or not. In this last case, the gene expression is 
+normalized into log(counts) per million. 
+
+The gene expression matrix (called `London`) is including in the package `dearseq`. It was extracted from one of the GEO supplementary files (namely the "GSE107991_edgeR_normalized_Berry_London.xlsx" file). 
+
+NB: The data is already normalized using `edgeR`.
+
+```{r, message=FALSE}
+library(dearseq)
+data("London")
+genes <- London$Genes
+London <- as.matrix(London[,-c(1:3)])
+```
+
+We have:
+
+ * in row `ENSGxxxxxxxxxxx` for each gene identifier (saved in `genes`)
+ * in column `Berry_London_Samplex` for the name of each sample
+ * each cell contains the normalized gene expression
+ 
+The vector `genes` contains all the gene identifiers.
+
+
+The entire matrix contains $14,150$ genes and $54$ samples.
+
+
+## Variance component score test : identifying differentially expressed (DE) genes
+
+This function provides the result of variance component score test for each gene.
+`dearseq` function requires:
+
+* `exprmat`: a numeric matrix containing the raw RNA-seq counts or preprocessed expressions
+* `covariates`: a numeric matrix containing the model covariates that needs to be adjusted. Usually, its first column is the intercept (full of 1s).
+* `variables2test`: a numeric design matrix containing the variables of interest (with whom the expression association is tested)
+* `which_test`: a character string indicating which method to use to approximate the variance component score test, either "permutation" or "asymptotic".
+* `preprocessed`: a logical flag indicating whether the expression data have already been preprocessed (e.g. log2 transformed). Default is FALSE, in which case y is assumed to contain raw counts and is normalized into log(counts) per million.
+* `doPlot`: a logical flag indicating whether the mean-variance plot should be drawn.
+
+We use the permutation test due to the low sample size (=33).
+
+```{r LR_ST}
+res_dearseq <- dearseq::dear_seq(exprmat = London[,-group_London_LTBI], 
+                               covariates = matrix(rep(1,ncol(London[,-group_London_LTBI])),ncol=1),
+                               variables2test = matrix(group, ncol=1),
+                               which_test='asymptotic', doPlot = FALSE,
+                               preprocessed=TRUE)
+```
+
+Now `res_dearseq` is a list object containing, in addition to the parameters summary: 
+
+- the raw p-values
+- the adjusted p-values (after correction for multiple testing with the Benjamini-Hochberg procedure)
+
+Following *Singhania et al.*, to be included in the signature a DE gene must have
+had both: 
+
+- an absolute log2(fold change) > 1
+- an FDR adjusted p-value < 0.05
+
+### log FC with edgeR
+
+To be sure to be comparable with the edgeR analysis, we calculated the log fold-change using the edgeR procedure from the `London_raw` dataset.
+
+```{r logFC, message=FALSE}
+library(edgeR)
+Y <- rep(NA,length(infos_df$Status))
+Y[which(infos_df$Status=="ActiveTB")] <- rep(1,length(which(infos_df$Status=="ActiveTB")))
+Y[which(infos_df$Status=="LTBI")] <- rep(0,length(which(infos_df$Status=="LTBI")))
+Y[which(infos_df$Status=="Control")] <- rep(0,length(which(infos_df$Status=="Control")))
+
+dgList <- DGEList(counts=London_raw,group=Y)
+cpm <- cpm(dgList)
+countCheck <- cpm > 2
+keep <- which(rowSums(countCheck) >= 5)
+dgList <- dgList[keep,]
+dgList <- calcNormFactors(dgList, method="TMM")
+dgList_group <- dgList[,-group_London_LTBI]
+design <- model.matrix(~group)
+dgList_group <- estimateGLMTrendedDisp(dgList_group, design=design) 
+fit <- glmFit(dgList_group, design)
+lrt <- glmLRT(fit)
+```
+
+`lrt` contains the log fold-changes for the $14,150$ genes.
+
+### Results 
+
+```{r DEgenes}
+df <- data.frame(logFC=lrt$table$logFC,res_dearseq$pvals$adjPval) 
+res <- rbind(subset(df, res_dearseq$pvals$adjPval<.05 & logFC>1),subset(df, res_dearseq$pvals$adjPval<.05 & logFC<(-1)))
+genes_dearseq <- genes[as.numeric(rownames(res))]
+```
+
+After applying the filtering, `genes_dearseq` returns the DE gene identifiers.
+
+# How to use dearseq for a longitudinal gene-set analysis ? 
+
+# References
+
+Singhania A, Verma R, Graham CM, Lee J, Tran T, Richardson M, et al., (2018) A modular transcriptional signature identifies phenotypic heterogeneity of human tuberculosis infection. _Nature communications_ 9(1):2308.
+
+Berry, M. P. et al., (2010) An interferon-inducible neutrophil-driven blood transcriptional signature in human tuberculosis. _Nature_ 466, 973–977.
+
+
+# Appendix
+
+## GEOquery package
+
+In case the data you want to analyze is publicly available through [Gene Expression Omnibus (GEO)](https://www.ncbi.nlm.nih.gov/geo/), you can access it with the `GEOquery` package, that can be installed with the following commands:
+
+```{r dl_GEOquery, warning=FALSE, message=FALSE, eval=FALSE}
+if (!requireNamespace("GEOquery", quietly = TRUE)) {
+	if (!requireNamespace("BiocManager", quietly = TRUE)){
+		install.packages("BiocManager")
+	}
+	BiocManager::install("GEOquery")
+}
+```
+
+More details can be found on [Bioconductor](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) and in Davis S, Meltzer P, (2007) GEOquery: a bridge between the Gene Expression Omnibus (GEO) and Bioconductor _Bioinformatics_ 14:1846-1847.

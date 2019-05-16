@@ -12,23 +12,23 @@ knitr::opts_chunk$set(
 )
 ```
 
-# `tcgsaseq`
+# `dearseq`
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tcgsaseq)](https://cran.r-project.org/package=tcgsaseq)
-[![Travis-CI Build Status](https://travis-ci.org/denisagniel/tcgsaseq.svg?branch=master)](https://travis-ci.org/denisagniel/tcgsaseq)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/denisagniel/tcgsaseq?branch=master&svg=true)](https://ci.appveyor.com/project/denisagniel/tcgsaseq)
-[![Coverage Status](https://img.shields.io/codecov/c/github/denisagniel/tcgsaseq/master.svg)](https://codecov.io/github/denisagniel/tcgsaseq?branch=master)
-[![Downloads](https://cranlogs.r-pkg.org/badges/tcgsaseq?color=blue)](https://www.r-pkg.org/pkg/tcgsaseq)
+<!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/dearseq)](https://cran.r-project.org/package=dearseq) -->
+[![Travis-CI Build Status](https://travis-ci.org/borishejblum/dearseq.svg?branch=master)](https://travis-ci.org/borishejblum/dearseq)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/borishejblum/dearseq?branch=master&svg=true)](https://ci.appveyor.com/project/borishejblum/dearseq)
+[![Coverage Status](https://img.shields.io/codecov/c/github/borishejblum/dearseq/master.svg)](https://codecov.io/github/borishejblum/dearseq?branch=master)
+<!-- [![Downloads](https://cranlogs.r-pkg.org/badges/dearseq?color=blue)](https://www.r-pkg.org/pkg/dearseq) -->
 
 
 ## Overview
 
-`tcgsaseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `varseq` and `tcgsa_seq`: 
+`dearseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `dear_seq` and `tcgsa_seq`: 
 
-* **Gene-wise Differential Analysis of RNA-seq data** can be performed using the function `varseq`. 
+* **Gene-wise Differential Analysis of RNA-seq data** can be performed using the function `dear_seq`. 
 * **Gene Set Analysis of RNA-seq data** can be performed using the function `tcgsa_seq`. 
 
-The method implemented in this package is detailed in the following article:
+The methods implemented in this package are detailed in the following article:
 
 > Agniel D & Hejblum BP (2017). Variance component score test for time-course gene set analysis of longitudinal RNA-seq data, 2017, [*Biostatistics*](https://academic.oup.com/biostatistics/article-abstract/18/4/589/3065599), 18(4):589-604. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4) [DOI: 10.1093/biostatistics/kxx005](https://doi.org/10.1093/biostatistics/kxx005)
 
@@ -36,15 +36,10 @@ The method implemented in this package is detailed in the following article:
 ## Installation
 
 
-The easiest way to get `tcgsaseq` is to install it from [CRAN](https://cran.r-project.org/package=tcgsaseq):
-```{r CRAN-install, eval=FALSE}
-install.packages("tcgsaseq")
-```
-
-Or to get the development version from [GitHub](https://github.com/denisagniel/tcgsaseq):
+The easiest way to get `dearseq` is to install its development version from [GitHub](https://github.com/borishejblum/dearseq):
 ```{r GitHub-install, eval=FALSE}
 #install.packages("devtools")
-devtools::install_github("denisagniel/tcgsaseq")
+devtools::install_github("borishejblum/dearseq")
 ```
 
  -- Denis Agniel and Boris Hejblum

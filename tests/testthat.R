@@ -1,4 +1,4 @@
 library(testthat)
-library(tcgsaseq)
+library(dearseq)
 
-test_check("tcgsaseq")
+test_check("dearseq")

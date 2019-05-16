@@ -1,16 +1,18 @@
-#'tcgsaseq: a package to perform Time-course Gene Set Analysis and General Gene-Wise Analysis of RNA-seq data
+#'dearseq: a package to perform Differential Expression Analysis of RNA-seq data
 #'
 #'Analysis of RNA-seq data with variance component score
 #'test accounting for data heteroscedasticity through precision weights.
+#'Performs gene-wise analysis as well as gene set analysis, including for
+#'complex experimental designs such as longitudinal data.
 #'
 #'\tabular{ll}{
-#'Package: \tab tcgsaseq\cr
+#'Package: \tab dearseq\cr
 #'Type: \tab Package\cr
-#'Version: \tab 1.8.1\cr
-#'Date: \tab 2018-12-06\cr
+#'Version: \tab 1.0.0\cr
+#'Date: \tab 2019-04-29\cr
 #'License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 #'}
-#'The two main functions of the \code{tcgsaseq} package are \code{\link{varseq}} and \code{\link{tcgsa_seq}}.
+#'The two main functions of the \code{dearseq} package are \code{\link{dearseq}} and \code{\link{gsa_seq}}.
 #'
 #'
 #'@author Boris P. Hejblum, Denis Agniel
@@ -21,9 +23,10 @@
 #'18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
 #'\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 #'
+#'@aliases dearseq-package
 #'
 #'@docType package
-#'@name tcgsaseq
+#'@name dearseq-package
 #'@importFrom GSA GSA.read.gmt
 #'
 NULL

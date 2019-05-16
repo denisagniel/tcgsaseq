@@ -71,7 +71,7 @@
 #'
 #'
 #'@import ggplot2
-#'@importFrom stats bw.bcv bw.nrd0 bw.nrd bw.SJ bw.ucv dnorm approx
+#'@importFrom stats bw.bcv bw.nrd0 bw.nrd bw.SJ bw.ucv dnorm approx sd pnorm qnorm
 #'@importFrom KernSmooth locpoly
 #'@export
 
@@ -266,7 +266,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   }else{
     if(!na.rm){
       stop("Cannot compute the weights without ignoring NA/NaN values...
-           Try setting 'na.rm' or na.rm_tcgsaseq' to 'TRUE' to ignore NA/NaN values, but think carefully about where does those NA/NaN come from...")
+           Try setting 'na.rm' or na.rm_gsaseq' to 'TRUE' to ignore NA/NaN values, but think carefully about where does those NA/NaN come from...")
     }else if(sum(is.na(mu_x))>1){
       mu_x <- mu_x[-which(is.na(mu_x))]
       sq_err <- sq_err[-which(is.na(sq_err))]

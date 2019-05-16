@@ -89,7 +89,7 @@
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
-#'@param na.rm_tcgsaseq logical: should missing values in \code{y} (including
+#'@param na.rm_gsaseq logical: should missing values in \code{y} (including
 #'\code{NA} and \code{NaN}) be omitted from the calculations?
 #'Default is \code{TRUE}.
 #'
@@ -146,10 +146,10 @@
 #'x <- matrix(1, ncol=1, nrow=r)
 #'
 #'#run test
-#'res <- tcgsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
+#'res <- gsa_seq(y, x, phi=t, genesets=lapply(0:9, function(x){x*10+(1:10)}),
 #'                         Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="asymptotic",
 #'                         which_weights="none", preprocessed=TRUE)
-#'res_genes <- tcgsa_seq(y, x, phi=cbind(t),#, rnorm(r)), #t^2
+#'res_genes <- gsa_seq(y, x, phi=cbind(t),#, rnorm(r)), #t^2
 #'                       genesets=NULL,
 #'                       Sigma_xi=diag(1), indiv=rep(1:(r/nr), each=nr), which_test="asymptotic",
 #'                       which_weights="none", preprocessed=TRUE)
@@ -162,7 +162,7 @@
 #'#mean(unlist(res_quant)<0.05)
 #'
 #'\dontrun{
-#'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
+#'res_genes <- gsa_seq(y, x, phi=t, genesets=NULL,
 #'                       Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="permutation",
 #'                       which_weights="none", preprocessed=TRUE, n_perm=1000)
 #'
@@ -170,7 +170,7 @@
 #'summary(res_genes$pvals$FDR)
 #'}
 #'@export
-tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
+gsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       genesets,
                       indiv = NULL,
                       Sigma_xi = diag(ncol(phi)),
@@ -184,17 +184,17 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                       lowess_span = 0.5,
                       homogen_traj = FALSE,
-                      na.rm_tcgsaseq = TRUE,
+                      na.rm_gsaseq = TRUE,
                       verbose = TRUE){
 
   stopifnot(is.matrix(y))
   stopifnot(is.matrix(x) | is.data.frame(x))
   stopifnot(is.matrix(phi) | is.data.frame(phi))
 
-  if(sum(is.na(y))>1 & na.rm_tcgsaseq){
+  if(sum(is.na(y))>1 & na.rm_gsaseq){
     warning(paste("\n\n!!!!!\n'y' contains", sum(is.na(y)), "NA values.",
                   "\nCurrently they are ignored in the computations but you should think carefully about where do those NA/NaN come from...",
-                  "\nIf you don't want to ignore those NA/NaN values, set the 'na.rm_tcgsaseq' argument to 'FALSE' (this may lead to errors).\n!!!!!\n"))
+                  "\nIf you don't want to ignore those NA/NaN values, set the 'na.rm_gsaseq' argument to 'FALSE' (this may lead to errors).\n!!!!!\n"))
   }
 
   if(!preprocessed){
@@ -255,7 +255,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
 
     if(n_perm > N_possible_perms){
-      warning(paste("The number of permutations requested 'n_perm' is larger than the total number of existing permutations", N_possible_perms,
+      warning(paste0("The number of permutations requested 'n_perm' is larger than the total number of existing permutations ", N_possible_perms,
                  ". Try a lower number for 'n_perm' (currently running with 'nperm=", N_possible_perms, "')."))
       n_perm <- N_possible_perms
     }
@@ -270,7 +270,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                                    preprocessed = TRUE, doPlot = doPlot,
                                    gene_based = gene_based_weights,
                                    bw = bw, kernel = kernel,
-                                   exact = exact, transform = transform, verbose = verbose, na.rm = na.rm_tcgsaseq),
+                                   exact = exact, transform = transform, verbose = verbose, na.rm = na.rm_gsaseq),
                voom = voom_weights(y = y_lcpm, x = if(weights_phi_condi){cbind(x, phi)}else{x},
                                    preprocessed = TRUE, doPlot = doPlot,
                                    lowess_span = lowess_span),
@@ -296,14 +296,14 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
                                w = w, Sigma_xi = Sigma_xi,
                                genewise_pvals = TRUE, homogen_traj = homogen_traj,
-                               na.rm = na.rm_tcgsaseq)$gene_pvals
+                               na.rm = na.rm_gsaseq)$gene_pvals
     }else if(which_test == "permutation"){
       if(is.null(indiv)){
         indiv <- rep(1, nrow(x))
       }
 
       # constructing residuals
-      if(na.rm_tcgsaseq){
+      if(na.rm_gsaseq){
         y_lcpm0 <- y_lcpm
         y_lcpm0[is.na(y_lcpm0)] <- 0
         y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm0))
@@ -315,7 +315,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       perm_result <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
                                   w = w, Sigma_xi = Sigma_xi,
                                   n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
-                                  na.rm = na.rm_tcgsaseq)
+                                  na.rm = na.rm_gsaseq)
       rawPvals <- perm_result$gene_pvals
       }
 
@@ -354,7 +354,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
           vc_test_asym(y = y_lcpm[gs, , drop=FALSE], x = x, indiv = indiv, phi = phi,
                        w = w[gs, , drop=FALSE], Sigma_xi = Sigma_xi,
                        genewise_pvals = FALSE, homogen_traj = homogen_traj,
-                       na.rm = na.rm_tcgsaseq)$set_pval
+                       na.rm = na.rm_gsaseq)$set_pval
         }
       }
       )
@@ -363,7 +363,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
         indiv <- rep(1, nrow(x))
       }
 
-      if(na.rm_tcgsaseq){
+      if(na.rm_gsaseq){
         y_lcpm0 <- y_lcpm
         y_lcpm0[is.na(y_lcpm0)] <- 0
         y_lcpm_res <- y_lcpm - t(x%*%solve(crossprod(x))%*%t(x)%*%t(y_lcpm0))
@@ -383,7 +383,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
           vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
                        w = w[gs, , drop=FALSE], Sigma_xi = Sigma_xi,
                        n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj,
-                       na.rm = na.rm_tcgsaseq)$set_pval
+                       na.rm = na.rm_gsaseq)$set_pval
         }
       }
       )
@@ -415,11 +415,11 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                        asymptotic = vc_test_asym(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
                                                  w = w[genesets, ], Sigma_xi = Sigma_xi,
                                                  genewise_pvals = FALSE, homogen_traj = homogen_traj,
-                                                 na.rm = na.rm_tcgsaseq),
+                                                 na.rm = na.rm_gsaseq),
                        permutation = vc_test_perm(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
                                                   w = w[genesets, ], Sigma_xi = Sigma_xi, n_perm = n_perm,
                                                   genewise_pvals = FALSE, homogen_traj = homogen_traj,
-                                                  na.rm = na.rm_tcgsaseq)
+                                                  na.rm = na.rm_gsaseq)
     )
     pvals <- data.frame("rawPval" = res_test$set_pval, "adjPval" = NA)
     padjust_methods <- NA

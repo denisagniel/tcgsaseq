@@ -1,4 +1,4 @@
-library(tcgsaseq)
+library(dearseq)
 context("Gene Set Analysis with tcgsa_seq wrapper")
 
 test_that("Gene sets with no genes measure trigger warnings", {
@@ -14,10 +14,10 @@ test_that("Gene sets with no genes measure trigger warnings", {
            matrix(rep(y.tilde, n), ncol=n, nrow=r))
   x <- matrix(1, ncol=1, nrow=r)
   gs <- list(nrow(y) + 1:10)
-  expect_warning(tcgsa_seq(y, x, phi=t, genesets=gs,
+  expect_warning(gsa_seq(y, x, phi=t, genesets=gs,
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="permutation",
                            which_weights="none", preprocessed=TRUE))
-  expect_warning(tcgsa_seq(y, x, phi=t, genesets=gs,
+  expect_warning(gsa_seq(y, x, phi=t, genesets=gs,
                            Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
                            which_weights="none", preprocessed=TRUE))
 })
@@ -34,7 +34,7 @@ test_that("Returned as many p-values as there are genesets", {
   y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
            matrix(rep(y.tilde, n), ncol=n, nrow=r))
   x <- matrix(1, ncol=1, nrow=r)
-  res <- tcgsa_seq(y=y, x=x, phi=t, genesets=list(1:10, 11:20),
+  res <- gsa_seq(y=y, x=x, phi=t, genesets=list(1:10, 11:20),
                    Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
                    which_weights="none", preprocessed=TRUE)
   expect_length(res$pvals$rawPval, n = length(res$genesets))

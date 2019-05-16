@@ -40,11 +40,13 @@ r_packages:
 - rex
 - Hmisc
 - shiny
+- BiocManager
 
 bioc_packages:
 - limma
 - DESeq2
 - edgeR
+- GEOquery
 
 r_github_packages:
 - hadley/ggplot2
