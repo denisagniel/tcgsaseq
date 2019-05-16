@@ -168,7 +168,7 @@ had both:
 
 To guaranty comparable results with the original edgeR analysis, we computed the log fold-changes using the `edgeR` procedure from the raw data.
 
-```{r London-raw}
+```{r London-raw, message=FALSE}
 GEOquery::getGEOSuppFiles('GSE107991', filter_regex="GSE107991_Raw_counts_Berry_London.xlsx")
 London_raw <- readxl::read_excel("GSE107991/GSE107991_Raw_counts_Berry_London.xlsx")
 genes_raw <- London_raw$Genes
@@ -215,7 +215,7 @@ genes_dearseq <- genes[as.numeric(rownames(res))]
 
 After applying the filtering, `genes_dearseq` returns the DE gene identifiers.
 
-```{r singhania-373}
+```{r singhania-373, message=FALSE}
 # Singhania et al. 373 genes signature
 download.file("https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6008327/bin/41467_2018_4579_MOESM3_ESM.xlsx", destfile = "GSE107991/41467_2018_4579_MOESM3_ESM.xlsx")
 TB373 <- as.data.frame(readxl::read_excel("GSE107991/41467_2018_4579_MOESM3_ESM.xlsx"))
