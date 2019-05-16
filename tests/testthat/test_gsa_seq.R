@@ -34,7 +34,7 @@ test_that("Returned as many p-values as there are genesets", {
   y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
            matrix(rep(y.tilde, n), ncol=n, nrow=r))
   x <- matrix(1, ncol=1, nrow=r)
-  res <- gsa_seq(y=y, x=x, phi=t, genesets=list(as.character(1:10), 11:20),
+  res <- gsa_seq(y=y, x=x, phi=t, genesets=list(1:10, 11:20),
                    Sigma_xi=matrix(1), indiv=rep(1:4, each=3), which_test="asymptotic",
                    which_weights="none", preprocessed=TRUE)
   expect_length(res$pvals$rawPval, n = length(res$genesets))
