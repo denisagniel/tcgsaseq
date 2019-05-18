@@ -71,7 +71,7 @@ sims_fromSEQCA <- function(orig_counts_mat, sample_size = 10){
   deseq2_pv <- DESeq2::results(res_dsq)$pvalue
 
 
-  # varseq ----
+  # dearseq ----
   ints <- matrix(1,nrow=ncol(sims_counts),ncol=1)
   phi <- as.numeric(as.character(Group2))
   if(sum(isexpr & hasannot)>0){
@@ -80,12 +80,12 @@ sims_fromSEQCA <- function(orig_counts_mat, sample_size = 10){
     sims_counts_dearseq <- sims_counts
   }
 
-  tcg_pv <- dearseq::varseq(covariates=ints, exprmat=sims_counts_dearseq, variables2test=matrix(phi, ncol=1),
+  tcg_pv <- dearseq::dear_seq(covariates=ints, exprmat=sims_counts_dearseq, variables2test=matrix(phi, ncol=1),
                              gene_based_weights=FALSE, which_weights="loclin",
                              which_test="asymptotic",
                              preprocessed=FALSE, doPlot = FALSE)$pval
 
-  tcgperm_pv <- dearseq::varseq(covariates=ints, exprmat=sims_counts_dearseq, variables2test=matrix(phi, ncol=1),
+  tcgperm_pv <- dearseq::dear_seq(covariates=ints, exprmat=sims_counts_dearseq, variables2test=matrix(phi, ncol=1),
                                  gene_based_weights=FALSE, which_weights="loclin",
                                  which_test="permutation", n_perm = 1000,
                                  preprocessed=FALSE, doPlot = FALSE)$pval
