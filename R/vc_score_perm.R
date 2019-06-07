@@ -195,7 +195,26 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
     return(rowSums(matrix(qq, ncol=K)))# genewise scores
   }
 
-  perm_list <- c(list(1:n), lapply(1:n_perm, function(x){as.numeric(unlist(lapply(split(x = as.character(1:n), f = indiv), FUN=sample)))}))
+  o <- order(as.numeric(unlist(split(x = as.character(1:n), f = indiv))))
+  perm_list <- c(list(1:n), lapply(1:n_perm, function(x){as.numeric(unlist(lapply(split(x = as.character(1:n), f = indiv), FUN=sample)))[o]}))
+
+  #browser()
+  #all perms for 2
+  # nums <- as.numeric(unlist(split(x = as.character(1:n), f = indiv)))
+  # perm_mat <- permutations(n = 2, r=2, v=nums[1:2])
+  # perm_list <- split(t(perm_mat), rep(1:nrow(perm_mat), each = ncol(perm_mat)))
+  # for(p in 2:nb_indiv){
+  #     perm_temp <- permutations(n = 2, r=2, v=nums[(p-1)*2+1:2])
+  #     perm_list_temp <- list()
+  #     for (r in 1:length(perm_list)){
+  #       for(rr in 1:nrow(perm_temp)){
+  #         perm_list_temp <- c(perm_list_temp, list(c(perm_list[[r]], perm_temp[rr,])))
+  #       }
+  #     }
+  #     perm_list <- perm_list_temp
+  # }
+  # perm_list <- lapply(perm_list, function(x){x[o]})
+
   gene_Q <- sapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
   QQ <- colSums(gene_Q)
 
