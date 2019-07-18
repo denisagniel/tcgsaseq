@@ -5,8 +5,9 @@
 \title{Permutation-based variance component test statistic}
 \usage{
 vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
-  homogen_traj = FALSE, na.rm = FALSE)
+  Sigma_xi = diag(ncol(phi)), n_perm = 1000, progressbar = TRUE,
+  parallel_comp = TRUE, nb_cores = parallel::detectCores() - 1,
+  genewise_pvals = FALSE, homogen_traj = FALSE, na.rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{G x n} containing the raw RNA-seq counts for G
@@ -29,6 +30,18 @@ samples.}
 of the \code{K} random effects.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}.}
+
+\item{progressbar}{logical indicating wether a progressBar should be displayed
+when computing permutations (only in interactive mode).}
+
+\item{parallel_comp}{a logical flag indicating whether parallel computation
+should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{TRUE}.}
+
+\item{nb_cores}{an integer indicating the number of cores to be used when
+\code{parallel_comp} is \code{TRUE}.
+Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{parallel::detectCores() - 1}.}
 
 \item{genewise_pvals}{a logical flag indicating whether gene-wise p-values should be returned. Default
 is \code{FALSE} in which case gene-set p-value is computed and returned instead.}
@@ -79,7 +92,8 @@ x <- matrix(1, ncol=1, nrow=r)
 
 #run test
 permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-                           indiv=rep(1:4, each=3), n_perm=50) #1000)
+                           indiv=rep(1:4, each=3), n_perm=50, #1000,
+                           parallel_comp = FALSE)
 permTestRes$set_pval
 
 }

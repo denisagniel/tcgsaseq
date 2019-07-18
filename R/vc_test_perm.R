@@ -26,6 +26,18 @@
 #'of the \code{K} random effects.
 #'
 #'@param n_perm the number of perturbations. Default is \code{1000}.
+
+#'@param progressbar logical indicating wether a progressBar should be displayed
+#'when computing permutations (only in interactive mode).
+#'
+#'@param parallel_comp a logical flag indicating whether parallel computation
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{TRUE}.
+#'
+#'@param nb_cores an integer indicating the number of cores to be used when
+#'\code{parallel_comp} is \code{TRUE}.
+#'Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{parallel::detectCores() - 1}.
 #'
 #'@param genewise_pvals a logical flag indicating whether gene-wise p-values should be returned. Default
 #'is \code{FALSE} in which case gene-set p-value is computed and returned instead.
@@ -76,14 +88,17 @@
 #'
 #'#run test
 #'permTestRes <- vc_test_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y), nrow=nrow(y)),
-#'                            indiv=rep(1:4, each=3), n_perm=50) #1000)
+#'                            indiv=rep(1:4, each=3), n_perm=50, #1000,
+#'                            parallel_comp = FALSE)
 #'permTestRes$set_pval
 #'
 #'@importFrom CompQuadForm davies
 #'
 #'@export
 vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(ncol(phi)),
-                         n_perm = 1000, genewise_pvals = FALSE, homogen_traj = FALSE,
+                         n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
+                         nb_cores = parallel::detectCores() - 1,
+                         genewise_pvals = FALSE, homogen_traj = FALSE,
                          na.rm = FALSE){
 
   n_samples <- ncol(y)
@@ -110,7 +125,9 @@ vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(n
 
 
   score_list_res <- vc_score_2use(y = y, x = x, indiv = indiv_fact, phi = phi, w = w,
-                                  Sigma_xi = Sigma_xi, na_rm = na.rm, n_perm = n_perm)
+                                  Sigma_xi = Sigma_xi, na_rm = na.rm, n_perm = n_perm,
+                                  progressbar = progressbar, parallel_comp = parallel_comp,
+                                  nb_cores = nb_cores)
 
   if(genewise_pvals){
     gene_scores_obs <- score_list_res$gene_scores_unscaled

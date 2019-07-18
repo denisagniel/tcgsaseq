@@ -7,13 +7,14 @@
 tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
   Sigma_xi = diag(ncol(phi)), which_test = c("permutation",
   "asymptotic"), which_weights = c("loclin", "voom", "none"),
-  n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
-  gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",
-  "epanechnikov", "rectangular", "triangular", "biweight", "tricube",
-  "cosine", "optcosine"), exact = FALSE, transform = FALSE,
-  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel",
-  "bonferroni"), lowess_span = 0.5, R = NULL, homogen_traj = FALSE,
-  na.rm_tcgsaseq = TRUE, verbose = TRUE)
+  n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
+  nb_cores = parallel::detectCores() - 1, preprocessed = FALSE,
+  doPlot = TRUE, gene_based_weights = TRUE, bw = "nrd",
+  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
+  "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
+  transform = FALSE, padjust_methods = c("BH", "BY", "holm",
+  "hochberg", "hommel", "bonferroni"), lowess_span = 0.5, R = NULL,
+  homogen_traj = FALSE, na.rm_tcgsaseq = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -57,6 +58,18 @@ Default is \code{"loclin"}.
 See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}.}
+
+\item{progressbar}{logical indicating wether a progressBar should be displayed
+when computing permutations (only in interactive mode).}
+
+\item{parallel_comp}{a logical flag indicating whether parallel computation
+should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{TRUE}.}
+
+\item{nb_cores}{an integer indicating the number of cores to be used when
+\code{parallel_comp} is \code{TRUE}.
+Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{parallel::detectCores() - 1}.}
 
 \item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -172,7 +185,7 @@ res_quant[[i]] <- res_genes$pvals[, "rawPval"]
 \dontrun{
 res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
                       Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="permutation",
-                      which_weights="none", preprocessed=TRUE, n_perm=1000)
+                      which_weights="none", preprocessed=TRUE, n_perm=1000, parallel_comp = FALSE)
 
 mean(res_genes$pvals$rawPval < 0.05)
 summary(res_genes$pvals$FDR)

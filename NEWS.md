@@ -1,5 +1,9 @@
 # News about the `tcgsaseq` R package
 
+### Main changes in Version 1.9.0 (2018-07-18):
+ * (partial) parallel support for permutations
+ * progressbar for permutations in interactive mode
+ * bug fix for `voom`-like weights
 
 ### Main changes in Version 1.8.1 (2018-12-06):
 * perm_pe function for exact p-values and accurate FDR control when using permutation test. 

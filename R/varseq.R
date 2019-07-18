@@ -36,7 +36,19 @@
 #'the variance component score test, either \code{"permutation"} or \code{"asymptotic"}.
 #'Default is \code{"permutation"}.
 #'
-#'@param n_perm the number of perturbations. Default is \code{1000}
+#'@param n_perm the number of perturbations. Default is \code{1000}.
+
+#'@param progressbar logical indicating wether a progressBar should be displayed
+#'when computing permutations (only in interactive mode).
+#'
+#'@param parallel_comp a logical flag indicating whether parallel computation
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{TRUE}.
+#'
+#'@param nb_cores an integer indicating the number of cores to be used when
+#'\code{parallel_comp} is \code{TRUE}.
+#'Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{parallel::detectCores() - 1}.
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -150,7 +162,7 @@
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 #'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
-#'                    which_weights="none", preprocessed=TRUE, n_perm=1000)
+#'                    which_weights="none", preprocessed=TRUE)
 #'summary(res_genes$pvals)
 #'}
 #'@export
@@ -159,7 +171,8 @@ varseq <- function(exprmat, covariates, variables2test,
                    cov_variables2test_eff = diag(ncol(variables2test)),
                    which_test = c("permutation", "asymptotic"),
                    which_weights = c("loclin", "voom", "none"),
-                   n_perm = 1000,
+                   n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
+                   nb_cores = parallel::detectCores() - 1,
                    preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
                    bw = "nrd",
                    kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
@@ -176,7 +189,8 @@ varseq <- function(exprmat, covariates, variables2test,
                    Sigma_xi = cov_variables2test_eff,
                    which_test = which_test,
                    which_weights = which_weights,
-                   n_perm = n_perm,
+                   n_perm = n_perm, progressbar = progressbar,
+                   parallel_comp = parallel_comp, nb_cores = nb_cores,
                    preprocessed = preprocessed, doPlot = doPlot, gene_based_weights = gene_based_weights,
                    bw = bw,
                    kernel = kernel,

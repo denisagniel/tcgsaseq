@@ -5,7 +5,8 @@
 \title{Computes variance component test statistic for homogeneous trajectory}
 \usage{
 vc_score_h_perm(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
-  na_rm = FALSE, n_perm = 1000)
+  na_rm = FALSE, n_perm = 1000, progressbar = TRUE,
+  parallel_comp = TRUE, nb_cores = parallel::detectCores() - 1)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g
@@ -30,6 +31,18 @@ of the \code{K} random effects corresponding to \code{phi}.}
 \item{na_rm}{logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 
 \item{n_perm}{the number of permutation to perform. Default is \code{1000}.}
+
+\item{progressbar}{logical indicating wether a progressBar should be displayed
+when computing permutations (only in interactive mode).}
+
+\item{parallel_comp}{a logical flag indicating whether parallel computation
+should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{TRUE}.}
+
+\item{nb_cores}{an integer indicating the number of cores to be used when
+\code{parallel_comp} is \code{TRUE}.
+Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{parallel::detectCores() - 1}.}
 }
 \value{
 A list with the following elements:\itemize{
@@ -80,11 +93,13 @@ myw <- matrix(rnorm(nsample*ng, sd=0.1), ncol=nsample, nrow=ng)
 #We only use few permutations (10) to keep example running time low
 #Otherwise one can use n_perm = 1000
 score_homogen <- vc_score_h_perm(y, x, phi=tim, indiv=myindiv,
-                                w=myw, Sigma_xi=cov(tim), n_perm = 10)
+                                w=myw, Sigma_xi=cov(tim), n_perm = 10,
+                                parallel_comp = FALSE)
 score_homogen$score
 
 score_heterogen <- vc_score_perm(y, x, phi=tim, indiv=myindiv,
-                           w=myw, Sigma_xi=cov(tim), n_perm = 10)
+                           w=myw, Sigma_xi=cov(tim), n_perm = 10,
+                           parallel_comp = FALSE)
 score_heterogen$score
 
 scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),

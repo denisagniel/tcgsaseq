@@ -43,6 +43,18 @@
 #'Default is \code{"permutation"}.
 #'
 #'@param n_perm the number of perturbations. Default is \code{1000}.
+
+#'@param progressbar logical indicating wether a progressBar should be displayed
+#'when computing permutations (only in interactive mode).
+#'
+#'@param parallel_comp a logical flag indicating whether parallel computation
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{TRUE}.
+#'
+#'@param nb_cores an integer indicating the number of cores to be used when
+#'\code{parallel_comp} is \code{TRUE}.
+#'Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{parallel::detectCores() - 1}.
 #'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -167,7 +179,7 @@
 #'\dontrun{
 #'res_genes <- tcgsa_seq(y, x, phi=t, genesets=NULL,
 #'                       Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr), which_test="permutation",
-#'                       which_weights="none", preprocessed=TRUE, n_perm=1000)
+#'                       which_weights="none", preprocessed=TRUE, n_perm=1000, parallel_comp = FALSE)
 #'
 #'mean(res_genes$pvals$rawPval < 0.05)
 #'summary(res_genes$pvals$FDR)
@@ -179,7 +191,8 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       Sigma_xi = diag(ncol(phi)),
                       which_test = c("permutation", "asymptotic"),
                       which_weights = c("loclin", "voom", "none"),
-                      n_perm = 1000,
+                      n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
+                      nb_cores = parallel::detectCores() - 1,
                       preprocessed = FALSE, doPlot = TRUE, gene_based_weights = TRUE,
                       bw = "nrd",
                       kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
@@ -317,7 +330,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
       perm_result <- vc_test_perm(y = y_lcpm_res, x = x_res, indiv = indiv, phi = phi,
                                   w = w, Sigma_xi = Sigma_xi,
-                                  n_perm=n_perm, genewise_pvals = TRUE, homogen_traj = homogen_traj,
+                                  n_perm=n_perm, progressbar = progressbar,
+                                  parallel_comp = parallel_comp, nb_cores = nb_cores,
+                                  genewise_pvals = TRUE, homogen_traj = homogen_traj,
                                   na.rm = na.rm_tcgsaseq)
       rawPvals <- perm_result$gene_pvals
       }
@@ -385,7 +400,9 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
         }else{
           vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv, phi = phi,
                        w = w[gs, , drop=FALSE], Sigma_xi = Sigma_xi,
-                       n_perm=n_perm, genewise_pvals = FALSE, homogen_traj = homogen_traj,
+                       n_perm = n_perm, progressbar = progressbar,
+                       parallel_comp = parallel_comp, nb_cores = nb_cores,
+                       genewise_pvals = FALSE, homogen_traj = homogen_traj,
                        na.rm = na.rm_tcgsaseq)$set_pval
         }
       }
@@ -415,13 +432,23 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
 
     res_test <- switch(which_test,
-                       asymptotic = vc_test_asym(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
-                                                 w = w[genesets, ], Sigma_xi = Sigma_xi,
-                                                 genewise_pvals = FALSE, homogen_traj = homogen_traj,
+                       asymptotic = vc_test_asym(y = y_lcpm[genesets, ], x = x,
+                                                 indiv = indiv, phi = phi,
+                                                 w = w[genesets, ],
+                                                 Sigma_xi = Sigma_xi,
+                                                 genewise_pvals = FALSE,
+                                                 homogen_traj = homogen_traj,
                                                  na.rm = na.rm_tcgsaseq),
-                       permutation = vc_test_perm(y = y_lcpm[genesets, ], x = x, indiv = indiv, phi = phi,
-                                                  w = w[genesets, ], Sigma_xi = Sigma_xi, n_perm = n_perm,
-                                                  genewise_pvals = FALSE, homogen_traj = homogen_traj,
+                       permutation = vc_test_perm(y = y_lcpm[genesets, ], x = x,
+                                                  indiv = indiv, phi = phi,
+                                                  w = w[genesets, ],
+                                                  Sigma_xi = Sigma_xi,
+                                                  n_perm = n_perm,
+                                                  progressbar = progressbar,
+                                                  parallel_comp = parallel_comp,
+                                                  nb_cores = nb_cores,
+                                                  genewise_pvals = FALSE,
+                                                  homogen_traj = homogen_traj,
                                                   na.rm = na.rm_tcgsaseq)
     )
     pvals <- data.frame("rawPval" = res_test$set_pval, "adjPval" = NA)

@@ -28,6 +28,18 @@
 #'@param na_rm logical: should missing values (including \code{NA} and \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.
 #'
 #'@param n_perm the number of permutation to perform. Default is \code{1000}.
+
+#'@param progressbar logical indicating wether a progressBar should be displayed
+#'when computing permutations (only in interactive mode).
+#'
+#'@param parallel_comp a logical flag indicating whether parallel computation
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{TRUE}.
+#'
+#'@param nb_cores an integer indicating the number of cores to be used when
+#'\code{parallel_comp} is \code{TRUE}.
+#'Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{parallel::detectCores() - 1}.
 #'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{score}: an approximation of the observed set score
@@ -74,11 +86,13 @@
 #'#We only use few permutations (10) to keep example running time low
 #'#Otherwise one can use n_perm = 1000
 #'score_homogen <- vc_score_h_perm(y, x, phi=tim, indiv=myindiv,
-#'                                 w=myw, Sigma_xi=cov(tim), n_perm = 10)
+#'                                 w=myw, Sigma_xi=cov(tim), n_perm = 10,
+#'                                 parallel_comp = FALSE)
 #'score_homogen$score
 #'
 #'score_heterogen <- vc_score_perm(y, x, phi=tim, indiv=myindiv,
-#'                            w=myw, Sigma_xi=cov(tim), n_perm = 10)
+#'                            w=myw, Sigma_xi=cov(tim), n_perm = 10,
+#'                            parallel_comp = FALSE)
 #'score_heterogen$score
 #'
 #'scoreTest_homogen <- vc_test_asym(y, x, phi=tim, indiv=rep(1:nindiv, each=nt),
@@ -92,9 +106,14 @@
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
 #'@importFrom CompQuadForm davies
+#'@importFrom pbapply pbsapply
+#'@importFrom parallel mclapply
 #'
 #'@export
-vc_score_h_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE, n_perm = 1000) {
+vc_score_h_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
+                            na_rm = FALSE, n_perm = 1000, progressbar = TRUE,
+                            parallel_comp = TRUE,
+                            nb_cores = parallel::detectCores() - 1) {
 
   ## validity checks
   if(sum(!is.finite(w))>0){
@@ -214,7 +233,21 @@ vc_score_h_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_
   }
 
   perm_list <- c(list(1:n), lapply(1:n_perm, function(x){as.numeric(unlist(lapply(split(x = as.character(1:n), f = indiv), FUN=sample)))}))
-  gene_Q <- sapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+  if(!parallel_comp){
+    if(progressbar){
+      gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+    }else{
+      gene_Q <- sapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+    }
+  }else{
+    if(progressbar){
+      gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                  cl = nb_cores)
+    }else{
+      gene_Q <- simplify2array(parallel::mclapply(X = perm_list, FUN = compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                                  mc.cores = nb_cores))
+    }
+  }
   QQ <- colSums(gene_Q)
 
   return(list("score" = QQ[1], "scores_perm" = QQ[-1],
