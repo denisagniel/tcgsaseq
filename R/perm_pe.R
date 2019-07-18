@@ -22,11 +22,12 @@ perm_pe <- function(nperm_supobs, nperm_eff, total_possible_nperm){
 
   # (slightly) adapted from the implementation by Belinda Phipson and Gordon Smyth from the R package statmod
 
-  z <- statmod::gauss.quad.prob(n = 128, l = 0, u = 0.5/total_possible_nperm)
+  nbnodes_quad <- 128
+  z <- statmod::gauss.quad.prob(n = nbnodes_quad, l = 0, u = 0.5/total_possible_nperm)
   npvals <- length(nperm_supobs)
   prob <- rep(z$nodes, npvals)
-  x2 <- rep(nperm_supobs, each = 128)
-  Y <- matrix(data = stats::pbinom(x2, prob = prob, size = nperm_eff), nrow = 128,ncol = npvals)
+  x2 <- rep(nperm_supobs, each = nbnodes_quad)
+  Y <- matrix(data = stats::pbinom(x2, prob = prob, size = nperm_eff), nrow = nbnodes_quad, ncol = npvals)
   int <- 0.5/total_possible_nperm * colSums(z$weights * Y)
 
   pe <- (nperm_supobs + 1)/(nperm_eff + 1) - int
