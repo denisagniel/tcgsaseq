@@ -12,7 +12,7 @@ tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
   "epanechnikov", "rectangular", "triangular", "biweight", "tricube",
   "cosine", "optcosine"), exact = FALSE, transform = FALSE,
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel",
-  "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
+  "bonferroni"), lowess_span = 0.5, R = NULL, homogen_traj = FALSE,
   na.rm_tcgsaseq = TRUE, verbose = TRUE)
 }
 \arguments{
@@ -99,6 +99,9 @@ Other possibilities are: \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 the proportion of points in the plot which influence the smooth at each value.
 Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
 Default is \code{0.5}.}
+
+\item{R}{library.size (optional, important to provide if \code{preprocessed = TRUE}).
+Default is \code{NULL}}
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be considered homogeneous.
 Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.}

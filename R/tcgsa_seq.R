@@ -86,6 +86,9 @@
 #'Larger values give more smoothness. Only used if \code{which_weights} is \code{"voom"}.
 #'Default is \code{0.5}.
 #'
+#'@param R library.size (optional, important to provide if \code{preprocessed = TRUE}).
+#'Default is \code{NULL}
+#'
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
@@ -183,6 +186,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                       exact = FALSE, transform = FALSE,
                       padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                       lowess_span = 0.5,
+                      R = NULL,
                       homogen_traj = FALSE,
                       na.rm_tcgsaseq = TRUE,
                       verbose = TRUE){
@@ -198,6 +202,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   }
 
   if(!preprocessed){
+    R <- colSums(y, na.rm = TRUE)
     y_lcpm <- apply(y, MARGIN=2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
   }else{
     y_lcpm <- y
@@ -255,13 +260,11 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
     }
 
     if(n_perm > N_possible_perms){
-      warning(paste("The number of permutations requested 'n_perm' is larger than the total number of existing permutations", N_possible_perms,
+      warning(paste0("The number of permutations requested 'n_perm' is ", n_perm, "which is larger than the total number of existing permutations ", N_possible_perms,
                  ". Try a lower number for 'n_perm' (currently running with 'nperm=", N_possible_perms, "')."))
       n_perm <- N_possible_perms
     }
   }
-
-
 
   # Computing the weights
   if(which_weights != "none" & verbose){message("Computing the weights... ")}
@@ -273,7 +276,7 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                                    exact = exact, transform = transform, verbose = verbose, na.rm = na.rm_tcgsaseq),
                voom = voom_weights(y = y_lcpm, x = if(weights_phi_condi){cbind(x, phi)}else{x},
                                    preprocessed = TRUE, doPlot = doPlot,
-                                   lowess_span = lowess_span),
+                                   lowess_span = lowess_span, R = R),
                none = matrix(1, ncol=ncol(y_lcpm), nrow=nrow(y_lcpm),
                              dimnames = list(rownames(y_lcpm),
                                              colnames(y_lcpm)
@@ -427,6 +430,6 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
   }
 
   return(list("which_test" = which_test, "preprocessed" = preprocessed, "n_perm" = n_perm,
-              "genesets" = genesets, "pvals" = pvals))
+              "genesets" = genesets, "pvals" = pvals, "w" = w))
 
 }

@@ -21,6 +21,9 @@
 #'the proportion of points in the plot which influence the smooth at each value.
 #'Larger values give more smoothness. Default is \code{0.5}.
 #'
+#'@param R library.size (optional, important to provide if \code{preprocessed = TRUE}).
+#'Default is \code{NULL}
+#'
 #'@return a vector of length \code{n} containing the computed precision weights
 #'
 #'@seealso \code{\link{lowess}}  \code{\link{approxfun}}  \code{\link[limma]{voom}}
@@ -55,7 +58,8 @@
 #'@export
 
 
-voom_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5){
+voom_weights <- function(y, x, preprocessed = FALSE, doPlot = FALSE,
+                         lowess_span = 0.5, R = NULL){
 
   ## dimensions check------
 
@@ -75,7 +79,9 @@ voom_weights <- function(y, x, preprocessed=FALSE, doPlot=FALSE, lowess_span=0.5
   }
 
   # library size
-  R <- colSums(y, na.rm = TRUE)
+  if(is.null(R)){
+    R <- colSums(y, na.rm = TRUE)
+  }
 
   # fitting OLS to the lcpm
   B_ols <- solve(t(x)%*%x)%*%t(x)%*%y_lcpm
