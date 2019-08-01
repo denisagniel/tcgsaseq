@@ -131,14 +131,14 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   mu <- xphi%*%B_ols
 
   sq_err <- (y_lcpm - mu)^2
+  lse <- log(sq_err)
   v <- colMeans(sq_err, na.rm = na.rm)
-  mu_avg <- colMeans(mu, na.rm = na.rm)
+  mu_avg <- colMeans(y_lcpm, na.rm = na.rm)
 
   if (gene_based) {
     mu_x <- mu_avg
   } else {
-    mu_x <- mu
-    mu_x[is.na(y_lcpm)] <- NA
+    mu_x <- y_lcpm
   }
   # transforming if necessary
   if (transform) {
@@ -165,11 +165,11 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }else{
       bw <- switch(bw,
-                   nrd0 = stats::bw.nrd0(as.vector(mu)),
-                   nrd = stats::bw.nrd(as.vector(mu)),
-                   ucv = stats::bw.ucv(as.vector(mu)),
-                   bcv = stats::bw.bcv(as.vector(mu)),
-                   SJ = stats::bw.SJ(as.vector(mu), method = "ste"),
+                   nrd0 = stats::bw.nrd0(as.vector(mu_x)),
+                   nrd = stats::bw.nrd(as.vector(mu_x)),
+                   ucv = stats::bw.ucv(as.vector(mu_x)),
+                   bcv = stats::bw.bcv(as.vector(mu_x)),
+                   SJ = stats::bw.SJ(as.vector(mu_x), method = "ste"),
                    stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
     }
     if(verbose){
@@ -251,7 +251,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
       message("'exact' is TRUE: the computation may take up to a couple minutes...", "\n",
           "Set 'exact = FALSE' for quicker computation of the weights\n")
 
-      weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol = n, nrow = p, byrow = FALSE))
+      weights <- t(matrix(1/unlist(lapply(as.vector(mu_x), w)), ncol = n, nrow = p, byrow = FALSE))
       if(sum(!is.finite(weights))>0){
         warning("At least 1 non finite weight. Try to increase the bandwith")
       }
@@ -270,11 +270,12 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     }else if(sum(is.na(mu_x))>1){
       mu_x <- mu_x[-which(is.na(mu_x))]
       sq_err <- sq_err[-which(is.na(sq_err))]
+      lse <- lse[-which(is.na(lse))]
     }
-    smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err),
+    smth <- KernSmooth::locpoly(x = c(mu_x), y = c(lse),
                                 degree = 2, kernel = kernel, bandwidth = bw)
-    w <- (1/stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = mu, rule = 2)$y)
-    weights <- matrix(w, nrow(mu), ncol(mu))
+    w <- (1/exp(stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = mu_x, rule = 2)$y))
+    weights <- matrix(w, nrow(mu_x), ncol(mu_x))
     if(sum(weights<0)>1){
       stop("negative variance weights estimated: please contact the authors of the package")
     }
@@ -292,9 +293,9 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
       }
       plot_df_lo <- data.frame("lo.x" = mu_avg[o], "lo.y" = kern_fit)
     } else {
-      inds <- sample(1:length(mu), size = 1000)
-      mu_s <- mu[inds]
-      ep_s <- sq_err[inds]
+      inds <- sample(1:length(mu_x), size = 1000)
+      mu_s <- mu_x[inds]
+      ep_s <- lse[inds]
       plot_df <- data.frame("m_o" = mu_s, "v_o" = ep_s)
       plot_df_lo <- data.frame("lo.x" = reverse_trans(smth$x), "lo.y" = smth$y)
     }
@@ -312,7 +313,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     )
     print(ggp)
   }
-
+  # browser()
   colnames(weights) <- colnames(y_lcpm)
   rownames(weights) <- rownames(y_lcpm)
 
