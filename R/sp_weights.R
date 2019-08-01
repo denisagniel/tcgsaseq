@@ -274,7 +274,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     }
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(lse),
                                 degree = 2, kernel = kernel, bandwidth = bw)
-    w <- (1/exp(stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = mu_x, rule = 2)$y))
+    w <- (1/exp(stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = reverse_trans(mu_x), rule = 2)$y))
     weights <- matrix(w, nrow(mu_x), ncol(mu_x))
     if(sum(weights<0)>1){
       stop("negative variance weights estimated: please contact the authors of the package")
