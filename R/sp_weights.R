@@ -294,7 +294,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
       plot_df_lo <- data.frame("lo.x" = mu_avg[o], "lo.y" = kern_fit)
     } else {
       inds <- sample(1:length(mu_x), size = 1000)
-      mu_s <- mu_x[inds]
+      mu_s <- reverse_trans(mu_x)[inds]
       ep_s <- lse[inds]
       plot_df <- data.frame("m_o" = mu_s, "v_o" = ep_s)
       plot_df_lo <- data.frame("lo.x" = reverse_trans(smth$x), "lo.y" = smth$y)
