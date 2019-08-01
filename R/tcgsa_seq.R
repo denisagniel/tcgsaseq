@@ -214,6 +214,15 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
                   "\nIf you don't want to ignore those NA/NaN values, set the 'na.rm_tcgsaseq' argument to 'FALSE' (this may lead to errors).\n!!!!!\n"))
   }
 
+  # checking for 0 variance genes
+  v_g <- apply(X = y, MARGIN = 1, FUN = stats::var)
+  if(sum(v_g==0) > 0){
+    warning(paste0("Removing ", sum(v_g==0), " genes with 0 variance from the testing procedure.\n",
+                   "  Those genes should probably have been removed beforehand..."))
+    y <- y[v_g>0, ]
+  }
+
+  # normalization if needed
   if(!preprocessed){
     R <- colSums(y, na.rm = TRUE)
     y_lcpm <- apply(y, MARGIN=2, function(v){log2((v+0.5)/(sum(v)+1)*10^6)})
