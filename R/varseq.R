@@ -80,7 +80,7 @@
 #'@param transform a logical flag used for \code{"loclin"} weights, indicating whether values should be
 #'transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
 #'observations are sparse and the specified bandwidth gives suboptimal performance there.
-#'Default is \code{FALSE}.
+#'Default is \code{TRUE}.
 #'
 #'@param padjust_methods multiple testing correction method used if \code{genesets}
 #'is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for controlling the FDR.
@@ -176,7 +176,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
                    bw = "nrd",
                    kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight", "tricube", "cosine", "optcosine"),
-                   exact = FALSE, transform = FALSE,
+                   exact = FALSE, transform = TRUE,
                    padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                    lowess_span = 0.5,
                    na.rm_varseq = TRUE,
