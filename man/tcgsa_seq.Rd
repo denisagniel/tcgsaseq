@@ -12,8 +12,8 @@ tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
   doPlot = TRUE, gene_based_weights = TRUE, bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
   "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  transform = FALSE, padjust_methods = c("BH", "BY", "holm",
-  "hochberg", "hommel", "bonferroni"), lowess_span = 0.5, R = NULL,
+  transform = TRUE, padjust_methods = c("BH", "BY", "holm", "hochberg",
+  "hommel", "bonferroni"), lowess_span = 0.5, R = NULL,
   homogen_traj = FALSE, na.rm_tcgsaseq = TRUE, verbose = TRUE)
 }
 \arguments{
@@ -101,7 +101,7 @@ variance. Default is \code{FALSE}, which uses interpolation (faster computation)
 \item{transform}{a logical flag used for \code{"loclin"} weights, indicating whether values should be
 transformed to uniform for the purpose of local linear smoothing. This may be helpful if tail
 observations are sparse and the specified bandwidth gives suboptimal performance there.
-Default is \code{FALSE}.}
+Default is \code{TRUE}.}
 
 \item{padjust_methods}{multiple testing correction method used if \code{genesets}
 is a list. Default is "BH", i.e. Benjamini-Hochberg procedure for controlling the FDR.

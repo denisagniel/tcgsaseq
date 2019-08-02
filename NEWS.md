@@ -1,10 +1,10 @@
 # News about the `tcgsaseq` R package
 
-### Main changes in Version 2.0.0 (2018-08-02):
+### Main changes in Version 2.0.0 (2019-08-02):
  * `transform = TRUE` is now the default
  * `loc-lin` weights are now computed on unconditional (transformed) counts. They should be more robust this way to outlier genes
 
-### Main changes in Version 1.9.0 (2018-07-18):
+### Main changes in Version 1.9.0 (2019-07-18):
  * (partial) parallel support for permutations
  * progressbar for permutations in interactive mode
  * bug fix for `voom`-like weights
