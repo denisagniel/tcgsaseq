@@ -228,6 +228,7 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
                                                   mc.cores = nb_cores))
     }
   }
+  rownames(gene_Q) <- colnames(yt_mu)
   QQ <- colSums(gene_Q)
 
   return(list("score" = QQ[1], "scores_perm" = QQ[-1],

@@ -137,6 +137,7 @@ vc_test_perm <- function(y, x, indiv = rep(1,nrow(x)), phi, w, Sigma_xi = diag(n
     #pvals_naive <- nperm_sup_obs/n_perm
     #pvals_u <- (nperm_sup_obs + 1)/(n_perm +1)
     pvals_e <- perm_pe(nperm_sup_obs, nperm_eff = n_perm, total_possible_nperm = N_possible_perms)
+    names(pvals_e) <- names(gene_scores_obs)
 
     ans <- list("gene_scores_obs" = gene_scores_obs, "gene_pvals" = pvals_e)
   }else{
