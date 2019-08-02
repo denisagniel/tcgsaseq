@@ -293,27 +293,41 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
       }
       plot_df_lo <- data.frame("lo.x" = mu_avg[o], "lo.y" = kern_fit)
     } else {
-      inds <- sample(1:length(mu_x), size = 1000)
+      grid <- seq(from=min(mu_x), to= max(mu_x), length.out = 20)
+      n_mu_x <- length(mu_x)
+      inds <- list()
+      for (i in 2:length(grid)){
+        possibles <- which(mu_x>=grid[i-1] & mu_x<=grid[i])
+        n.points <- max(2000, min(length(possibles)/20, 5000))
+        if(length(possibles)<n.points){
+          n.points <- length(possibles)
+        }
+        inds[[i]] <- sample(possibles, size = n.points)
+      }
+      inds <- unique(unlist(inds))
+      #inds <- mu_x#sample(1:length(mu_x), size = 1000)
       mu_s <- reverse_trans(mu_x)[inds]
       ep_s <- lse[inds]
       plot_df <- data.frame("m_o" = mu_s, "v_o" = ep_s)
       plot_df_lo <- data.frame("lo.x" = reverse_trans(smth$x), "lo.y" = smth$y)
     }
 
-
     #plot_df_lo_temp <- data.frame("lo.x" = mu_avg[o], "lo.y" = f_interp(mu_avg[o]))
-    ggp <- (ggplot(data = plot_df)
-            + geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.45, color = "grey25", size = 0.5)
-            + theme_bw()
-            + xlab("Conditional mean")
-            + ylab("Variance")
-            + ggtitle("Mean-variance local regression non-parametric fit")
-            + geom_line(data = plot_df_lo, aes_string(x = "lo.x", y = "lo.y"), color = "blue", lwd = 1.4, lty = "solid", alpha = 0.8)
+    ggp <- (ggplot(data = plot_df) +
+            geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.4, color = "grey25", size = 0.6) +
+            theme_bw() +
+            ylim(range(lse)) +
+            xlim(range(reverse_trans(mu_x))) +
+            xlab("Observed (transformed) counts") +
+            ylab("log squared-error") +
+            ggtitle("Mean-variance local regression non-parametric fit",
+                    subtitle = paste(length(inds), "subsampled points")) +
+            geom_line(data = plot_df_lo, aes_string(x = "lo.x", y = "lo.y"), color = "blue", lwd = 1.4, lty = "solid", alpha = 0.5)
             #+ geom_line(data = plot_df_lo_temp, aes(x = lo.x, y = lo.y), color = "red", lwd = 1, lty = 2)
     )
     print(ggp)
   }
-  # browser()
+
   colnames(weights) <- colnames(y_lcpm)
   rownames(weights) <- rownames(y_lcpm)
 
