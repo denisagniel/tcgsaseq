@@ -145,8 +145,14 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
       }
     }
     dv <- CompQuadForm::davies(score_list$score, lam)
-    if(dv$ifault == 1){#error
-      stop("fault in the computation from CompQuadForm::davies", dv$trace)
+    if(dv$ifault == 1){# accuracy error
+      dv <- CompQuadForm::davies(score_list$score, lam, acc = 0.001)
+      if(dv$ifault == 1){
+        stop("fault in the computation from CompQuadForm::davies", dv$trace)
+      }
+    }
+    if(dv$ifault > 1){# other error
+        stop("fault in the computation from CompQuadForm::davies\n", dv$trace)
     }
     ans <- list("set_score_obs" = score_list$score, "set_pval" = dv$Qq)
   }

@@ -32,7 +32,7 @@ weights computation should be conditional on both the variable(s) to be tested
 \code{phi} and on covariate(s) \code{x}, or on \code{x} alone. #'Default is \code{TRUE}
 in which case conditional means are estimated conditionally on both \code{x} and \code{phi}.}
 
-\item{genesets}{either a vector of index or subscripts that defines which columns of \code{y}
+\item{genesets}{either a vector of index or subscripts that defines which rows of \code{y}
 constitute the investigated gene set (when only 1 gene set is being tested).
 Can also be a \code{list} of index (or \code{rownames} of \code{y}) when several
 gene sets are tested at once, such as the first element of a
