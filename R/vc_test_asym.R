@@ -144,7 +144,20 @@ vc_test_asym <- function(y, x, indiv=rep(1,nrow(x)), phi, w, Sigma_xi = diag(nco
         stop("Error in svd decomposition")
       }
     }
-    dv <- CompQuadForm::davies(score_list$score, lam)
+    acc=0.0001 #default value
+    dv <- CompQuadForm::davies(score_list$score, lam,acc=acc)
+    
+    comp=1 #reducing the acc value if the calculated pvalue is negative
+    while ((dv$Qq<=0 | dv$Qq==1) & comp<10){
+      acc=acc/2
+      dv <- CompQuadForm::davies(score_list$score, lam,acc=acc) 
+      comp=comp+1
+    }
+    if (dv$Qq<0){
+      dv$Qq=0
+      message("accuracy in davies at 1.5*10^(-7) still giving <0 probability, probability set to 0")
+    }
+    
     if(dv$ifault == 1){# accuracy error
       dv <- CompQuadForm::davies(score_list$score, lam, acc = 0.001)
       if(dv$ifault == 1){
