@@ -402,8 +402,8 @@ tcgsa_seq <- function(y, x, phi, weights_phi_condi = TRUE,
       x_res <- matrix(1, nrow=nrow(x), ncol=1)
       rawPvals <- sapply(seq_along(genesets), FUN = function(i_gs){
         gs <- genesets[[i_gs]]
-        e <- try(y_lcpm[gs, 1], silent = TRUE)
-        if(inherits(e, "try-error")){
+        e <- try(y_lcpm[gs, 1, drop = FALSE], silent = TRUE)
+        if(inherits(e, "try-error") | length(e) < 1){
           warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
           NA
         }else{
