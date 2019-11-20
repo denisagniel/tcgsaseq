@@ -289,13 +289,15 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
             mu_x <- mu_x[-which(is.na(mu_x))]
             sq_err <- sq_err[-which(is.na(sq_err))]
         }
-        smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err), degree = 1,
+        smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err), degree = 2,
                                     kernel = kernel, bandwidth = bw)
-        w <- (1/stats::approx(reverse_trans(smth$x), smth$y, xout = mu,
+        w <- (1/stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = mu,
                               rule = 2)$y)
         weights <- matrix(w, nrow(mu), ncol(mu))
     }
-
+    if(sum(weights<0)>1){
+        stop("negative variance weights estimated: please contact the authors of the package")
+    }
 
     if (doPlot) {
         if (gene_based) {
