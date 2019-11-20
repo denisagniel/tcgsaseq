@@ -196,10 +196,9 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
         return(rowSums(matrix(qq, ncol = K)))  # genewise scores
     }
 
-    perm_list <- c(list(seq_len(n)), lapply(seq_len(n_perm), function(x) {
-        as.numeric(unlist(lapply(split(x = as.character(seq_len(n)), f = indiv),
-            FUN = sample)))
-    }))
+    o <- order(as.numeric(unlist(split(x = as.character(1:n), f = indiv))))
+    perm_list <- c(list(1:n), lapply(1:n_perm, function(x){as.numeric(unlist(lapply(split(x = as.character(1:n), f = indiv), FUN=sample)))[o]}))
+
     gene_Q <- vapply(perm_list, compute_genewise_scores,
                      FUN.VALUE = rep(1.1, g),
                      indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
