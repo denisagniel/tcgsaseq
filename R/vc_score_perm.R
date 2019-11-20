@@ -215,16 +215,20 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
 
   if(!parallel_comp){
     if(progressbar){
-      gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+      gene_Q <- pbapply::pbsapply(X = perm_list, FUN = compute_genewise_scores,
+                                  indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
     }else{
-      gene_Q <- sapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+      gene_Q <- sapply(X = perm_list, FUN = compute_genewise_scores,
+                       indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
     }
   }else{
     if(progressbar){
-      gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+      gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
+                                  indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
                                   cl = nb_cores)
     }else{
-      gene_Q <- simplify2array(parallel::mclapply(X = perm_list, FUN = compute_genewise_scores, indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+      gene_Q <- simplify2array(parallel::mclapply(X = perm_list, FUN = compute_genewise_scores,
+                                                  indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
                                                   mc.cores = nb_cores))
     }
   }

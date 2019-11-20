@@ -133,12 +133,13 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   sq_err <- (y_lcpm - mu)^2
   lse <- log(sq_err)
   v <- colMeans(sq_err, na.rm = na.rm)
-  mu_avg <- colMeans(y_lcpm, na.rm = na.rm)
+  mu_avg <- colMeans(mu, na.rm = na.rm)
 
   if (gene_based) {
     mu_x <- mu_avg
   } else {
-    mu_x <- y_lcpm
+    mu_x <- mu
+    mu_x[is.na(y_lcpm)] <- NA
   }
   # transforming if necessary
   if (transform) {
@@ -185,6 +186,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   }
 
 
+  # choose kernel
   if(kernel == "gaussian"){
     kern_func <- function(x, bw){
       stats::dnorm(x, sd = bw)
@@ -234,6 +236,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
   }
 
 
+  # compute the weights
   if(gene_based){
 
     w <- function(x){
@@ -274,7 +277,8 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
     }
     smth <- KernSmooth::locpoly(x = c(mu_x), y = c(lse),
                                 degree = 2, kernel = kernel, bandwidth = bw)
-    w <- (1/exp(stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = reverse_trans(mu_x), rule = 2)$y))
+    w <- (1/exp(stats::approx(x = reverse_trans(smth$x), y = smth$y,
+                              xout = reverse_trans(mu_x), rule = 2)$y))
     weights <- matrix(w, nrow(mu_x), ncol(mu_x))
     if(sum(weights<0)>1){
       stop("negative variance weights estimated: please contact the authors of the package")
