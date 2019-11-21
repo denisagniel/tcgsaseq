@@ -145,11 +145,15 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         #pvals_u <- (nperm_sup_obs + 1)/(n_perm +1)
         pvals_e <- perm_pe(nperm_sup_obs, nperm_eff = n_perm,
                            total_possible_nperm = N_possible_perms)
+        names(pvals_e) <- names(gene_scores_obs)
+
         ans <- list(gene_scores_obs = gene_scores_obs, gene_pvals = pvals_e)
     } else {
         pvals_u <- (sum(score_list_res$scores_perm >=
                             score_list_res$score) + 1)/(n_perm + 1)
+
         ans <- list(set_score_obs = score_list_res$score, set_pval = pvals_u)
 
     }
+    return(ans)
 }
