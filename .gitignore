@@ -4,6 +4,8 @@
 .Ruserdata
 .Rapp.history
 
+*.Rproj
+
 .DS_Store
 inst/doc
 
