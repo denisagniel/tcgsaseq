@@ -143,6 +143,7 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
     mu <- xphi %*% B_ols
 
     sq_err <- (y_lcpm - mu)^2
+    lse <- log(sq_err)
     v <- colMeans(sq_err, na.rm = na.rm)
     mu_avg <- colMeans(mu, na.rm = na.rm)
 
@@ -171,21 +172,13 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         if (N < 2) {
             stop("need at least 2 points to select a bandwidth automatically")
         }
-        if (!exact & gene_based) {
+        if (!exact) {
             bw <- switch(bw,
-                         nrd0 = stats::bw.nrd0(as.vector(mu_avg)),
-                         nrd = stats::bw.nrd(as.vector(mu_avg)),
-                         ucv = stats::bw.ucv(as.vector(mu_avg)),
-                         bcv = stats::bw.bcv(as.vector(mu_avg)),
-                         SJ = stats::bw.SJ(as.vector(mu_avg), method = "ste"),
-                         stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
-        } else {
-            bw <- switch(bw,
-                         nrd0 = stats::bw.nrd0(as.vector(mu)),
-                         nrd = stats::bw.nrd(as.vector(mu)),
-                         ucv = stats::bw.ucv(as.vector(mu)),
-                         bcv = stats::bw.bcv(as.vector(mu)),
-                         SJ = stats::bw.SJ(as.vector(mu), method = "ste"),
+                         nrd0 = stats::bw.nrd0(as.vector(mu_x)),
+                         nrd = stats::bw.nrd(as.vector(mu_x)),
+                         ucv = stats::bw.ucv(as.vector(mu_x)),
+                         bcv = stats::bw.bcv(as.vector(mu_x)),
+                         SJ = stats::bw.SJ(as.vector(mu_x), method = "ste"),
                          stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
         }
         if (verbose) {
@@ -200,7 +193,7 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         stop("'bw' is not positive")
     }
 
-
+    # choose kernel ----
     if (kernel == "gaussian") {
         kern_func <- function(x, bw) {
             stats::dnorm(x, sd = bw)
@@ -265,9 +258,9 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         if (exact) {
 
             message("'exact' is TRUE: the computation may take up to a couple minutes...",
-                "\n", "Set 'exact = FALSE' for quicker computation of the weights\n")
+                    "\n", "Set 'exact = FALSE' for quicker computation of the weights\n")
 
-            weights <- t(matrix(1/unlist(lapply(as.vector(mu), w)), ncol = n,
+            weights <- t(matrix(1/unlist(lapply(as.vector(mu_x), w)), ncol = n,
                                 nrow = p, byrow = FALSE))
             if (sum(!is.finite(weights)) > 0) {
                 warning("At least 1 non finite weight. Try to increase the bandwith")
@@ -288,12 +281,14 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         } else if (sum(is.na(mu_x)) > 1) {
             mu_x <- mu_x[-which(is.na(mu_x))]
             sq_err <- sq_err[-which(is.na(sq_err))]
+            lse <- lse[-which(is.na(lse))]
         }
-        smth <- KernSmooth::locpoly(x = c(mu_x), y = c(sq_err), degree = 2,
+        smth <- KernSmooth::locpoly(x = c(mu_x), y = c(lse), degree = 2,
                                     kernel = kernel, bandwidth = bw)
-        w <- (1/stats::approx(x = reverse_trans(smth$x), y = smth$y, xout = mu,
-                              rule = 2)$y)
-        weights <- matrix(w, nrow(mu), ncol(mu))
+        w <- (1/exp(stats::approx(x = reverse_trans(smth$x), y = smth$y,
+                                  xout = reverse_trans(mu_x),
+                                  rule = 2)$y))
+        weights <- matrix(w, nrow(mu_x), ncol(mu_x))
     }
     if(sum(weights<0)>1){
         stop("negative variance weights estimated: please contact the authors of the package")
@@ -310,9 +305,20 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
             }
             plot_df_lo <- data.frame(lo.x = mu_avg[o], lo.y = kern_fit)
         } else {
-            inds <- sample(seq_along(mu), size = 1000)
-            mu_s <- mu[inds]
-            ep_s <- sq_err[inds]
+            grid <- seq(from=min(mu_x), to= max(mu_x), length.out = 20)
+            n_mu_x <- length(mu_x)
+            inds <- list()
+            for (i in 2:length(grid)){
+                possibles <- which(mu_x>=grid[i-1] & mu_x<=grid[i])
+                n.points <- max(2000, min(length(possibles)/20, 5000))
+                if(length(possibles)<n.points){
+                    n.points <- length(possibles)
+                }
+                inds[[i]] <- sample(possibles, size = n.points)
+            }
+            inds <- unique(unlist(inds))
+            mu_s <- reverse_trans(mu_x)[inds]
+            ep_s <- lse[inds]
             plot_df <- data.frame(m_o = mu_s, v_o = ep_s)
             plot_df_lo <- data.frame(lo.x = reverse_trans(smth$x),
                                      lo.y = smth$y)
@@ -322,20 +328,17 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         ## plot_df_lo_temp <- data.frame('lo.x' = mu_avg[o],
         ##                               'lo.y' = f_interp(mu_avg[o]))
         ggp <- (ggplot(data = plot_df) +
-                  geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.45,
-                             color = "grey25", size = 0.5) +
-                  theme_bw() +
-                  xlab("Conditional mean") +
-                  ylab("Variance") +
-                  ggtitle("Mean-variance local regression
-                          non-parametric fit") +
-                  geom_line(data = plot_df_lo, aes_string(x = "lo.x",
-                                                          y = "lo.y"),
-                            color = "blue", lwd = 1.4, lty = "solid",
-                            alpha = 0.8)
-                )
-        ## geom_line(data = plot_df_lo_temp, aes(x = lo.x, y = lo.y),
-        ##           color = 'red', lwd = 1, lty = 2)
+                    geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.4, color = "grey25", size = 0.6) +
+                    theme_bw() +
+                    ylim(range(lse)) +
+                    xlim(range(reverse_trans(mu_x))) +
+                    xlab("Observed (transformed) counts") +
+                    ylab("log squared-error") +
+                    ggtitle("Mean-variance local regression non-parametric fit",
+                            subtitle = paste(length(inds), "subsampled points")) +
+                    geom_line(data = plot_df_lo, aes_string(x = "lo.x", y = "lo.y"), color = "blue", lwd = 1.4, lty = "solid", alpha = 0.5)
+                #+ geom_line(data = plot_df_lo_temp, aes(x = lo.x, y = lo.y), color = "red", lwd = 1, lty = 2)
+        )
         print(ggp)
     }
 
