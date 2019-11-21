@@ -12,7 +12,10 @@ vc_score_perm(
   w,
   Sigma_xi = diag(ncol(phi)),
   na_rm = FALSE,
-  n_perm = 1000
+  n_perm = 1000,
+  progressbar = TRUE,
+  parallel_comp = TRUE,
+  nb_cores = parallel::detectCores() - 1
 )
 }
 \arguments{
@@ -39,6 +42,18 @@ of the \code{K} random effects on \code{phi}}
 \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 
 \item{n_perm}{the number of permutation to perform. Default is \code{1000}.}
+
+\item{progressbar}{logical indicating wether a progressBar should be displayed
+when computing permutations (only in interactive mode).}
+
+\item{parallel_comp}{a logical flag indicating whether parallel computation
+should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{TRUE}.}
+
+\item{nb_cores}{an integer indicating the number of cores to be used when
+\code{parallel_comp} is \code{TRUE}.
+Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{parallel::detectCores() - 1}.}
 }
 \value{
 A list with the following elements:\itemize{
@@ -79,7 +94,8 @@ x <- matrix(1, ncol=1, nrow=r)
 #run test
 scoreTest <- vc_score_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y),
                                                 nrow=nrow(y)),
-                    Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3))
+                    Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3),
+                    parallel_comp = FALSE)
 scoreTest$score
 
 }

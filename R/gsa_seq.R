@@ -49,6 +49,18 @@
 #'
 #'@param n_perm the number of perturbations. Default is \code{1000}.
 #'
+#'@param progressbar logical indicating wether a progressBar should be displayed
+#'when computing permutations (only in interactive mode).
+#'
+#'@param parallel_comp a logical flag indicating whether parallel computation
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{TRUE}.
+#'
+#'@param nb_cores an integer indicating the number of cores to be used when
+#'\code{parallel_comp} is \code{TRUE}.
+#'Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{parallel::detectCores() - 1}.
+#'
 #'@param preprocessed a logical flag indicating whether the expression data have
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 #'which case \code{y} is assumed to contain raw counts and is normalized into
@@ -188,11 +200,12 @@
 #'#plot(density(unlist(res_quant)))
 #'#mean(unlist(res_quant)<0.05)
 #'
-#'\dontrun{
+#'if(interactive()){
 #'res_genes <- gsa_seq(y, x, phi=t, genesets=NULL,
 #'                       Sigma_xi=matrix(1), indiv=rep(1:(r/nr), each=nr),
 #'                       which_test='permutation',
-#'                       which_weights='none', preprocessed=TRUE, n_perm=1000)
+#'                       which_weights='none', preprocessed=TRUE, n_perm=1000,
+#'                       parallel_comp=FALSE)
 #'
 #'mean(res_genes$pvals$rawPval < 0.05)
 #'summary(res_genes$pvals$adjPval)
@@ -207,7 +220,8 @@ gsa_seq <- function(y,
                     Sigma_xi = diag(ncol(phi)),
                     which_test = c("permutation", "asymptotic"),
                     which_weights = c("loclin", "voom", "none"),
-                    n_perm = 1000,
+                    n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
+                    nb_cores = parallel::detectCores() - 1,
                     preprocessed = FALSE,
                     doPlot = TRUE,
                     gene_based_weights = TRUE,
@@ -366,6 +380,9 @@ gsa_seq <- function(y,
             perm_result <- vc_test_perm(y = y_lcpm_res, x = x_res,
                                         indiv = indiv, phi = phi, w = w,
                                         Sigma_xi = Sigma_xi, n_perm = n_perm,
+                                        progressbar = progressbar,
+                                        parallel_comp = parallel_comp,
+                                        nb_cores = nb_cores,
                                         genewise_pvals = TRUE,
                                         homogen_traj = homogen_traj,
                                         na.rm = na.rm_gsaseq)
@@ -444,6 +461,9 @@ gsa_seq <- function(y,
                     vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv,
                                  phi = phi, w = w[gs, , drop = FALSE],
                                  Sigma_xi = Sigma_xi, n_perm = n_perm,
+                                 progressbar = progressbar,
+                                 parallel_comp = parallel_comp,
+                                 nb_cores = nb_cores,
                                  genewise_pvals = FALSE,
                                  homogen_traj = homogen_traj,
                                  na.rm = na.rm_gsaseq
@@ -491,6 +511,9 @@ gsa_seq <- function(y,
                                                       w = w[genesets, ],
                                                       Sigma_xi = Sigma_xi,
                                                       n_perm = n_perm,
+                                                      progressbar = progressbar,
+                                                      parallel_comp = parallel_comp,
+                                                      nb_cores = nb_cores,
                                                       genewise_pvals = FALSE,
                                                       homogen_traj = homogen_traj,
                                                       na.rm = na.rm_gsaseq))

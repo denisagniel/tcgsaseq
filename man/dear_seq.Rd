@@ -15,6 +15,9 @@ dear_seq(
   which_test = c("permutation", "asymptotic"),
   which_weights = c("loclin", "voom", "none"),
   n_perm = 1000,
+  progressbar = TRUE,
+  parallel_comp = TRUE,
+  nb_cores = parallel::detectCores() - 1,
   preprocessed = FALSE,
   doPlot = TRUE,
   gene_based_weights = FALSE,
@@ -70,6 +73,18 @@ performed). Default is \code{'loclin'}. See \code{\link{sp_weights}} and
 \code{\link{voom_weights}} for details.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}}
+
+\item{progressbar}{logical indicating wether a progressBar should be displayed
+when computing permutations (only in interactive mode).}
+
+\item{parallel_comp}{a logical flag indicating whether parallel computation
+should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{TRUE}.}
+
+\item{nb_cores}{an integer indicating the number of cores to be used when
+\code{parallel_comp} is \code{TRUE}.
+Only Linux and MacOS are supported, this is ignored on Windows.
+Default is \code{parallel::detectCores() - 1}.}
 
 \item{preprocessed}{a logical flag indicating whether the expression data have
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
@@ -187,7 +202,7 @@ cat(i,'\\n')
 }
 mean(res)
 
-\dontrun{
+if(interactive()){
 b0 <- 1
 b1 <- 0
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
@@ -195,7 +210,7 @@ y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
       matrix(rep(y.tilde, n), ncol=n, nrow=r))
 res_genes <- dear_seq(exprmat=y, covariates=x, variables2test=t,
                    sample_group=rep(1:ni, each=nr),
-                   which_weights='none', preprocessed=TRUE, n_perm=1000)
+                   which_weights='none', preprocessed=TRUE)
 summary(res_genes$pvals)
 }
 }

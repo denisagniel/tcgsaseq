@@ -30,6 +30,18 @@
 #'
 #'@param n_perm the number of permutation to perform. Default is \code{1000}.
 #'
+#'@param progressbar logical indicating wether a progressBar should be displayed
+#'when computing permutations (only in interactive mode).
+#'
+#'@param parallel_comp a logical flag indicating whether parallel computation
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{TRUE}.
+#'
+#'@param nb_cores an integer indicating the number of cores to be used when
+#'\code{parallel_comp} is \code{TRUE}.
+#'Only Linux and MacOS are supported, this is ignored on Windows.
+#'Default is \code{parallel::detectCores() - 1}.
+#'
 #'@return A list with the following elements:\itemize{
 #'   \item \code{score}: an approximation of the observed set score
 #'   \item \code{scores_perm}: a vector containing the permuted set scores
@@ -65,16 +77,21 @@
 #'#run test
 #'scoreTest <- vc_score_perm(y, x, phi=t, w=matrix(1, ncol=ncol(y),
 #'                                                 nrow=nrow(y)),
-#'                     Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3))
+#'                     Sigma_xi=matrix(1), indiv=rep(1:(r/3), each=3),
+#'                     parallel_comp = FALSE)
 #'scoreTest$score
 #'
 #'@importFrom CompQuadForm davies
 #'@importFrom stats model.matrix
+#'@importFrom pbapply pbsapply
+#'@importFrom parallel mclapply
 #'
 #'@export
 vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
                           na_rm = FALSE,
-                          n_perm = 1000) {
+                          n_perm = 1000, progressbar = TRUE,
+                          parallel_comp = TRUE,
+                          nb_cores = parallel::detectCores() - 1) {
     ## validity checks
     if (sum(!is.finite(w)) > 0) {
         stop("At least 1 non-finite weight in 'w'")
@@ -199,9 +216,26 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
     o <- order(as.numeric(unlist(split(x = as.character(1:n), f = indiv))))
     perm_list <- c(list(1:n), lapply(1:n_perm, function(x){as.numeric(unlist(lapply(split(x = as.character(1:n), f = indiv), FUN=sample)))[o]}))
 
-    gene_Q <- vapply(perm_list, compute_genewise_scores,
-                     FUN.VALUE = rep(1.1, g),
-                     indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+    if(!parallel_comp){
+        if(progressbar){
+            gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
+                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+        }else{
+            gene_Q <- vapply(perm_list, compute_genewise_scores,
+                             FUN.VALUE = rep(1.1, g),
+                             indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+        }
+    }else{
+        if(progressbar){
+            gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
+                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                        cl = nb_cores)
+        }else{
+            gene_Q <- simplify2array(parallel::mclapply(X = perm_list, FUN = compute_genewise_scores,
+                                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                                        mc.cores = nb_cores))
+        }
+    }
     QQ <- colSums(gene_Q)
 
     return(list(score = QQ[1], scores_perm = QQ[-1],
