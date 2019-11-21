@@ -16,7 +16,7 @@ sp_weights(
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
     "tricube", "cosine", "optcosine"),
   exact = FALSE,
-  transform = FALSE,
+  transform = TRUE,
   verbose = TRUE,
   na.rm = FALSE
 )
@@ -68,7 +68,7 @@ the variance. Default is \code{FALSE}, which uses interpolation (faster).}
 \item{transform}{a logical flag indicating whether values should be
 transformed to uniform for the purpose of local linear smoothing. This may be
 helpful if tail observations are sparse and the specified bandwidth gives
-suboptimal performance there. Default is \code{FALSE}.}
+suboptimal performance there. Default is \code{TRUE}.}
 
 \item{verbose}{a logical flag indicating whether informative messages are
 printed during the computation. Default is \code{TRUE}.}

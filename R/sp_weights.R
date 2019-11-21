@@ -49,7 +49,7 @@
 #'@param transform a logical flag indicating whether values should be
 #'transformed to uniform for the purpose of local linear smoothing. This may be
 #'helpful if tail observations are sparse and the specified bandwidth gives
-#'suboptimal performance there. Default is \code{FALSE}.
+#'suboptimal performance there. Default is \code{TRUE}.
 #'
 #'@param verbose a logical flag indicating whether informative messages are
 #'printed during the computation. Default is \code{TRUE}.
@@ -88,7 +88,7 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
                        kernel = c("gaussian", "epanechnikov", "rectangular",
                                   "triangular", "biweight", "tricube", "cosine",
                                   "optcosine"),
-                       exact = FALSE, transform = FALSE, verbose = TRUE,
+                       exact = FALSE, transform = TRUE, verbose = TRUE,
                        na.rm = FALSE) {
 
 

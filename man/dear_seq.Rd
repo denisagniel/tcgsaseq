@@ -25,7 +25,7 @@ dear_seq(
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
     "tricube", "cosine", "optcosine"),
   exact = FALSE,
-  transform = FALSE,
+  transform = TRUE,
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
   lowess_span = 0.5,
   R = NULL,
@@ -119,7 +119,7 @@ computation).}
 whether values should be transformed to uniform for the purpose of local
 linear smoothing. This may be helpful if tail observations are sparse and the
 specified bandwidth gives suboptimal performance there. Default is
-\code{FALSE}.}
+\code{TRUE}.}
 
 \item{padjust_methods}{multiple testing correction method used if
 \code{genesets} is a list. Default is 'BH', i.e. Benjamini-Hochberg procedure

@@ -25,7 +25,7 @@ gsa_seq(
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
     "tricube", "cosine", "optcosine"),
   exact = FALSE,
-  transform = FALSE,
+  transform = TRUE,
   padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
   lowess_span = 0.5,
   R = NULL,
@@ -52,7 +52,7 @@ weights computation should be conditional on both the variable(s) to be tested
 both \code{x} and \code{phi}.}
 
 \item{genesets}{either a vector of index or subscripts that defines which
-columns of \code{y} constitute the investigated gene set (when only 1 gene
+rows of \code{y} constitute the investigated gene set (when only 1 gene
 set is being tested).
 Can also be a \code{list} of index (or \code{rownames} of \code{y}) when several
 gene sets are tested at once, such as the first element of a
@@ -127,7 +127,7 @@ computation).}
 whether values should be transformed to uniform for the purpose of local
 linear smoothing. This may be helpful if tail observations are sparse and the
 specified bandwidth gives suboptimal performance there. Default is
-\code{FALSE}.}
+\code{TRUE}.}
 
 \item{padjust_methods}{multiple testing correction method used if
 \code{genesets} is a list. Default is 'BH', i.e. Benjamini-Hochberg procedure
