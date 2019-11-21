@@ -4,8 +4,14 @@
 \alias{voom_weights}
 \title{Precision weights accounting for heteroscedasticity in RNA-seq count data}
 \usage{
-voom_weights(y, x, preprocessed = FALSE, doPlot = FALSE,
-  lowess_span = 0.5)
+voom_weights(
+  y,
+  x,
+  preprocessed = FALSE,
+  doPlot = FALSE,
+  lowess_span = 0.5,
+  R = NULL
+)
 }
 \arguments{
 \item{y}{a matrix of size \code{G x n} containing the raw RNA-seq counts or
@@ -25,6 +31,9 @@ be drawn. Default is \code{FALSE}.}
 \item{lowess_span}{smoother span for the lowess function, between 0 and 1.
 This gives the proportion of points in the plot which influence the smooth at
 each value. Larger values give more smoothness. Default is \code{0.5}.}
+
+\item{R}{library.size (optional, important to provide if \code{preprocessed = TRUE}).
+Default is \code{NULL}}
 }
 \value{
 a vector of length \code{n} containing the computed precision weights

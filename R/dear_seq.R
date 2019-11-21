@@ -89,6 +89,9 @@
 #'each value. Larger values give more smoothness. Only used if
 #'\code{which_weights} is \code{'voom'}. Default is \code{0.5}.
 #'
+#'@param R library.size (optional, important to provide if \code{preprocessed = TRUE}).
+#'Default is \code{NULL}
+#'
 #'@param homogen_traj a logical flag indicating whether trajectories should be
 #'considered homogeneous. Default is \code{FALSE} in which case trajectories
 #'are not only tested for trend, but also for heterogeneity.
@@ -195,8 +198,9 @@ dear_seq <- function(exprmat,
                      padjust_methods = c("BH", "BY", "holm", "hochberg",
                                          "hommel", "bonferroni"),
                      lowess_span = 0.5,
-                     na.rm_dearseq = TRUE,
-                     homogen_traj = FALSE) {
+                     R=NULL,
+                     homogen_traj = FALSE,
+                     na.rm_dearseq = TRUE) {
 
     return(gsa_seq(y = exprmat,
                    x = covariates,
@@ -217,6 +221,7 @@ dear_seq <- function(exprmat,
                    transform = transform,
                    padjust_methods = padjust_methods,
                    lowess_span = lowess_span,
+                   R = R,
                    homogen_traj = homogen_traj,
                    na.rm_gsaseq = na.rm_dearseq,
                    verbose = FALSE))

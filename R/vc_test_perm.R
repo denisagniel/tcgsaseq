@@ -123,11 +123,10 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         gene_scores_obs <- score_list_res$gene_scores_unscaled
         gene_scores_perm <- score_list_res$gene_scores_unscaled_perm
 
-        nprem_supobs <- rowSums(gene_scores_perm >= gene_scores_obs)
-
-        ## pvals_naive <- nprem_supobs/n_perm
-        ## pvals_u <- (nprem_supobs + 1)/(n_perm +1)
-        pvals_e <- perm_pe(nprem_supobs, nperm_eff = n_perm,
+        nperm_sup_obs <- rowSums(gene_scores_perm >= gene_scores_obs)
+        #pvals_naive <- nperm_sup_obs/n_perm
+        #pvals_u <- (nperm_sup_obs + 1)/(n_perm +1)
+        pvals_e <- perm_pe(nperm_sup_obs, nperm_eff = n_perm,
                            total_possible_nperm = N_possible_perms)
         ans <- list(gene_scores_obs = gene_scores_obs, gene_pvals = pvals_e)
     } else {

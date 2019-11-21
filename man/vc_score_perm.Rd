@@ -4,8 +4,16 @@
 \alias{vc_score_perm}
 \title{Computes variance component test statistic and its permuted distribution}
 \usage{
-vc_score_perm(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
-  na_rm = FALSE, n_perm = 1000)
+vc_score_perm(
+  y,
+  x,
+  indiv,
+  phi,
+  w,
+  Sigma_xi = diag(ncol(phi)),
+  na_rm = FALSE,
+  n_perm = 1000
+)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq

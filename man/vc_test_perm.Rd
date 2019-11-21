@@ -4,9 +4,18 @@
 \alias{vc_test_perm}
 \title{Permutation-based variance component test statistic}
 \usage{
-vc_test_perm(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), n_perm = 1000, genewise_pvals = FALSE,
-  homogen_traj = FALSE, na.rm = FALSE)
+vc_test_perm(
+  y,
+  x,
+  indiv = rep(1, nrow(x)),
+  phi,
+  w,
+  Sigma_xi = diag(ncol(phi)),
+  n_perm = 1000,
+  genewise_pvals = FALSE,
+  homogen_traj = FALSE,
+  na.rm = FALSE
+)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{G x n} containing the raw RNA-seq

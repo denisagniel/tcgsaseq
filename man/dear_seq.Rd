@@ -5,17 +5,30 @@
 \title{Differential expression analyis through a variance component testing for
 RNA-seq data analysis}
 \usage{
-dear_seq(exprmat, covariates, variables2test, sample_group = NULL,
+dear_seq(
+  exprmat,
+  covariates,
+  variables2test,
+  sample_group = NULL,
   weights_var2test_condi = TRUE,
   cov_variables2test_eff = diag(ncol(variables2test)),
   which_test = c("permutation", "asymptotic"),
-  which_weights = c("loclin", "voom", "none"), n_perm = 1000,
-  preprocessed = FALSE, doPlot = TRUE, gene_based_weights = FALSE,
-  bw = "nrd", kernel = c("gaussian", "epanechnikov", "rectangular",
-  "triangular", "biweight", "tricube", "cosine", "optcosine"),
-  exact = FALSE, transform = FALSE, padjust_methods = c("BH", "BY",
-  "holm", "hochberg", "hommel", "bonferroni"), lowess_span = 0.5,
-  na.rm_dearseq = TRUE, homogen_traj = FALSE)
+  which_weights = c("loclin", "voom", "none"),
+  n_perm = 1000,
+  preprocessed = FALSE,
+  doPlot = TRUE,
+  gene_based_weights = FALSE,
+  bw = "nrd",
+  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
+    "tricube", "cosine", "optcosine"),
+  exact = FALSE,
+  transform = FALSE,
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+  lowess_span = 0.5,
+  R = NULL,
+  homogen_traj = FALSE,
+  na.rm_dearseq = TRUE
+)
 }
 \arguments{
 \item{exprmat}{a numeric matrix of size \code{G x n} containing the raw
@@ -104,13 +117,16 @@ This gives the proportion of points in the plot which influence the smooth at
 each value. Larger values give more smoothness. Only used if
 \code{which_weights} is \code{'voom'}. Default is \code{0.5}.}
 
-\item{na.rm_dearseq}{logical: should missing values in \code{y} (including
-\code{NA} and \code{NaN}) be omitted from the calculations?
-Default is \code{FALSE}.}
+\item{R}{library.size (optional, important to provide if \code{preprocessed = TRUE}).
+Default is \code{NULL}}
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be
 considered homogeneous. Default is \code{FALSE} in which case trajectories
 are not only tested for trend, but also for heterogeneity.}
+
+\item{na.rm_dearseq}{logical: should missing values in \code{y} (including
+\code{NA} and \code{NaN}) be omitted from the calculations?
+Default is \code{FALSE}.}
 }
 \value{
 A list with the following elements:\itemize{

@@ -4,16 +4,32 @@
 \alias{gsa_seq}
 \title{Time-course Gene Set Analysis}
 \usage{
-gsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
-  Sigma_xi = diag(ncol(phi)), which_test = c("permutation",
-  "asymptotic"), which_weights = c("loclin", "voom", "none"),
-  n_perm = 1000, preprocessed = FALSE, doPlot = TRUE,
-  gene_based_weights = TRUE, bw = "nrd", kernel = c("gaussian",
-  "epanechnikov", "rectangular", "triangular", "biweight", "tricube",
-  "cosine", "optcosine"), exact = FALSE, transform = FALSE,
-  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel",
-  "bonferroni"), lowess_span = 0.5, homogen_traj = FALSE,
-  na.rm_gsaseq = TRUE, verbose = TRUE)
+gsa_seq(
+  y,
+  x,
+  phi,
+  weights_phi_condi = TRUE,
+  genesets,
+  indiv = NULL,
+  Sigma_xi = diag(ncol(phi)),
+  which_test = c("permutation", "asymptotic"),
+  which_weights = c("loclin", "voom", "none"),
+  n_perm = 1000,
+  preprocessed = FALSE,
+  doPlot = TRUE,
+  gene_based_weights = TRUE,
+  bw = "nrd",
+  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
+    "tricube", "cosine", "optcosine"),
+  exact = FALSE,
+  transform = FALSE,
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+  lowess_span = 0.5,
+  R = NULL,
+  homogen_traj = FALSE,
+  na.rm_gsaseq = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq
@@ -108,6 +124,9 @@ for controlling the FDR. Other possibilities are: \code{'holm'},
 This gives the proportion of points in the plot which influence the smooth at
 each value. Larger values give more smoothness. Only used if
 \code{which_weights} is \code{'voom'}. Default is \code{0.5}.}
+
+\item{R}{library size (optional, important to provide if \code{preprocessed = TRUE}).
+Default is \code{NULL}}
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be
 considered homogeneous. Default is \code{FALSE} in which case trajectories are

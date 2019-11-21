@@ -96,6 +96,9 @@
 #'each value. Larger values give more smoothness. Only used if
 #'\code{which_weights} is \code{'voom'}. Default is \code{0.5}.
 #'
+#'@param R library size (optional, important to provide if \code{preprocessed = TRUE}).
+#'Default is \code{NULL}
+#'
 #'@param homogen_traj a logical flag indicating whether trajectories should be
 #'considered homogeneous. Default is \code{FALSE} in which case trajectories are
 #'not only tested for trend, but also for heterogeneity.
@@ -217,6 +220,7 @@ gsa_seq <- function(y,
                     padjust_methods = c("BH", "BY", "holm", "hochberg",
                                         "hommel", "bonferroni"),
                     lowess_span = 0.5,
+                    R=NULL,
                     homogen_traj = FALSE,
                     na.rm_gsaseq = TRUE,
                     verbose = TRUE) {
@@ -228,10 +232,11 @@ gsa_seq <- function(y,
     if (sum(is.na(y)) > 1 & na.rm_gsaseq) {
         warning(paste("\n\n!!!!!\n'y' contains", sum(is.na(y)), "NA values.",
                       "\nCurrently they are ignored in the computations but you should think carefully about where do those NA/NaN come from...",
-            "\nIf you don't want to ignore those NA/NaN values, set the 'na.rm_gsaseq' argument to 'FALSE' (this may lead to errors).\n!!!!!\n"))
+                      "\nIf you don't want to ignore those NA/NaN values, set the 'na.rm_gsaseq' argument to 'FALSE' (this may lead to errors).\n!!!!!\n"))
     }
 
     if (!preprocessed) {
+        R <- colSums(y, na.rm = TRUE)
         y_lcpm <- apply(y, MARGIN = 2, function(v) {
             log2((v + 0.5)/(sum(v) + 1) * 10^6)
         })
@@ -292,9 +297,8 @@ gsa_seq <- function(y,
         }
 
         if (n_perm > N_possible_perms) {
-            warning(paste0("The number of permutations requested 'n_perm' is larger than the total number of existing permutations ",
-                N_possible_perms, ". Try a lower number for 'n_perm' (currently running with 'nperm=",
-                N_possible_perms, "')."))
+            warning(paste0("The number of permutations requested 'n_perm' is ", n_perm, "which is larger than the total number of existing permutations ", N_possible_perms,
+                           ". Try a lower number for 'n_perm' (currently running with 'nperm=", N_possible_perms, "')."))
             n_perm <- N_possible_perms
         }
     }
@@ -314,11 +318,12 @@ gsa_seq <- function(y,
                                     transform = transform, verbose = verbose,
                                     na.rm = na.rm_gsaseq),
                 voom = voom_weights(y = y_lcpm, x = if (weights_phi_condi) {
-                  cbind(x, phi)
+                    cbind(x, phi)
                 } else {
-                  x
+                    x
                 }, preprocessed = TRUE, doPlot = doPlot,
-                lowess_span = lowess_span),
+                lowess_span = lowess_span,
+                R = R),
                 none = matrix(1, ncol = ncol(y_lcpm), nrow = nrow(y_lcpm),
                               dimnames = list(rownames(y_lcpm),
                                               colnames(y_lcpm))))
@@ -338,9 +343,9 @@ gsa_seq <- function(y,
             }
 
             rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = indiv, phi = phi,
-                w = w, Sigma_xi = Sigma_xi, genewise_pvals = TRUE,
-                homogen_traj = homogen_traj,
-                na.rm = na.rm_gsaseq)$gene_pvals
+                                     w = w, Sigma_xi = Sigma_xi, genewise_pvals = TRUE,
+                                     homogen_traj = homogen_traj,
+                                     na.rm = na.rm_gsaseq)$gene_pvals
         } else if (which_test == "permutation") {
             if (is.null(indiv)) {
                 indiv <- rep(1, nrow(x))
@@ -351,10 +356,10 @@ gsa_seq <- function(y,
                 y_lcpm0 <- y_lcpm
                 y_lcpm0[is.na(y_lcpm0)] <- 0
                 y_lcpm_res <- y_lcpm - t(x %*% solve(crossprod(x)) %*% t(x) %*%
-                                           t(y_lcpm0))
+                                             t(y_lcpm0))
             } else {
                 y_lcpm_res <- y_lcpm - t(x %*% solve(crossprod(x)) %*% t(x) %*%
-                                           t(y_lcpm))
+                                             t(y_lcpm))
             }
             rm(y_lcpm0)
             x_res <- matrix(1, nrow = nrow(x), ncol = 1)
@@ -387,7 +392,7 @@ gsa_seq <- function(y,
             if (sum(prop_meas) != length(prop_meas)) {
                 warning("Some transcripts in the investigated gene sets were not measured:\nremoving those transcripts from the gene set definition...")
                 genesets <- lapply(genesets, function(x) {
-                  x[which(x %in% gene_names_measured)]
+                    x[which(x %in% gene_names_measured)]
                 })
             }
         }
@@ -400,16 +405,16 @@ gsa_seq <- function(y,
                 gs <- genesets[[i_gs]]
                 e <- try(y_lcpm[gs, 1, drop = FALSE], silent = TRUE)
                 if (inherits(e, "try-error") | length(e) == 0) {
-                  warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
-                  NA
+                    warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
+                    NA
                 } else {
-                  vc_test_asym(y = y_lcpm[gs, , drop = FALSE], x = x,
-                               indiv = indiv, phi = phi,
-                               w = w[gs, , drop = FALSE], Sigma_xi = Sigma_xi,
-                               genewise_pvals = FALSE,
-                               homogen_traj = homogen_traj,
-                               na.rm = na.rm_gsaseq
-                  )$set_pval
+                    vc_test_asym(y = y_lcpm[gs, , drop = FALSE], x = x,
+                                 indiv = indiv, phi = phi,
+                                 w = w[gs, , drop = FALSE], Sigma_xi = Sigma_xi,
+                                 genewise_pvals = FALSE,
+                                 homogen_traj = homogen_traj,
+                                 na.rm = na.rm_gsaseq
+                    )$set_pval
                 }
             }, FUN.VALUE = 0.5)
         } else if (which_test == "permutation") {
@@ -421,10 +426,10 @@ gsa_seq <- function(y,
                 y_lcpm0 <- y_lcpm
                 y_lcpm0[is.na(y_lcpm0)] <- 0
                 y_lcpm_res <- y_lcpm - t(x %*% solve(crossprod(x)) %*% t(x) %*%
-                                           t(y_lcpm0))
+                                             t(y_lcpm0))
             } else {
                 y_lcpm_res <- y_lcpm - t(x %*% solve(crossprod(x)) %*% t(x) %*%
-                                           t(y_lcpm))
+                                             t(y_lcpm))
             }
             rm(y_lcpm0)
 
@@ -433,16 +438,16 @@ gsa_seq <- function(y,
                 gs <- genesets[[i_gs]]
                 e <- try(y_lcpm[gs, 1], silent = TRUE)
                 if (inherits(e, "try-error")) {
-                  warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
-                  NA
+                    warning(paste("Gene set", i_gs, "contains 0 measured transcript: associated p-value cannot be computed"))
+                    NA
                 } else {
-                  vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv,
-                               phi = phi, w = w[gs, , drop = FALSE],
-                               Sigma_xi = Sigma_xi, n_perm = n_perm,
-                               genewise_pvals = FALSE,
-                               homogen_traj = homogen_traj,
-                               na.rm = na.rm_gsaseq
-                  )$set_pval
+                    vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = indiv,
+                                 phi = phi, w = w[gs, , drop = FALSE],
+                                 Sigma_xi = Sigma_xi, n_perm = n_perm,
+                                 genewise_pvals = FALSE,
+                                 homogen_traj = homogen_traj,
+                                 na.rm = na.rm_gsaseq
+                    )$set_pval
                 }
             }, FUN.VALUE = 0.5)
         }
@@ -495,6 +500,6 @@ gsa_seq <- function(y,
     }
 
     return(list(which_test = which_test, preprocessed = preprocessed,
-                n_perm = n_perm, genesets = genesets, pvals = pvals))
+                n_perm = n_perm, genesets = genesets, pvals = pvals, w=w))
 
 }

@@ -4,11 +4,22 @@
 \alias{sp_weights}
 \title{Non parametric local heteroscedasticity weights}
 \usage{
-sp_weights(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
-  doPlot = FALSE, gene_based = FALSE, bw = c("nrd", "ucv", "SJ",
-  "nrd0", "bcv"), kernel = c("gaussian", "epanechnikov", "rectangular",
-  "triangular", "biweight", "tricube", "cosine", "optcosine"),
-  exact = FALSE, transform = FALSE, verbose = TRUE, na.rm = FALSE)
+sp_weights(
+  y,
+  x,
+  phi = NULL,
+  use_phi = TRUE,
+  preprocessed = FALSE,
+  doPlot = FALSE,
+  gene_based = FALSE,
+  bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
+  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
+    "tricube", "cosine", "optcosine"),
+  exact = FALSE,
+  transform = FALSE,
+  verbose = TRUE,
+  na.rm = FALSE
+)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq
