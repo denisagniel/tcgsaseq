@@ -173,7 +173,7 @@
 #'mean(res_genes$pvals[, 'rawPval']>0.05)
 #'quantile(res_genes$pvals[, 'rawPval'])
 #'res[i] <- mean(res_genes$pvals[, 'rawPval']<0.05)
-#'cat(i,'\n')
+#'message(i)
 #'}
 #'mean(res)
 #'
