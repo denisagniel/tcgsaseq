@@ -51,24 +51,27 @@
 #'}
 #'
 #'@examples
-#' \dontrun{
+#' if(interactive()){
 #' rm(list=ls())
 #' data('baduel_5gs')
 #'
 #' set.seed(54321)
-#' KAvsTBG <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[,
-#'   c('Intercept', Vernalized', 'Age_weeks', 'Vernalized_Population', '
-#'   AgeWeeks_Population'), drop=FALSE]), 2, as.numeric),
-#'                      phi=as.matrix(design[, c('PopulationKA'), drop=FALSE]),
+#' KAvsTBG <- dgsa_seq(exprmat=log2(expr_norm_corr+1),
+#'                     covariates=apply(as.matrix(design[,
+#'   c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population',
+#'   'AgeWeeks_Population'), drop=FALSE]), 2, as.numeric),
+#'                      variables2test =
+#'                          as.matrix(design[, c('PopulationKA'), drop=FALSE]),
 #'                      genesets=baduel_gmt$genesets[c(3,5)],
 #'                      which_test = 'permutation', which_weights = 'loclin',
 #'                      n_perm=1000, preprocessed = TRUE, doPlot = TRUE)
 #'
 #' set.seed(54321)
-#' Cold <- tcgsa_seq(y=log2(expr_norm_corr+1), x=apply(as.matrix(design[,
-#'    c('Intercept', Age_weeks', 'PopulationKA', 'AgeWeeks_Population'),
+#' Cold <- dgsa_seq(exprmat=log2(expr_norm_corr+1),
+#'                  covariates=apply(as.matrix(design[,
+#'    c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
 #'    drop=FALSE]), 2, as.numeric),
-#'                  phi=as.matrix(design[, c('Vernalized',
+#'                 variables2test=as.matrix(design[, c('Vernalized',
 #'                  'Vernalized_Population')]),
 #'                  genesets=baduel_gmt$genesets[c(3,5)],
 #'                  which_test = 'permutation', which_weights = 'loclin',

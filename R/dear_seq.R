@@ -47,8 +47,8 @@
 #'when computing permutations (only in interactive mode).
 #'
 #'@param parallel_comp a logical flag indicating whether parallel computation
-#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
-#'Default is \code{TRUE}.
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on
+#'Windows. Default is \code{TRUE}.
 #'
 #'@param nb_cores an integer indicating the number of cores to be used when
 #'\code{parallel_comp} is \code{TRUE}.
@@ -74,9 +74,10 @@
 #'
 #'@param kernel a character string indicating which kernel should be used.
 #'Possibilities are \code{'gaussian'}, \code{'epanechnikov'},
-#'\code{'rectangular'}, \code{'triangular'}, \code{'biweight'}, \code{'tricube'},
-#'\code{'cosine'}, \code{'optcosine'}. Default is \code{'gaussian'}
-#'(NB: \code{'tricube'} kernel corresponds to the loess method).
+#'\code{'rectangular'}, \code{'triangular'}, \code{'biweight'},
+#'\code{'tricube'}, \code{'cosine'}, \code{'optcosine'}. Default is
+#'\code{'gaussian'} (NB: \code{'tricube'} kernel corresponds to the loess
+#'method).
 #'
 #'@param exact a logical flag indicating whether the non-parametric weights
 #'accounting for the mean-variance relationship should be computed exactly or
@@ -101,8 +102,8 @@
 #'each value. Larger values give more smoothness. Only used if
 #'\code{which_weights} is \code{'voom'}. Default is \code{0.5}.
 #'
-#'@param R library.size (optional, important to provide if \code{preprocessed = TRUE}).
-#'Default is \code{NULL}
+#'@param R library.size (optional, important to provide if
+#'\code{preprocessed = TRUE}). Default is \code{NULL}
 #'
 #'@param homogen_traj a logical flag indicating whether trajectories should be
 #'considered homogeneous. Default is \code{FALSE} in which case trajectories
@@ -159,7 +160,6 @@
 #'
 #'#under the null:
 #'b1 <- 0
-#'
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -179,6 +179,7 @@
 #'
 #'if(interactive()){
 #'b0 <- 1
+#'#under the null:
 #'b1 <- 0
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
@@ -215,29 +216,29 @@ dear_seq <- function(exprmat,
                      homogen_traj = FALSE,
                      na.rm_dearseq = TRUE) {
 
-    return(gsa_seq(y = exprmat,
-                   x = covariates,
-                   phi = variables2test,
-                   weights_phi_condi = weights_var2test_condi,
-                   genesets = NULL,
-                   indiv = sample_group,
-                   Sigma_xi = cov_variables2test_eff,
-                   which_test = which_test,
-                   which_weights = which_weights,
-                   n_perm = n_perm, progressbar = progressbar,
-                   parallel_comp = parallel_comp, nb_cores = nb_cores,
-                   preprocessed = preprocessed,
-                   doPlot = doPlot,
-                   gene_based_weights = gene_based_weights,
-                   bw = bw,
-                   kernel = kernel,
-                   exact = exact,
-                   transform = transform,
-                   padjust_methods = padjust_methods,
-                   lowess_span = lowess_span,
-                   R = R,
-                   homogen_traj = homogen_traj,
-                   na.rm_gsaseq = na.rm_dearseq,
-                   verbose = FALSE))
+  return(dgsa_seq(exprmat = exprmat,
+                 covariates = covariates,
+                 variables2test = variables2test,
+                 weights_var2test_condi = weights_var2test_condi,
+                 genesets = NULL,
+                 sample_group = sample_group,
+                 cov_variables2test_eff = cov_variables2test_eff,
+                 which_test = which_test,
+                 which_weights = which_weights,
+                 n_perm = n_perm, progressbar = progressbar,
+                 parallel_comp = parallel_comp, nb_cores = nb_cores,
+                 preprocessed = preprocessed,
+                 doPlot = doPlot,
+                 gene_based_weights = gene_based_weights,
+                 bw = bw,
+                 kernel = kernel,
+                 exact = exact,
+                 transform = transform,
+                 padjust_methods = padjust_methods,
+                 lowess_span = lowess_span,
+                 R = R,
+                 homogen_traj = homogen_traj,
+                 na.rm_gsaseq = na.rm_dearseq,
+                 verbose = FALSE))
 
 }

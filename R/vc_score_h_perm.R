@@ -36,8 +36,8 @@
 #'when computing permutations (only in interactive mode).
 #'
 #'@param parallel_comp a logical flag indicating whether parallel computation
-#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
-#'Default is \code{TRUE}.
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on
+#'Windows. Default is \code{TRUE}.
 #'
 #'@param nb_cores an integer indicating the number of cores to be used when
 #'\code{parallel_comp} is \code{TRUE}.
@@ -172,7 +172,8 @@ vc_score_h_perm <- function(y, x, indiv, phi, w,
     ##     x_i <- x[select,]
     ##     y_i <- y_T[select,]
     ##     phi_i <- phi[select,]
-    ##     Phi_list[[i]] <- do.call(rbind, replicate(g, phi_i, simplify = FALSE)) #TODO
+    ##     Phi_list[[i]] <- do.call(rbind, replicate(g, phi_i,
+    ##                              simplify = FALSE)) #TODO
     ##     x_tilde_list[[i]] <- matrix(data=rep(x_i, each=g), ncol = p) #TODO
     ##     y_tilde_list[[i]] <- matrix(y_i, ncol=1)
     ## }
@@ -189,7 +190,8 @@ vc_score_h_perm <- function(y, x, indiv, phi, w,
 
 
     ## test statistic computation ------
-    sig_xi_sqrt <- (Sigma_xi * diag(K)) %^% (-0.5) # sig_xi_sqrt <- (Sigma_xi %^% (-0.5))
+    sig_xi_sqrt <- (Sigma_xi * diag(K)) %^% (-0.5)
+    # sig_xi_sqrt <- (Sigma_xi %^% (-0.5))
     ## xtx_inv <- solve(t(x_tilde) %*% x_tilde)
     ## long_indiv <- rep(indiv, each = g)
     ## q <- matrix(NA, nrow=nb_indiv, ncol=K)
@@ -248,21 +250,27 @@ vc_score_h_perm <- function(y, x, indiv, phi, w,
     if(!parallel_comp){
         if(progressbar){
             gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
-                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+                                        indiv_mat = indiv_mat,
+                                        avg_xtx_inv_tx = avg_xtx_inv_tx)
         }else{
             gene_Q <- vapply(perm_list, compute_genewise_scores,
                              FUN.VALUE = rep(1.1, g),
-                             indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+                             indiv_mat = indiv_mat,
+                             avg_xtx_inv_tx = avg_xtx_inv_tx)
         }
     }else{
         if(progressbar){
             gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
-                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                        indiv_mat = indiv_mat,
+                                        avg_xtx_inv_tx = avg_xtx_inv_tx,
                                         cl = nb_cores)
         }else{
-            gene_Q <- simplify2array(parallel::mclapply(X = perm_list, FUN = compute_genewise_scores,
-                                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
-                                                        mc.cores = nb_cores))
+            gene_Q <- simplify2array(
+                parallel::mclapply(X = perm_list,
+                                   FUN = compute_genewise_scores,
+                                   indiv_mat = indiv_mat,
+                                   avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                   mc.cores = nb_cores))
         }
     }
     QQ <- colSums(gene_Q)

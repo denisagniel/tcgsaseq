@@ -134,7 +134,8 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
                 if (inherits(lam, "try-error")) {
                     lam <- try(svd(round(Sig_q_gene, 6))$d)
                     if (inherits(lam, "try-error")) {
-                        warning("Error in svd decomposition for at least one gene")
+                        warning("Error in svd decomposition for at least one ",
+                                "gene")
                         lam <- NA
                     }
                 }
@@ -142,7 +143,8 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
             })
 
             pv <- unlist(mapply(FUN = CompQuadForm::davies, q = gene_scores_obs,
-                                lambda = gene_lambda, lim = 15000, acc = 5e-04)["Qq", ])
+                                lambda = gene_lambda, lim = 15000,
+                                acc = 5e-04)["Qq", ])
         }
 
         names(pv) <- rownames(y)
@@ -175,17 +177,20 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         }
         if (dv$Qq<0){
             dv$Qq=0
-            message("accuracy in davies at 1.5*10^(-7) still giving <0 probability, probability set to 0")
+            message("accuracy in davies at 1.5*10^(-7) still giving <0 ",
+                    "probability, probability set to 0")
         }
 
         if(dv$ifault == 1){# accuracy error
             dv <- CompQuadForm::davies(score_list$score, lam, acc = 0.001)
             if(dv$ifault == 1){
-                stop("fault in the computation from CompQuadForm::davies", dv$trace)
+                stop("fault in the computation from CompQuadForm::davies",
+                     dv$trace)
             }
         }
         if(dv$ifault > 1){# other error
-            stop("fault in the computation from CompQuadForm::davies\n", dv$trace)
+            stop("fault in the computation from CompQuadForm::davies\n",
+                 dv$trace)
         }
         ans <- list(set_score_obs = score_list$score, set_pval = dv$Qq)
     }

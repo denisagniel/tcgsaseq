@@ -78,8 +78,8 @@ performed). Default is \code{'loclin'}. See \code{\link{sp_weights}} and
 when computing permutations (only in interactive mode).}
 
 \item{parallel_comp}{a logical flag indicating whether parallel computation
-should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
-Default is \code{TRUE}.}
+should be enabled. Only Linux and MacOS are supported, this is ignored on
+Windows. Default is \code{TRUE}.}
 
 \item{nb_cores}{an integer indicating the number of cores to be used when
 \code{parallel_comp} is \code{TRUE}.
@@ -105,9 +105,10 @@ are \code{'ucv'}, \code{'SJ'}, \code{'bcv'}, \code{'nrd'} or \code{'nrd0'}.}
 
 \item{kernel}{a character string indicating which kernel should be used.
 Possibilities are \code{'gaussian'}, \code{'epanechnikov'},
-\code{'rectangular'}, \code{'triangular'}, \code{'biweight'}, \code{'tricube'},
-\code{'cosine'}, \code{'optcosine'}. Default is \code{'gaussian'}
-(NB: \code{'tricube'} kernel corresponds to the loess method).}
+\code{'rectangular'}, \code{'triangular'}, \code{'biweight'},
+\code{'tricube'}, \code{'cosine'}, \code{'optcosine'}. Default is
+\code{'gaussian'} (NB: \code{'tricube'} kernel corresponds to the loess
+method).}
 
 \item{exact}{a logical flag indicating whether the non-parametric weights
 accounting for the mean-variance relationship should be computed exactly or
@@ -132,8 +133,8 @@ This gives the proportion of points in the plot which influence the smooth at
 each value. Larger values give more smoothness. Only used if
 \code{which_weights} is \code{'voom'}. Default is \code{0.5}.}
 
-\item{R}{library.size (optional, important to provide if \code{preprocessed = TRUE}).
-Default is \code{NULL}}
+\item{R}{library.size (optional, important to provide if
+\code{preprocessed = TRUE}). Default is \code{NULL}}
 
 \item{homogen_traj}{a logical flag indicating whether trajectories should be
 considered homogeneous. Default is \code{FALSE} in which case trajectories
@@ -184,7 +185,6 @@ b0 <- 1
 
 #under the null:
 b1 <- 0
-
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
       matrix(rep(y.tilde, n), ncol=n, nrow=r))
@@ -204,6 +204,7 @@ mean(res)
 
 if(interactive()){
 b0 <- 1
+#under the null:
 b1 <- 0
 y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +

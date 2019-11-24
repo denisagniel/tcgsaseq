@@ -22,14 +22,34 @@ knitr::knit_hooks$set(small.mar = function(before, options, envir) {
 })
 ```
 
-# Overview of dearseq
+# Overview of `dearseq`
 
-The `dearseq` (Differential Expression Analysis that Robustly controls the FDR *Gauthier et al., 2019*) `R` package tests gene expression for significance. `dearseq` relies on variance component score test accounting for data heteroscedasticity through precision weights. It performs both gene-wise and gene set analyses, and can deal with various experimental designs such as multiple biological conditions, repeated or longitudinal measurements. For more details, check the TODO [BioRxiv](lien).
+`dearseq` is an `R` package that performs **D**ifferential **E**xpression **A**nalysis of **R**NA-**seq** data, while guaranteeing a *sound control of false positives* (Gauthier *et al.*, 2019). It relies on variance component score test accounting for data heteroscedasticity through precision weights, not unlike `voom` (Law *et al.*, 2014). It can perform either 
+
+ - **gene-wise** differential analysis, or
+ - **gene set analysis**
+ 
+In addition, `dearseq` can deal with various and complex experimental designs such as:
+
+ - **multiple biological conditions**, 
+ - **repeated or longitudinal measurements**
+
+More details are provided in this [*bioRxiv* preprint 635714](https://www.biorxiv.org/content/10.1101/635714v1).
 
 
-# How to use dearseq for a non-longitudinal gene-wise analysis ? 
+# Using `dearseq` for a gene-wise analysis 
 
-## A real dataset
+## Getting started using `dear_seq()`
+
+2 inputs are required to run `dear_seq()`:
+
+ - The gene expression matrix
+ - The data.frame containing the variables of interested to be tested (e.g. the group factor)
+
+A third optional input is a data.frame containing the covariates that will be adjusted on (such as age for instance).
+
+## An example analysis
+
 
 Tuberculosis (TB) is a disease caused by a bacterium called Mycobacterium tuberculosis. Bacteria typically infect the lungs, but they can also affect other parts of the body. Tuberculosis can remain in a quiescent state in the body. It is called latent tuberculosis infection (LTBI). It is an infection without clinical signs, bacteriological and radiological disease.
 
@@ -41,20 +61,15 @@ It results in 54 patients of whom 21 are active TB patients, 21 are latent TB pa
 
 For more details, check the article from *Berry  et al., 2010* [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3492754/).
 
-The data are publicly available on [GEO website](https://www.ncbi.nlm.nih.gov/geo/) with GEO access number 'GSE107995'. We will be using the `GEOquery` package to get the data files from GEO website (see appendix for more details on `GEOquery`)
-
-3 inputs are required to run `dearseq`:
-
-* The gene expression matrix
-* The matrix/vector of covariates that needs to be adjusted
-* The matrix/vector of variables to be tested
 
 
-### Design data matrix
+### Data preparation
 
-In this example, we need to import the supplementary file available: 
+Data from *Singhania et al.* inverstigating active TB are publicly available on [GEO website](https://www.ncbi.nlm.nih.gov/geo/) with GEO access number 'GSE107995'. Thanks to the `GEOquery` package to get the data files from GEO website (see appendix for more details on `GEOquery`)
 
-```{r GEOquery, message=FALSE}
+
+#### Design data matrix
+```{r GEOquery, message=FALSE, echo=FALSE, eval=TRUE}
 if (!requireNamespace("GEOquery", quietly = TRUE)) {
     if (!requireNamespace("BiocManager", quietly = TRUE)) {
         install.packages("BiocManager")
@@ -65,10 +80,10 @@ if (!requireNamespace("GEOquery", quietly = TRUE)) {
 
 ```{r import, message=FALSE, results='hide'}
 library(GEOquery)
-GSE107991_metadata <- getGEO("GSE107991", GSEMatrix = FALSE)
+GSE107991_metadata <- GEOquery::getGEO("GSE107991", GSEMatrix = FALSE)
 
 get_info <- function(i){
-    name <- Meta(GSMList(GSE107991_metadata)[[i]])$source_name_ch1
+    name <- GEOquery::Meta(GSMList(GSE107991_metadata)[[i]])$source_name_ch1
     name <- gsub("Active_TB", "ActiveTB", name)
     name <- gsub("Test_set", "TestSet", name)
     unlist(strsplit(name, split="_"))
@@ -77,7 +92,7 @@ get_info <- function(i){
 infos <- vapply(1:length(GSMList(GSE107991_metadata)), FUN=get_info,
                 FUN.VALUE = c("a", "b", "c", "d"))
 infos_df <- cbind.data.frame("SampleID" = names(GSMList(GSE107991_metadata)), t(infos))
-rownames(infos_df) <- names(GSMList(GSE107991_metadata))
+rownames(infos_df) <- names(GEOquery::GSMList(GSE107991_metadata))
 colnames(infos_df)[-1] <- c("Cohort", "Location", "Set", "Status")
 
 group_London_TB <- which(infos_df$Status=="ActiveTB") # 21
@@ -87,30 +102,24 @@ group_London_Control <- which(infos_df$Status=="Control") # 12
 group <- rep(NA,length(infos_df$Status[-group_London_LTBI]))
 group[which(infos_df$Status[-group_London_LTBI]=="ActiveTB")] <- rep(1,length(which(infos_df$Status[-group_London_LTBI]=="ActiveTB")))
 group[which(infos_df$Status[-group_London_LTBI]=="Control")] <- rep(0,length(which(infos_df$Status[-group_London_LTBI]=="Control")))
-
 ```
 
-We excluded the LTBI patients to focus on the comparison between Active TB patients and Control patients.
+**NB:** We excluded the LTBI patients to focus on the comparison between Active TB patients and Control patients.
 
 
-### Gene expression matrix
+#### Gene expression matrix
 
 This matrix contains the gene expression (in cells) for each gene (in rows) of 
 each sample (in columns) gathered from RNA-seq measurements. The gene expression 
-could already be normalized or not. In this last case, the gene expression is 
-normalized into log(counts) per million. 
+could already be normalized, or not (e.g. raw counts or pseudo-counts straight 
+from the alignment). In the latter case, the gene expression is 
+normalized then into log(counts) per million (i.e. *log-cpm*). 
 
 The gene expression matrix (called `London`) is including in the package `dearseq`. It was extracted from one of the GEO supplementary files (namely the "GSE107991_edgeR_normalized_Berry_London.xlsx" file). 
 
-NB: The data is already normalized using `edgeR`.
+**NB:** These expression data have already been already normalized using `edgeR`
 
-```{r readxl, message=FALSE}
-if (!requireNamespace("readxl", quietly = TRUE)) {
-    install.packages("readxl")
-}
-```
-
-```{r London-download, message=FALSE}
+```{r London-download, message=FALSE, results='hide'}
 library(readxl)
 GEOquery::getGEOSuppFiles('GSE107991', filter_regex="edgeR_normalized_Berry_London")
 London <- readxl::read_excel("GSE107991/GSE107991_edgeR_normalized_Berry_London.xlsx")
@@ -119,132 +128,100 @@ London <- as.matrix(London[, -c(1:3)])
 rownames(London) <- genes
 ```
 
-We have:
-
- * in row `ENSGxxxxxxxxxxx` for each gene identifier (saved in `genes`)
- * in column `Berry_London_Samplex` for the name of each sample
- * each cell contains the normalized gene expression
+We have `nrow(London)` genes in rows and `ncol(London)` samples in columns
+ * rownames are Ensembl IDs `ENSGxxxxxxxxxxx` for each gene (saved in `genes`)
+ * colnames are the name of each sample `Berry_London_Samplex`
+ * each data-cell contains the normalized gene expression
  
 The vector `genes` contains all the gene identifiers.
 
+### Identifying differentially expressed genes (DEG) from `dearseq` variance component score test
 
-The entire matrix contains $14,150$ genes and $54$ samples.
+The main arguments to the `dear_seq()` function are:
 
+ * `exprmat`: a numeric matrix containing the raw RNA-seq counts or preprocessed expressions
+ * `covariates`: a numeric matrix containing the model covariates that needs to be adjusted. Usually, its first column is the intercept (full of 1s).
+ * `variables2test`: a numeric design matrix containing the variables of interest (with whom the expression association is tested)
+ * `which_test`: a character string indicating which method to use to approximate the variance component score test, either "permutation" or "asymptotic".
+ * `preprocessed`: a logical flag indicating whether the expression data have already been preprocessed (e.g. log2 transformed). Default is FALSE, in which case y is assumed to contain raw counts and is normalized into log(counts) per million.
 
-## Variance component score test:  identifying differentially expressed (DE) genes
-
-This function provides the result of variance component score test for each gene.
-`dearseq` function requires:
-
-* `exprmat`: a numeric matrix containing the raw RNA-seq counts or preprocessed expressions
-* `covariates`: a numeric matrix containing the model covariates that needs to be adjusted. Usually, its first column is the intercept (full of 1s).
-* `variables2test`: a numeric design matrix containing the variables of interest (with whom the expression association is tested)
-* `which_test`: a character string indicating which method to use to approximate the variance component score test, either "permutation" or "asymptotic".
-* `preprocessed`: a logical flag indicating whether the expression data have already been preprocessed (e.g. log2 transformed). Default is FALSE, in which case y is assumed to contain raw counts and is normalized into log(counts) per million.
-* `doPlot`: a logical flag indicating whether the mean-variance plot should be drawn.
-
-We use the permutation test due to the low sample size (=33).
+We use the permutation test because of the relatively small sample size ($n=33$).
 
 ```{r LR_ST}
-res_dearseq <- dearseq::dear_seq(exprmat = London[,-group_London_LTBI], 
+library(dearseq)
+res_dearseq <- dearseq::dear_seq(exprmat = London[,-group_London_LTBI], #the Latent TB samples are excluded 
                                  covariates = matrix(rep(1, ncol(London[, -group_London_LTBI])), ncol=1),
                                  variables2test = matrix(group, ncol=1),
                                  which_test='asymptotic', doPlot = FALSE,
                                  preprocessed=TRUE)
 ```
 
-Now `res_dearseq` is a list object containing, in addition to the parameters summary: 
+`res_dearseq` is a list containing: 
 
-- the raw p-values
-- the adjusted p-values (after correction for multiple testing with the Benjamini-Hochberg procedure)
+ - the input values for `which_test`, `nperm` and `preprocessed`
+ - the gene-wise p-values (raw and adjusted - default is correction for multiple testing with the Benjamini-Hochberg procedure)
 
-Following *Singhania et al.*, to be included in the signature a DE gene must have
-had both: 
 
-- an absolute log2(fold change) > 1
-- an FDR adjusted p-value < 0.05
+# Using `dearseq` for gene-set analysis
 
-### log FC with edgeR
+Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) studying Arabidopsis Arenosa physiology, that is included in the dearseq package.
 
-To guaranty comparable results with the original edgeR analysis, we computed the log fold-changes using the `edgeR` procedure from the raw data.
+```{r baduel}
+library(dearseq)
+data('baduel_5gs')
 
-```{r London-raw, message=FALSE}
-GEOquery::getGEOSuppFiles('GSE107991', filter_regex="GSE107991_Raw_counts_Berry_London.xlsx")
-London_raw <- readxl::read_excel("GSE107991/GSE107991_Raw_counts_Berry_London.xlsx")
-genes_raw <- London_raw$Genes
-London_raw <- as.matrix(London_raw[, -c(1:3)])
-rownames(London_raw) <- genes_raw
+KAvsTBG <- dearseq::dgsa_seq(exprmat=log2(expr_norm_corr+1),
+                    covariates=apply(as.matrix(design[,c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'), drop=FALSE]), 2, as.numeric),
+                     variables2test = as.matrix(design[, c('PopulationKA'), drop=FALSE]),
+                     genesets=baduel_gmt$genesets[c(3,5)],
+                     which_test = 'permutation', which_weights = 'loclin',
+                     n_perm=1000, preprocessed = TRUE, doPlot = FALSE, verbose = FALSE)
+
+Cold <- dearseq::dgsa_seq(exprmat = log2(expr_norm_corr+1),
+                 covariates = apply(as.matrix(design[,c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'), drop = FALSE]), 2, as.numeric),
+                variables2test = as.matrix(design[, c('Vernalized', 'Vernalized_Population')]),
+                 genesets = baduel_gmt$genesets[c(3,5)],
+                 which_test = 'permutation', which_weights = 'loclin',
+                 n_perm = 1000, preprocessed = TRUE, doPlot = FALSE, verbose = FALSE)
 ```
 
 
-```{r edgeR, message=FALSE}
-if (!requireNamespace("edgeR", quietly = TRUE)) {
-    install.packages("edgeR")
-}
-```
+# Bibliography
 
-```{r logFC, message=FALSE}
-library(edgeR)
-Y <- rep(NA,length(infos_df$Status))
-Y[which(infos_df$Status == "ActiveTB")] <- rep(1, length(which(infos_df$Status == "ActiveTB")))
-Y[which(infos_df$Status == "LTBI")] <- rep(0, length(which(infos_df$Status == "LTBI")))
-Y[which(infos_df$Status == "Control")] <- rep(0, length(which(infos_df$Status == "Control")))
+Agniel D & Hejblum BP (2017). Variance component score test for time-course gene set analysis of longitudinal RNA-seq data. *Biostatistics* 18(4):589-604. [DOI: 10.1093/biostatistics/kxx005](https://doi.org/10.1093/biostatistics/kxx005).
 
-dgList <- DGEList(counts=London_raw, group=Y)
-cpm <- cpm(dgList)
-countCheck <- cpm > 2
-keep <- which(rowSums(countCheck) >= 5)
-dgList <- dgList[keep, ]
-dgList <- calcNormFactors(dgList, method = "TMM")
-dgList_group <- dgList[, -group_London_LTBI]
-design <- model.matrix( ~ group)
-dgList_group <- estimateGLMTrendedDisp(dgList_group, design = design) 
-fit <- glmFit(dgList_group, design)
-lrt <- glmLRT(fit)
-```
+Baduel P, Arnold B, Weisman CM, Hunter B & Bomblies K (2016). Habitat-Associated Life History and Stress-Tolerance Variation in Arabidopsis Arenosa. *Plant Physiology*, 171(1):437-51.
+[DOI: 10.1104/pp.15.01875](https://doi.org/10.1104/pp.15.01875).
 
-`lrt` contains the log fold-changes for the $14,150$ genes.
+Berry MP, Graham CM, McNab FW, Xu Z, Bloch SAA, Oni T, Wilkinson KA, Banchereau R, Skinner J, Wilkinson RJ, Quinn C, Blankenship D, Dhawan R, Cush JJ, Mejias A, Ramilo O, Kon OM, Pascual V, Banchereau J, Chaussabel D & O’Garra A (2010). An interferon-inducible neutrophil-driven blood transcriptional signature in human tuberculosis. _Nature_ 466:973–977. [DOI: 10.1038/nature09247](https://doi.org/10.1038/nature09247)
 
-### Results 
-
-```{r DEgenes}
-df <- data.frame(logFC=lrt$table$logFC,res_dearseq$pvals$adjPval) 
-res <- rbind(subset(df, res_dearseq$pvals$adjPval<.05 & logFC>1),subset(df, res_dearseq$pvals$adjPval<.05 & logFC<(-1)))
-genes_dearseq <- genes[as.numeric(rownames(res))]
-```
-
-After applying the filtering, `genes_dearseq` returns the DE gene identifiers.
-
-```{r singhania-373, message=FALSE}
-# Singhania et al. 373 genes signature
-download.file("https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6008327/bin/41467_2018_4579_MOESM3_ESM.xlsx", destfile = "GSE107991/41467_2018_4579_MOESM3_ESM.xlsx")
-TB373 <- as.data.frame(readxl::read_excel("GSE107991/41467_2018_4579_MOESM3_ESM.xlsx"))
-genes_373 <- TB373[-c(1:2),1]
-
-```
+Gauthier M, Agniel D, THiébaut R & Hejblum BP (2019). Variance component score test for time-course gene set analysis of longitudinal RNA-seq data. *bioRxiv* 635714. [DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
 
 
-# How to use dearseq for a longitudinal gene-set analysis ? 
-
-# References
-
-Singhania A, Verma R, Graham CM, Lee J, Tran T, Richardson M, et al., (2018) A modular transcriptional signature identifies phenotypic heterogeneity of human tuberculosis infection. _Nature communications_ 9(1):2308.
-
-Berry, M. P. et al., (2010) An interferon-inducible neutrophil-driven blood transcriptional signature in human tuberculosis. _Nature_ 466, 973–977.
+Singhania A, Verma R, Graham CM, Lee J, Tran T, Richardson M, Lecine P, Leissner P, Berry MPR, Wilkinson RJ, Kaiser K, Rodrigue M, Woltmann G, Haldar P, O’Garra A, (2018). A modular transcriptional signature identifies phenotypic heterogeneity of human tuberculosis infection. _Nature communications_ 9(1):2308. [DOI: 10.1038/s41467-018-04579-w](https://doi.org/10.1038/s41467-018-04579-w)
 
 
 # Appendix
 
-## GEOquery package
+## `GEOquery` package
 
 In case the data you want to analyze is publicly available through [Gene Expression Omnibus (GEO)](https://www.ncbi.nlm.nih.gov/geo/), you can access it with the `GEOquery` package, that can be installed with the following commands:
-
-```{r dl_GEOquery, warning=FALSE, message=FALSE, eval=FALSE}
+```{r dl_GEOquery, warning=FALSE, message=FALSE, eval=FALSE, echo=TRUE}
 if (!requireNamespace("GEOquery", quietly = TRUE)) {
     if (!requireNamespace("BiocManager", quietly = TRUE)){
         install.packages("BiocManager")
     }
     BiocManager::install("GEOquery")
+}
+```
+
+
+## `readxl`
+
+The `readxl` package allows to easily imports data from Excel format and can be similarly installed with the following commands:
+```{r dl_readxl, message=FALSE, echo=TRUE, eval=FALSE}
+if (!requireNamespace("readxl", quietly = TRUE)) {
+    install.packages("readxl")
 }
 ```
 

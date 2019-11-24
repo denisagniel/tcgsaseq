@@ -146,7 +146,8 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
     ##      x_i <- x[select,]
     ##      y_i <- y_T[select,]
     ##      phi_i <- phi[select,]
-    ##      Phi_list[[i]] <- do.call(rbind, replicate(g, phi_i, simplify = FALSE))
+    ##      Phi_list[[i]] <- do.call(rbind, replicate(g, phi_i,
+    ##                               simplify = FALSE))
     ##      x_tilde_list[[i]] <- matrix(data=rep(x_i, each=g), ncol = p)
     ##      y_tilde_list[[i]] <- matrix(y_i, ncol=1) }
     ## x_tilde <- do.call(rbind, x_tilde_list)
@@ -162,7 +163,9 @@ vc_score_h <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
 
 
     ## test statistic computation ------
-    sig_xi_sqrt <- (Sigma_xi * diag(K)) %^% (-0.5) # sig_xi_sqrt <- (Sigma_xi %^% (-0.5))
+    sig_xi_sqrt <- (Sigma_xi * diag(K)) %^% (-0.5)
+    # sig_xi_sqrt <- (Sigma_xi %^% (-0.5))
+
     ## xtx_inv <- solve(t(x_tilde) %*% x_tilde)
     ## long_indiv <- rep(indiv, each = g)
     ## q <- matrix(NA, nrow=nb_indiv, ncol=K)

@@ -105,11 +105,12 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
     stopifnot(nrow(x) == n)
     stopifnot(nrow(phi) == n)
 
-
-    observed <- which(rowSums(y, na.rm = TRUE) != 0) # removing genes never observed
+    # removing genes never observed:
+    observed <- which(rowSums(y, na.rm = TRUE) != 0)
     nb_g_sum0 <- length(observed) - g
     if (nb_g_sum0 > 0) {
-        warning(paste(nb_g_sum0, " y rows sum to 0 (i.e. are never observed) and have been removed"))
+        warning(paste(nb_g_sum0, " y rows sum to 0 (i.e. are never observed)",
+                      "and have been removed"))
     }
 
     kernel <- match.arg(kernel)
@@ -179,7 +180,10 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
                          ucv = stats::bw.ucv(as.vector(mu_x)),
                          bcv = stats::bw.bcv(as.vector(mu_x)),
                          SJ = stats::bw.SJ(as.vector(mu_x), method = "ste"),
-                         stop("unknown bandwidth rule: 'bw' argument must be among 'nrd0', 'nrd', 'ucv', 'bcv', 'SJ'"))
+                         stop(paste("unknown bandwidth rule: 'bw' argument",
+                                    "must be among 'nrd0', 'nrd', 'ucv',",
+                                    "'bcv', 'SJ'"))
+            )
         }
         if (verbose) {
             message("\nBandwith computed.\n")
@@ -239,7 +243,9 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
             (abs(x) < h) * (pi/4 * cos(pi * x/(2 * h))/h)
         }
     } else {
-        stop("unknown kernel: 'kernel' argument must be among 'gaussian', 'rectangular', 'triangular', 'epanechnikov', 'biweight', 'cosine', 'optcosine'")
+        stop(paste("unknown kernel: 'kernel' argument must be among",
+                   "'gaussian', 'rectangular', 'triangular', 'epanechnikov',",
+                   "'biweight', 'cosine', 'optcosine'"))
     }
 
 
@@ -257,13 +263,15 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         kern_fit <- NULL
         if (exact) {
 
-            message("'exact' is TRUE: the computation may take up to a couple minutes...",
-                    "\n", "Set 'exact = FALSE' for quicker computation of the weights\n")
+            message("'exact' is TRUE: the computation may take up to a",
+                    "couple minutes...", "\n", "Set 'exact = FALSE' for",
+                    "quicker computation of the weights\n")
 
             weights <- t(matrix(1/unlist(lapply(as.vector(mu_x), w)), ncol = n,
                                 nrow = p, byrow = FALSE))
             if (sum(!is.finite(weights)) > 0) {
-                warning("At least 1 non finite weight. Try to increase the bandwith")
+                warning("At least 1 non finite weight. ",
+                        "Try to increase the bandwith")
             }
         } else {
             kern_fit <- vapply(mu_avg, w, FUN.VALUE = 1.1)
@@ -276,8 +284,10 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         #                   nrow = nrow(y_lcpm), byrow = TRUE)
     } else {
         if (!na.rm) {
-            stop("Cannot compute the weights without ignoring NA/NaN values...
-           Try setting 'na.rm' or na.rm_gsaseq' to 'TRUE' to ignore NA/NaN values, but think carefully about where does those NA/NaN come from...")
+            stop("Cannot compute the weights without ignoring NA/NaN ",
+                 "values...\nTry setting 'na.rm' or na.rm_gsaseq' to 'TRUE' ",
+                 "to ignore NA/NaN values, but think carefully about where ",
+                 "does those NA/NaN come from...")
         } else if (sum(is.na(mu_x)) > 1) {
             mu_x <- mu_x[-which(is.na(mu_x))]
             sq_err <- sq_err[-which(is.na(sq_err))]
@@ -291,7 +301,8 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
         weights <- matrix(w, nrow(mu_x), ncol(mu_x))
     }
     if(sum(weights<0)>1){
-        stop("negative variance weights estimated: please contact the authors of the package")
+        stop("negative variance weights estimated: please contact the authors",
+             "of the package")
     }
 
     if (doPlot) {
@@ -324,20 +335,25 @@ sp_weights <- function(y, x, phi = NULL, use_phi = TRUE, preprocessed = FALSE,
                                      lo.y = smth$y)
         }
 
-
         ## plot_df_lo_temp <- data.frame('lo.x' = mu_avg[o],
         ##                               'lo.y' = f_interp(mu_avg[o]))
         ggp <- (ggplot(data = plot_df) +
-                    geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.4, color = "grey25", size = 0.6) +
+                    geom_point(aes_string(x = "m_o", y = "v_o"), alpha = 0.4,
+                               color = "grey25", size = 0.6) +
                     theme_bw() +
-                    ylim(range(lse)) +
+                    #ylim(range(lse)) +
                     xlim(range(reverse_trans(mu_x))) +
                     xlab("Observed (transformed) counts") +
                     ylab("log squared-error") +
                     ggtitle("Mean-variance local regression non-parametric fit",
-                            subtitle = paste(length(inds), "subsampled points")) +
-                    geom_line(data = plot_df_lo, aes_string(x = "lo.x", y = "lo.y"), color = "blue", lwd = 1.4, lty = "solid", alpha = 0.5)
-                #+ geom_line(data = plot_df_lo_temp, aes(x = lo.x, y = lo.y), color = "red", lwd = 1, lty = 2)
+                            subtitle = paste(nrow(plot_df),
+                                             "subsampled points")) +
+                    geom_line(data = plot_df_lo, aes_string(x = "lo.x",
+                                                            y = "lo.y"),
+                              color = "blue", lwd = 1.4, lty = "solid",
+                              alpha = 0.5)
+                #+ geom_line(data = plot_df_lo_temp, aes(x = lo.x, y = lo.y),
+                #            color = "red", lwd = 1, lty = 2)
         )
         print(ggp)
     }

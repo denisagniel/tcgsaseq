@@ -16,11 +16,11 @@ complex experimental designs such as longitudinal data.
 Package: \tab dearseq\cr
 Type: \tab Package\cr
 Version: \tab 1.0.0\cr
-Date: \tab 2019-04-29\cr
+Date: \tab 2019-11-21\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
-The two main functions of the \code{dearseq} package are \code{\link{dearseq}}
-and \code{\link{gsa_seq}}.
+The two main functions of the \code{dearseq} package are \code{\link{dear_seq}}
+and \code{\link{dgsa_seq}}.
 }
 \references{
 Agniel D & Hejblum BP (2017). Variance component score test for

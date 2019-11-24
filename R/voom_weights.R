@@ -21,8 +21,8 @@
 #'This gives the proportion of points in the plot which influence the smooth at
 #'each value. Larger values give more smoothness. Default is \code{0.5}.
 #'
-#'@param R library.size (optional, important to provide if \code{preprocessed = TRUE}).
-#'Default is \code{NULL}
+#'@param R library.size (optional, important to provide if
+#'\code{preprocessed = TRUE}). Default is \code{NULL}
 #'
 #'@return a vector of length \code{n} containing the computed precision weights
 #'
@@ -46,13 +46,16 @@
 #'
 #'my_w <-  voom_weights(y, x, doPlot=TRUE)
 #'if (requireNamespace('limma', quietly = TRUE)) {
-#'  w_voom <- limma::voom(counts=y, design=x, plot=TRUE) #slightly faster-same results
+#'  w_voom <- limma::voom(counts=y, design=x, plot=TRUE)
+#'  #slightly faster, same results
 #'  all.equal(my_w, w_voom$weights)
 #'}
 #'
-#'\dontrun{
-#'microbenchmark::microbenchmark(limma::voom(counts=t(y), design=x, plot=FALSE),
-#'                               voom_weights(x, y, doPlot=FALSE), times=30)}
+#'if(interactive()){
+#'#microbenchmark::microbenchmark(limma::voom(counts=t(y), design=x,
+#'#                               plot=FALSE), voom_weights(x, y, doPlot=FALSE),
+#'#                               times=30)
+#'}
 #'
 #'@import ggplot2
 #'@importFrom stats approxfun lowess

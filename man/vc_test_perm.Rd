@@ -46,8 +46,8 @@ of the \code{K} random effects.}
 when computing permutations (only in interactive mode).}
 
 \item{parallel_comp}{a logical flag indicating whether parallel computation
-should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
-Default is \code{TRUE}.}
+should be enabled. Only Linux and MacOS are supported, this is ignored on
+Windows. Default is \code{TRUE}.}
 
 \item{nb_cores}{an integer indicating the number of cores to be used when
 \code{parallel_comp} is \code{TRUE}.
@@ -73,9 +73,11 @@ A list with the following elements when the set p-value is computed:
 }
 or a list with the following elements when gene-wise p-values are computed:
 \itemize{
-  \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
+  \item \code{gene_scores_obs}: vector of approximating the observed
+  gene-wise scores
   \item \code{gene_pvals}: vector of associated gene-wise p-values
-  \item \code{ds_fdr}: vector of associated gene-wise discrete false discovery rates
+  \item \code{ds_fdr}: vector of associated gene-wise discrete false
+  discovery rates
 }
 }
 \description{

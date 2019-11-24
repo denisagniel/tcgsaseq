@@ -34,8 +34,8 @@
 #'when computing permutations (only in interactive mode).
 #'
 #'@param parallel_comp a logical flag indicating whether parallel computation
-#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
-#'Default is \code{TRUE}.
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on
+#'Windows. Default is \code{TRUE}.
 #'
 #'@param nb_cores an integer indicating the number of cores to be used when
 #'\code{parallel_comp} is \code{TRUE}.
@@ -213,27 +213,36 @@ vc_score_perm <- function(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
         return(rowSums(matrix(qq, ncol = K)))  # genewise scores
     }
 
-    o <- order(as.numeric(unlist(split(x = as.character(1:n), f = indiv))))
-    perm_list <- c(list(1:n), lapply(1:n_perm, function(x){as.numeric(unlist(lapply(split(x = as.character(1:n), f = indiv), FUN=sample)))[o]}))
+    o <- order(as.numeric(unlist(split(x = as.character(seq_len(n)),
+                                       f = indiv))))
+    perm_list <- c(list(seq_len(n)), lapply(seq_len(n_perm), function(x){
+        as.numeric(unlist(lapply(split(x = as.character(seq_len(n)), f = indiv),
+                                 FUN=sample)))[o]}))
 
     if(!parallel_comp){
         if(progressbar){
             gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
-                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+                                        indiv_mat = indiv_mat,
+                                        avg_xtx_inv_tx = avg_xtx_inv_tx)
         }else{
             gene_Q <- vapply(perm_list, compute_genewise_scores,
                              FUN.VALUE = rep(1.1, g),
-                             indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx)
+                             indiv_mat = indiv_mat,
+                             avg_xtx_inv_tx = avg_xtx_inv_tx)
         }
     }else{
         if(progressbar){
             gene_Q <- pbapply::pbsapply(perm_list, compute_genewise_scores,
-                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                        indiv_mat = indiv_mat,
+                                        avg_xtx_inv_tx = avg_xtx_inv_tx,
                                         cl = nb_cores)
         }else{
-            gene_Q <- simplify2array(parallel::mclapply(X = perm_list, FUN = compute_genewise_scores,
-                                                        indiv_mat = indiv_mat, avg_xtx_inv_tx = avg_xtx_inv_tx,
-                                                        mc.cores = nb_cores))
+            gene_Q <- simplify2array(
+                parallel::mclapply(X = perm_list,
+                                   FUN = compute_genewise_scores,
+                                   indiv_mat = indiv_mat,
+                                   avg_xtx_inv_tx = avg_xtx_inv_tx,
+                                   mc.cores = nb_cores))
         }
     }
     rownames(gene_Q) <- colnames(yt_mu)

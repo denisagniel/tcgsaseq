@@ -19,15 +19,20 @@ Status](https://img.shields.io/codecov/c/github/borishejblum/dearseq/master.svg)
 of the package are `dear_seq` and `tcgsa_seq`:
 
   - **Gene-wise Differential Analysis of RNA-seq data** can be performed
-    using the function `dear_seq`.
+    using the function `dear_seq()`.
   - **Gene Set Analysis of RNA-seq data** can be performed using the
-    function `tcgsa_seq`.
+    function `dgsa_seq()`.
 
 The methods implemented in this package are detailed in the following
-article:
+articles:
+
+> Gauthier M, Agniel D, Thiébaut R & Hejblum BP (2019). dearseq: a
+> variance component score test for RNA-Seq differential analysis that
+> effectively controls the false discovery rate, *bioRxiv*.
+> [DOI: 10.1101/635714](https://doi.org/10.1101/635714)
 
 > Agniel D & Hejblum BP (2017). Variance component score test for
-> time-course gene set analysis of longitudinal RNA-seq data, 2017,
+> time-course gene set analysis of longitudinal RNA-seq data,
 > [*Biostatistics*](https://academic.oup.com/biostatistics/article-abstract/18/4/589/3065599),
 > 18(4):589-604. [arXiv:1605.02351](https://arxiv.org/abs/1605.02351v4)
 > [DOI: 10.1093/biostatistics/kxx005](https://doi.org/10.1093/biostatistics/kxx005)
@@ -42,4 +47,4 @@ from [GitHub](https://github.com/borishejblum/dearseq):
 devtools::install_github("borishejblum/dearseq")
 ```
 
-– Denis Agniel and Boris Hejblum
+– Marine Gauthier, Denis Agniel & Boris Hejblum

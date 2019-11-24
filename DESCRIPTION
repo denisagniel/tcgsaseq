@@ -1,7 +1,7 @@
 Package: dearseq
 Type: Package
 Title: Differential Expression Analysis for RNA-seq data
-Version: 1.0.0
+Version: 0.99.0
 Date: 2019-11-21
 Authors@R: c(person("Denis", "Agniel", role = c("aut"),
                     email = "denis.agniel@gmail.com"),

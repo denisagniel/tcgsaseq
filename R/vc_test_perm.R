@@ -31,8 +31,8 @@
 #'when computing permutations (only in interactive mode).
 #'
 #'@param parallel_comp a logical flag indicating whether parallel computation
-#'should be enabled. Only Linux and MacOS are supported, this is ignored on Windows.
-#'Default is \code{TRUE}.
+#'should be enabled. Only Linux and MacOS are supported, this is ignored on
+#'Windows. Default is \code{TRUE}.
 #'
 #'@param nb_cores an integer indicating the number of cores to be used when
 #'\code{parallel_comp} is \code{TRUE}.
@@ -63,9 +63,11 @@
 #' }
 #'or a list with the following elements when gene-wise p-values are computed:
 #'\itemize{
-#'   \item \code{gene_scores_obs}: vector of approximating the observed gene-wise scores
+#'   \item \code{gene_scores_obs}: vector of approximating the observed
+#'   gene-wise scores
 #'   \item \code{gene_pvals}: vector of associated gene-wise p-values
-#'   \item \code{ds_fdr}: vector of associated gene-wise discrete false discovery rates
+#'   \item \code{ds_fdr}: vector of associated gene-wise discrete false
+#'   discovery rates
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
@@ -103,7 +105,8 @@
 #'@export
 vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
                          Sigma_xi = diag(ncol(phi)),
-                         n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
+                         n_perm = 1000, progressbar = TRUE,
+                         parallel_comp = TRUE,
                          nb_cores = parallel::detectCores() - 1,
                          genewise_pvals = FALSE,
                          homogen_traj = FALSE, na.rm = FALSE) {
@@ -132,9 +135,11 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
 
 
     score_list_res <- vc_score_2use(y = y, x = x, indiv = indiv_fact, phi = phi,
-        w = w, Sigma_xi = Sigma_xi, na_rm = na.rm, n_perm = n_perm,
-        progressbar = progressbar, parallel_comp = parallel_comp,
-        nb_cores = nb_cores)
+                                    w = w, Sigma_xi = Sigma_xi, na_rm = na.rm,
+                                    n_perm = n_perm,
+                                    progressbar = progressbar,
+                                    parallel_comp = parallel_comp,
+                                    nb_cores = nb_cores)
 
     if (genewise_pvals) {
         gene_scores_obs <- score_list_res$gene_scores_unscaled

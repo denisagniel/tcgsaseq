@@ -37,7 +37,8 @@ perm_pe <- function(nperm_supobs, nperm_eff, total_possible_nperm) {
     ## Gordon Smyth from the R package statmod
 
     nbnodes_quad <- 128
-    z <- statmod::gauss.quad.prob(n = nbnodes_quad, l = 0, u = 0.5/total_possible_nperm)
+    z <- statmod::gauss.quad.prob(n = nbnodes_quad, l = 0,
+                                  u = 0.5/total_possible_nperm)
     npvals <- length(nperm_supobs)
     prob <- rep(z$nodes, npvals)
     x2 <- rep(nperm_supobs, each = nbnodes_quad)
