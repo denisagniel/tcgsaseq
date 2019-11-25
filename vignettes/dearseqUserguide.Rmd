@@ -152,18 +152,22 @@ library(dearseq)
 # Remember the Latent TB samples are excluded 
 col_data <- DataFrame(model.matrix(~group))
 rownames(col_data) <- colnames(London[,-group_London_LTBI])
-rse <- SummarizedExperiment(assays = London[,-group_London_LTBI], 
+se <- SummarizedExperiment(assays = London[,-group_London_LTBI], 
                             colData = col_data)
-res_dearseq <- dearseq::dear_seq(object = rse, 
+res_dearseq <- dearseq::dear_seq(object = se, 
                                  covariates = "X.Intercept.",
                                  variables2test = "group",
                                  which_test='asymptotic', doPlot = FALSE,
                                  preprocessed=TRUE)
 ```
 ```{r LR_ST_eval, eval=TRUE, echo=FALSE}
-res_dearseq <- dearseq::dear_seq(exprmat = London[,-group_London_LTBI], 
-                                 covariates = matrix(rep(1, ncol(London[, -group_London_LTBI])), ncol=1),
-                                 variables2test = matrix(group, ncol=1),
+col_data <- DataFrame(model.matrix(~group))
+rownames(col_data) <- colnames(London[,-group_London_LTBI])
+se <- SummarizedExperiment(assays = London[,-group_London_LTBI], 
+                            colData = col_data)
+res_dearseq <- dearseq::dear_seq(object = se, 
+                                 covariates = "X.Intercept.",
+                                 variables2test = "group",
                                  which_test='asymptotic', doPlot = FALSE,
                                  preprocessed=TRUE, parallel_comp = FALSE)
 ```
@@ -180,9 +184,9 @@ Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) stu
 
 ```{r baduel_echo, eval=FALSE, echo=TRUE}
 data('baduel_5gs')
-rse2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
+se2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
                              colData = design)
-KAvsTBG <- dearseq::dgsa_seq(object = rse2,
+KAvsTBG <- dearseq::dgsa_seq(object = se2,
                              covariates=c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
                              variables2test = 'PopulationKA',
                              genesets=baduel_gmt$genesets[c(3,5)],
@@ -190,7 +194,7 @@ KAvsTBG <- dearseq::dgsa_seq(object = rse2,
                              n_perm=1000, preprocessed = TRUE, doPlot = FALSE, 
                              verbose = FALSE)
 
-Cold <- dearseq::dgsa_seq(object = rse2,
+Cold <- dearseq::dgsa_seq(object = se2,
                           covariates = c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
                           variables2test = c('Vernalized', 'Vernalized_Population'),
                           genesets = baduel_gmt$genesets[c(3,5)],
@@ -203,9 +207,9 @@ Cold <- dearseq::dgsa_seq(object = rse2,
 library(dearseq)
 data('baduel_5gs')
 
-rse2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
+se2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
                              colData = design)
-KAvsTBG <- dearseq::dgsa_seq(object = rse2,
+KAvsTBG <- dearseq::dgsa_seq(object = se2,
                     covariates=c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
                     variables2test = 'PopulationKA',
                     genesets=baduel_gmt$genesets[c(3,5)],
@@ -213,7 +217,7 @@ KAvsTBG <- dearseq::dgsa_seq(object = rse2,
                     n_perm=1000, preprocessed = TRUE, doPlot = FALSE, 
                     verbose = FALSE, parallel_comp = FALSE)
 
-Cold <- dearseq::dgsa_seq(object = rse2,
+Cold <- dearseq::dgsa_seq(object = se2,
                  covariates = c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
                  variables2test = c('Vernalized', 'Vernalized_Population'),
                  genesets = baduel_gmt$genesets[c(3,5)],
