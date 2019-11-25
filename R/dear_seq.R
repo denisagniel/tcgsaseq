@@ -8,8 +8,9 @@
 #'genes. Default is \code{NULL}, in which case \code{object} must not be
 #'\code{NULL}.
 #'
-#'@param object an object that can be either an
-#'\code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
+#'@param object an object that can be either a
+#'\code{\link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment}},
+#'an \code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
 #'\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
 #'\code{\link[edgeR:DGEList]{DGEList}}.
 #'Default is \code{NULL}, in which case \code{exprmat} must not be
@@ -215,7 +216,7 @@ dear_seq <- function(exprmat = NULL, object = NULL,
                      variables2test,
                      sample_group = NULL,
                      weights_var2test_condi = TRUE,
-                     cov_variables2test_eff = diag(ncol(variables2test)),
+                     cov_variables2test_eff = NULL,
                      which_test = c("permutation", "asymptotic"),
                      which_weights = c("loclin", "voom", "none"),
                      n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,

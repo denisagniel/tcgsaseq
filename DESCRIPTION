@@ -9,7 +9,7 @@ Authors@R: c(person("Denis", "Agniel", role = c("aut"),
 	                  email = "boris.hejblum@u-bordeaux.fr"),
 	           person("Marine", "Gauthier", role = c("aut"),
 	                  email = "marine.gauthier@u-bordeaux.fr"))
-Depends: R (>= 3.6.0)
+Depends: R (>= 4.0.0)
 Imports: CompQuadForm, ggplot2, GSA, KernSmooth, methods, parallel, pbapply, stats, statmod
 Suggests: Biobase, BiocManager, edgeR, DESeq2, GEOquery, knitr, limma, readxl, rmarkdown, 
           S4Vectors, SummarizedExperiment, testthat, covr
@@ -28,5 +28,5 @@ biocViews: BiomedicalInformatics, CellBiology, DifferentialExpression, DNASeq,
         Transcriptomics
 BugReports: https://github.com/borishejblum/dearseq/issues
 Encoding: UTF-8
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.1
 VignetteBuilder: knitr

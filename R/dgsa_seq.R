@@ -9,7 +9,8 @@
 #'\code{NULL}.
 #'
 #'@param object an object that can be either an
-#'\code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
+#'\code{\link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment}},
+#'an \code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
 #'\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
 #'\code{\link[edgeR:DGEList]{DGEList}}.
 #'Default is \code{NULL}, in which case \code{exprmat} must not be
@@ -245,7 +246,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                      weights_var2test_condi = TRUE,
                      genesets,
                      sample_group = NULL,
-                     cov_variables2test_eff = diag(ncol(variables2test)),
+                     cov_variables2test_eff = NULL,
                      which_test = c("permutation", "asymptotic"),
                      which_weights = c("loclin", "voom", "none"),
                      n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
@@ -282,8 +283,8 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             stopifnot(!is.null(object$samples))
             stopifnot(nrow(object$samples)==ncol(object$counts))
             y <- object$counts
-            x <- object$samples[, covariates, drop=FALSE]
-            phi <- object$samples[, variables2test, drop=FALSE]
+            x <- as.data.frame(object$samples[, covariates, drop=FALSE])
+            phi <- as.data.frame(object$samples[, variables2test, drop=FALSE])
         }else if(is(object, "DESeqDataSet")){
             if(!requireNamespace("DESeq2", quietly = TRUE)){
                 stop("DESeq2 package required but is not available")
@@ -295,9 +296,8 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             stopifnot(nrow(SummarizedExperiment::colData(object)) ==
                           DESeq2::counts(object))
             y <- DESeq2::counts(object)
-            x <- SummarizedExperiment::colData(object)[, covariates, drop=FALSE]
-            phi <- SummarizedExperiment::colData(object)[, variables2test,
-                                                         drop=FALSE]
+            x <- as.data.frame(SummarizedExperiment::colData(object)[, covariates, drop=FALSE])
+            phi <- as.data.frame(SummarizedExperiment::colData(object)[, variables2test, drop=FALSE])
         }else if(is(object, "ExpressionSet")){
             if(!requireNamespace("Biobase",quietly=TRUE)){
                 stop("Biobase package required but not available")
@@ -306,8 +306,16 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             stopifnot(nrow(Biobase::phenoData(object)) ==
                           ncol(Biobase::exprs(object)))
             y <- Biobase::exprs(object)
-            x <- Biobase::phenoData(object)[, covariates, drop=FALSE]
-            phi <- Biobase::phenoData(object)[, variables2test, drop=FALSE]
+            x <- as.data.frame(Biobase::phenoData(object)[, covariates, drop=FALSE])
+            phi <- as.data.frame(Biobase::phenoData(object)[, variables2test, drop=FALSE])
+        }else if(is(object, "SummarizedExperiment")){
+            #Note: DESeqDataSet are SummarizedExperiments
+            if(!requireNamespace("SummarizedExperiment", quietly = TRUE)){
+                stop("SummarizedExperiment package required but is not available")
+            }
+            y <- SummarizedExperiment::assay(object)
+            x <- as.data.frame(SummarizedExperiment::colData(object)[, covariates, drop=FALSE])
+            phi <- as.data.frame(SummarizedExperiment::colData(object)[, variables2test, drop=FALSE])
         }else{
             stop("'object' is neither a 'DGEList', nor a 'DESeqDataSet',",
                  "nor an 'ExpressionSet'.\n",
@@ -332,6 +340,10 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 "(this may lead to errors).\n!!!!!\n")
     }
 
+    if(is.null(cov_variables2test_eff)){
+        cov_variables2test_eff <- diag(ncol(phi))
+    }
+
     # checking for 0 variance genes
     v_g <- apply(X = y, MARGIN = 1, FUN = stats::var)
     if(sum(v_g==0) > 0){
@@ -354,15 +366,15 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
     rm(y)
 
     if (is.data.frame(x)) {
-        warning("design matrix 'x' is a data.frame instead of a matrix: ",
+        message("'x' is a data.frame -> converted to a matrix: ",
                 "\n all variables (including factors) are converted ",
                 "to numeric...")
         x <- as.matrix(as.data.frame(lapply(x, as.numeric)))
     }
 
     if (is.data.frame(phi)) {
-        warning("design matrix 'phi' is a data.frame instead of a ",
-                "matrix:\n all variables (including factors) are ",
+        message("'phi' is a data.frame -> converted to a matrix: ",
+                "\n all variables (including factors) are ",
                 "converted to numeric... ")
         phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
     }
@@ -436,7 +448,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                                     bw = bw, kernel = kernel, exact = exact,
                                     transform = transform, verbose = verbose,
                                     na.rm = na.rm_gsaseq),
-                voom = voom_weights(y = y_lcpm, x = if (weights_var2test_condi) {
+                voom = voom_weights(y = y_lcpm, x = if(weights_var2test_condi) {
                     cbind(x, phi)
                 } else {
                     x
@@ -461,7 +473,6 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             if (is.null(sample_group)) {
                 sample_group <- seq_len(nrow(x))
             }
-
             rawPvals <- vc_test_asym(y = y_lcpm, x = x, indiv = sample_group,
                                      phi = phi, w = w,
                                      Sigma_xi = cov_variables2test_eff,
