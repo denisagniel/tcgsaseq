@@ -3,21 +3,42 @@
 #'Wrapper function for performing gene set analysis of (potentially
 #'longitudinal) RNA-seq data
 #'
-#'@param exprmat a numeric matrix of size \code{G x n} containing the raw RNA-seq
-#'counts or preprocessed expressions from \code{n} samples for \code{G} genes.
+#'@param exprmat a numeric matrix of size \code{G x n} containing the raw
+#'RNA-seq counts or preprocessed expressions from \code{n} samples for \code{G}
+#'genes. Default is \code{NULL}, in which case \code{object} must not be
+#'\code{NULL}.
 #'
-#'@param covariates a numeric matrix of size \code{n x p} containing the model covariates
-#'from \code{n} samples (design matrix). Usually, its first column is the
-#'intercept (full of \code{1}s).
+#'@param object an object that can be either an
+#'\code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
+#'\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
+#'\code{\link[edgeR:DGEList]{DGEList}}.
+#'Default is \code{NULL}, in which case \code{exprmat} must not be
+#'\code{NULL}.
 #'
-#'@param variables2test a numeric design matrix of size \code{n x K} containing the
-#'\code{K} variables to be tested
+#'@param covariates \itemize{
+#'\item If \code{exprmat} is specified as a matrix:
+#'then \code{covariates} must be a numeric matrix of size \code{n x p}
+#'containing the model covariates for \code{n} samples (design matrix).
+#'Usually, its first column is the intercept (full of \code{1}s).
+#'\item If \code{object} is specified: then \code{covariates} must be a
+#'character vector of length \code{p} containing the colnames of the
+#'design matrix given in \code{object}.
+#'}
 #'
-#'@param weights_var2test_condi a logical flag indicating whether heteroscedasticity
-#'weights computation should be conditional on both the variable(s) to be tested
-#'\code{phi} and on covariate(s) \code{x}, or on \code{x} alone. #'Default is
-#'\code{TRUE} in which case conditional means are estimated conditionally on
-#'both \code{x} and \code{phi}.
+#'@param variables2test \itemize{
+#'\item If \code{exprmat} is specified as a matrix:
+#'a numeric design matrix of size \code{n x K} containing
+#'the \code{K} variables to be tested.
+#'\item If \code{object} is specified: then \code{variables2test} must be a
+#'character vector of length \code{K} containing the colnames of the
+#'design matrix given in \code{object}.
+#'}
+#'
+#'@param weights_var2test_condi a logical flag indicating whether
+#'heteroscedasticity weights computation should be conditional on both the
+#'variable(s) to be tested \code{phi} and on covariate(s) \code{x}, or on
+#'\code{x} alone. Default is \code{TRUE} in which case conditional means are
+#'estimated conditionally on both \code{x} and \code{phi}.
 #'
 #'@param genesets either a vector of index or subscripts that defines which
 #'rows of \code{y} constitute the investigated gene set (when only 1 gene
@@ -32,10 +53,10 @@
 #'to be a \code{factor}. Default is \code{NULL} in which case no grouping is
 #'performed.
 #'
-#'@param cov_variables2test_eff a matrix of size \code{K x K} containing the covariance matrix
-#'of the \code{K} random effects. Only used if \code{homogen_traj} is
-#'\code{FALSE}. Default assume diagonal correlation matrix, i.e. independence
-#'of random effects.
+#'@param cov_variables2test_eff a matrix of size \code{K x K} containing the
+#'covariance matrix of the \code{K} random effects. Only used if
+#'\code{homogen_traj} is \code{FALSE}. Default assume diagonal correlation
+#'matrix, i.e. independence of random effects.
 #'
 #'@param which_weights a character string indicating which method to use to
 #'estimate the mean-variance relationship weights. Possibilities are
@@ -218,7 +239,7 @@
 #'summary(res_genes$pvals$adjPval)
 #'}
 #'@export
-dgsa_seq <- function(exprmat,
+dgsa_seq <- function(exprmat = NULL, object = NULL,
                      covariates,
                      variables2test,
                      weights_var2test_condi = TRUE,
@@ -246,9 +267,57 @@ dgsa_seq <- function(exprmat,
                      na.rm_gsaseq = TRUE,
                      verbose = TRUE) {
 
-    y <- exprmat
-    x <- covariates
-    phi <- variables2test
+    if(!is.null(object) & !is.null(exprmat)){
+        stop("only one of 'object' or 'exprmat' should be specified")
+    }
+    if(is.null(object) & is.null(exprmat)){
+        stop("One of either 'object' or 'exprmat' should be specified")
+    }
+    if(!is.null(object)){
+
+        stopifnot(is.character(covariates))
+        stopifnot(is.character(variables2test))
+
+        if(is(object, "DGEList")){
+            stopifnot(!is.null(object$samples))
+            stopifnot(nrow(object$samples)==ncol(object$counts))
+            y <- object$counts
+            x <- object$samples[, covariates, drop=FALSE]
+            phi <- object$samples[, variables2test, drop=FALSE]
+        }else if(is(object, "DESeqDataSet")){
+            if(!requireNamespace("DESeq2", quietly = TRUE)){
+                stop("DESeq2 package required but is not available")
+            }
+            if(!requireNamespace("SummarizedExperiment", quietly = TRUE)){
+                stop("SummarizedExperiment package required but not available")
+            }
+            stopifnot(!is.null(SummarizedExperiment::colData(object)))
+            stopifnot(nrow(SummarizedExperiment::colData(object)) ==
+                          DESeq2::counts(object))
+            y <- DESeq2::counts(object)
+            x <- SummarizedExperiment::colData(object)[, covariates, drop=FALSE]
+            phi <- SummarizedExperiment::colData(object)[, variables2test,
+                                                         drop=FALSE]
+        }else if(is(object, "ExpressionSet")){
+            if(!requireNamespace("Biobase",quietly=TRUE)){
+                stop("Biobase package required but not available")
+            }
+            stopifnot(!is.null(Biobase::phenoData(object)))
+            stopifnot(nrow(Biobase::phenoData(object)) ==
+                          ncol(Biobase::exprs(object)))
+            y <- Biobase::exprs(object)
+            x <- Biobase::phenoData(object)[, covariates, drop=FALSE]
+            phi <- Biobase::phenoData(object)[, variables2test, drop=FALSE]
+        }else{
+            stop("'object' is neither a 'DGEList', nor a 'DESeqDataSet',",
+                 "nor an 'ExpressionSet'.\n",
+                 "Consider specifying 'exprmat' as a matrix instead...")
+        }
+    }else{
+        y <- exprmat
+        x <- covariates
+        phi <- variables2test
+    }
 
     stopifnot(is.matrix(y))
     stopifnot(is.matrix(x) | is.data.frame(x))

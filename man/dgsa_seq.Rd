@@ -5,7 +5,8 @@
 \title{Time-course Gene Set Analysis}
 \usage{
 dgsa_seq(
-  exprmat,
+  exprmat = NULL,
+  object = NULL,
   covariates,
   variables2test,
   weights_var2test_condi = TRUE,
@@ -35,21 +36,42 @@ dgsa_seq(
 )
 }
 \arguments{
-\item{exprmat}{a numeric matrix of size \code{G x n} containing the raw RNA-seq
-counts or preprocessed expressions from \code{n} samples for \code{G} genes.}
+\item{exprmat}{a numeric matrix of size \code{G x n} containing the raw
+RNA-seq counts or preprocessed expressions from \code{n} samples for \code{G}
+genes. Default is \code{NULL}, in which case \code{object} must not be
+\code{NULL}.}
 
-\item{covariates}{a numeric matrix of size \code{n x p} containing the model covariates
-from \code{n} samples (design matrix). Usually, its first column is the
-intercept (full of \code{1}s).}
+\item{object}{an object that can be either an
+\code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
+\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
+\code{\link[edgeR:DGEList]{DGEList}}.
+Default is \code{NULL}, in which case \code{exprmat} must not be
+\code{NULL}.}
 
-\item{variables2test}{a numeric design matrix of size \code{n x K} containing the
-\code{K} variables to be tested}
+\item{covariates}{\itemize{
+\item If \code{exprmat} is specified as a matrix:
+then \code{covariates} must be a numeric matrix of size \code{n x p}
+containing the model covariates for \code{n} samples (design matrix).
+Usually, its first column is the intercept (full of \code{1}s).
+\item If \code{object} is specified: then \code{covariates} must be a
+character vector of length \code{p} containing the colnames of the
+design matrix given in \code{object}.
+}}
 
-\item{weights_var2test_condi}{a logical flag indicating whether heteroscedasticity
-weights computation should be conditional on both the variable(s) to be tested
-\code{phi} and on covariate(s) \code{x}, or on \code{x} alone. #'Default is
-\code{TRUE} in which case conditional means are estimated conditionally on
-both \code{x} and \code{phi}.}
+\item{variables2test}{\itemize{
+\item If \code{exprmat} is specified as a matrix:
+a numeric design matrix of size \code{n x K} containing
+the \code{K} variables to be tested.
+\item If \code{object} is specified: then \code{variables2test} must be a
+character vector of length \code{K} containing the colnames of the
+design matrix given in \code{object}.
+}}
+
+\item{weights_var2test_condi}{a logical flag indicating whether
+heteroscedasticity weights computation should be conditional on both the
+variable(s) to be tested \code{phi} and on covariate(s) \code{x}, or on
+\code{x} alone. Default is \code{TRUE} in which case conditional means are
+estimated conditionally on both \code{x} and \code{phi}.}
 
 \item{genesets}{either a vector of index or subscripts that defines which
 rows of \code{y} constitute the investigated gene set (when only 1 gene
@@ -64,10 +86,10 @@ should be grouped (e.g. paired samples or longitudinal data). Coerced
 to be a \code{factor}. Default is \code{NULL} in which case no grouping is
 performed.}
 
-\item{cov_variables2test_eff}{a matrix of size \code{K x K} containing the covariance matrix
-of the \code{K} random effects. Only used if \code{homogen_traj} is
-\code{FALSE}. Default assume diagonal correlation matrix, i.e. independence
-of random effects.}
+\item{cov_variables2test_eff}{a matrix of size \code{K x K} containing the
+covariance matrix of the \code{K} random effects. Only used if
+\code{homogen_traj} is \code{FALSE}. Default assume diagonal correlation
+matrix, i.e. independence of random effects.}
 
 \item{which_test}{a character string indicating which method to use to
 approximate the variance component score test, either \code{'permutation'} or

@@ -11,8 +11,8 @@ Authors@R: c(person("Denis", "Agniel", role = c("aut"),
 	                  email = "marine.gauthier@u-bordeaux.fr"))
 Depends: R (>= 3.6.0)
 Imports: CompQuadForm, ggplot2, GSA, KernSmooth, methods, parallel, pbapply, stats, statmod
-Suggests: BiocManager, edgeR, DESeq2, GEOquery, knitr, limma, readxl, rmarkdown, 
-          S4Vectors, testthat, covr
+Suggests: Biobase, BiocManager, edgeR, DESeq2, GEOquery, knitr, limma, readxl, rmarkdown, 
+          S4Vectors, SummarizedExperiment, testthat, covr
 Description: Differential Expression Analysis RNA-seq data with variance 
              component score test accounting for data heteroscedasticity through
              precision weights. Perform both gene-wise and gene set analyses, 

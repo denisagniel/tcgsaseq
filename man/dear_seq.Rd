@@ -2,11 +2,12 @@
 % Please edit documentation in R/dear_seq.R
 \name{dear_seq}
 \alias{dear_seq}
-\title{Differential expression analyis through a variance component testing for
-RNA-seq data analysis}
+\title{Differential expression analyis of RNA-seq data through a variance component
+test}
 \usage{
 dear_seq(
-  exprmat,
+  exprmat = NULL,
+  object = NULL,
   covariates,
   variables2test,
   sample_group = NULL,
@@ -36,14 +37,34 @@ dear_seq(
 \arguments{
 \item{exprmat}{a numeric matrix of size \code{G x n} containing the raw
 RNA-seq counts or preprocessed expressions from \code{n} samples for \code{G}
-genes.}
+genes. Default is \code{NULL}, in which case \code{object} must not be
+\code{NULL}.}
 
-\item{covariates}{a numeric matrix of size \code{n x p} containing the model
-covariates from \code{n} samples (design matrix). Usually, its first column is
-the intercept (full of \code{1}s).}
+\item{object}{an object that can be either an
+\code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
+\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
+\code{\link[edgeR:DGEList]{DGEList}}.
+Default is \code{NULL}, in which case \code{exprmat} must not be
+\code{NULL}.}
 
-\item{variables2test}{a numeric design matrix of size \code{n x K} containing
-the \code{K} variables to be tested}
+\item{covariates}{\itemize{
+\item If \code{exprmat} is specified as a matrix:
+then \code{covariates} must be a numeric matrix of size \code{n x p}
+containing the model covariates for \code{n} samples (design matrix).
+Usually, its first column is the intercept (full of \code{1}s).
+\item If \code{object} is specified: then \code{covariates} must be a
+character vector of length \code{p} containing the colnames of the
+design matrix given in \code{object}.
+}}
+
+\item{variables2test}{\itemize{
+\item If \code{exprmat} is specified as a matrix:
+a numeric design matrix of size \code{n x K} containing
+the \code{K} variables to be tested.
+\item If \code{object} is specified: then \code{variables2test} must be a
+character vector of length \code{K} containing the colnames of the
+design matrix given in \code{object}.
+}}
 
 \item{sample_group}{a vector of length \code{n} indicating whether the samples
 should be grouped (e.g. paired samples or longitudinal data). Coerced

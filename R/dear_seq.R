@@ -1,18 +1,38 @@
-#'Differential expression analyis through a variance component testing for
-#'RNA-seq data analysis
+#'Differential expression analyis of RNA-seq data through a variance component
+#'test
 #'
 #'Wrapper function for gene-by-gene association testing of RNA-seq data
 #'
 #'@param exprmat a numeric matrix of size \code{G x n} containing the raw
 #'RNA-seq counts or preprocessed expressions from \code{n} samples for \code{G}
-#'genes.
+#'genes. Default is \code{NULL}, in which case \code{object} must not be
+#'\code{NULL}.
 #'
-#'@param covariates a numeric matrix of size \code{n x p} containing the model
-#'covariates from \code{n} samples (design matrix). Usually, its first column is
-#' the intercept (full of \code{1}s).
+#'@param object an object that can be either an
+#'\code{\link[Biobase:ExpressionSet]{ExpressionSet}}, a
+#'\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
+#'\code{\link[edgeR:DGEList]{DGEList}}.
+#'Default is \code{NULL}, in which case \code{exprmat} must not be
+#'\code{NULL}.
 #'
-#'@param variables2test a numeric design matrix of size \code{n x K} containing
-#'the \code{K} variables to be tested
+#'@param covariates \itemize{
+#'\item If \code{exprmat} is specified as a matrix:
+#'then \code{covariates} must be a numeric matrix of size \code{n x p}
+#'containing the model covariates for \code{n} samples (design matrix).
+#'Usually, its first column is the intercept (full of \code{1}s).
+#'\item If \code{object} is specified: then \code{covariates} must be a
+#'character vector of length \code{p} containing the colnames of the
+#'design matrix given in \code{object}.
+#'}
+#'
+#'@param variables2test \itemize{
+#'\item If \code{exprmat} is specified as a matrix:
+#'a numeric design matrix of size \code{n x K} containing
+#'the \code{K} variables to be tested.
+#'\item If \code{object} is specified: then \code{variables2test} must be a
+#'character vector of length \code{K} containing the colnames of the
+#'design matrix given in \code{object}.
+#'}
 #'
 #'@param weights_var2test_condi  a logical flag indicating whether
 #'heteroscedasticity weights computation should be conditional on both the
@@ -190,7 +210,7 @@
 #'summary(res_genes$pvals)
 #'}
 #'@export
-dear_seq <- function(exprmat,
+dear_seq <- function(exprmat = NULL, object = NULL,
                      covariates,
                      variables2test,
                      sample_group = NULL,
@@ -216,7 +236,7 @@ dear_seq <- function(exprmat,
                      homogen_traj = FALSE,
                      na.rm_dearseq = TRUE) {
 
-  return(dgsa_seq(exprmat = exprmat,
+  return(dgsa_seq(exprmat = exprmat, object = object,
                  covariates = covariates,
                  variables2test = variables2test,
                  weights_var2test_condi = weights_var2test_condi,
