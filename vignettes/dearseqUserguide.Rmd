@@ -149,8 +149,9 @@ We use the permutation test because of the relatively small sample size ($n=33$)
 
 ```{r LR_ST_echo, eval=FALSE, echo=TRUE}
 library(dearseq)
+library(SummarizedExperiment)
 # Remember the Latent TB samples are excluded 
-col_data <- DataFrame(model.matrix(~group))
+col_data <- data.frame(model.matrix(~group))
 rownames(col_data) <- colnames(London[,-group_London_LTBI])
 se <- SummarizedExperiment(assays = London[,-group_London_LTBI], 
                             colData = col_data)
@@ -161,9 +162,10 @@ res_dearseq <- dearseq::dear_seq(object = se,
                                  preprocessed=TRUE)
 ```
 ```{r LR_ST_eval, eval=TRUE, echo=FALSE}
-col_data <- DataFrame(model.matrix(~group))
+library(SummarizedExperiment)
+col_data <- data.frame(model.matrix(~group))
 rownames(col_data) <- colnames(London[,-group_London_LTBI])
-se <- SummarizedExperiment(assays = London[,-group_London_LTBI], 
+se <- SummarizedExperiment::SummarizedExperiment(assays = London[,-group_London_LTBI], 
                             colData = col_data)
 res_dearseq <- dearseq::dear_seq(object = se, 
                                  covariates = "X.Intercept.",
@@ -205,9 +207,10 @@ Cold <- dearseq::dgsa_seq(object = se2,
 
 ```{r baduel_eval, eval=TRUE, echo=FALSE}
 library(dearseq)
+library(SummarizedExperiment)
 data('baduel_5gs')
 
-se2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
+se2 <- SummarizedExperiment::SummarizedExperiment(assay = log2(expr_norm_corr+1), 
                              colData = design)
 KAvsTBG <- dearseq::dgsa_seq(object = se2,
                     covariates=c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
