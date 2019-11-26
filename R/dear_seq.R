@@ -10,7 +10,7 @@
 #'
 #'@param object an object that can be either a
 #'\code{\link[SummarizedExperiment:RangedSummarizedExperiment-class]{SummarizedExperiment}},
-#'an \code{\link[Biobase:ExpressionSet-class]{ExpressionSet}}, a
+#'an \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}}, a
 #'\code{\link[DESeq2:DESeqDataSet]{DESeqDataSet}}, or a
 #'\code{\link[edgeR:DGEList]{DGEList}}.
 #'Default is \code{NULL}, in which case \code{exprmat} must not be
