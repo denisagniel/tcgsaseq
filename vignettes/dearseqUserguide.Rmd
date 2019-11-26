@@ -182,7 +182,10 @@ res_dearseq <- dearseq::dear_seq(object = se,
 
 # Using `dearseq` for gene-set analysis
 
-Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) studying Arabidopsis Arenosa physiology, that is included in the dearseq package.
+Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) studying Arabidopsis Arenosa physiology, that is included in the dearseq package. 
+
+We investigates 2 gene sets that were derived in a data-driven manner By Baduel *et al.* (2016).
+
 
 ```{r baduel_echo, eval=FALSE, echo=TRUE}
 data('baduel_5gs')
@@ -195,6 +198,7 @@ KAvsTBG <- dearseq::dgsa_seq(object = se2,
                              which_test = 'permutation', which_weights = 'loclin',
                              n_perm=1000, preprocessed = TRUE, doPlot = FALSE, 
                              verbose = FALSE)
+KAvsTBG$pvals
 
 Cold <- dearseq::dgsa_seq(object = se2,
                           covariates = c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
@@ -203,6 +207,7 @@ Cold <- dearseq::dgsa_seq(object = se2,
                           which_test = 'permutation', which_weights = 'loclin',
                           n_perm = 1000, preprocessed = TRUE, doPlot = FALSE, 
                           verbose = FALSE)
+Cold$pvals
 ```
 
 ```{r baduel_eval, eval=TRUE, echo=FALSE}
@@ -272,3 +277,10 @@ if (!requireNamespace("readxl", quietly = TRUE)) {
 ```
 
 More details can be found on [Bioconductor](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) and in Davis S, Meltzer P, (2007) GEOquery: a bridge between the Gene Expression Omnibus (GEO) and Bioconductor _Bioinformatics_ 14:1846-1847.
+
+## Session Info
+```{r, echo=FALSE}
+utils::sessionInfo()
+```
+
+
