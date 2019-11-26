@@ -237,9 +237,11 @@ Agniel D & Hejblum BP (2017). Variance component score test for time-course gene
 Baduel P, Arnold B, Weisman CM, Hunter B & Bomblies K (2016). Habitat-Associated Life History and Stress-Tolerance Variation in Arabidopsis Arenosa. *Plant Physiology*, 171(1):437-51.
 [DOI: 10.1104/pp.15.01875](https://doi.org/10.1104/pp.15.01875).
 
-Berry MP, Graham CM, McNab FW, Xu Z, Bloch SAA, Oni T, Wilkinson KA, Banchereau R, Skinner J, Wilkinson RJ, Quinn C, Blankenship D, Dhawan R, Cush JJ, Mejias A, Ramilo O, Kon OM, Pascual V, Banchereau J, Chaussabel D & O’Garra A (2010). An interferon-inducible neutrophil-driven blood transcriptional signature in human tuberculosis. _Nature_ 466:973–977. [DOI: 10.1038/nature09247](https://doi.org/10.1038/nature09247)
+Berry MP, Graham CM, McNab FW, Xu Z, Bloch SAA, Oni T, Wilkinson KA, Banchereau R, Skinner J, Wilkinson RJ, Quinn C, Blankenship D, Dhawan R, Cush JJ, Mejias A, Ramilo O, Kon OM, Pascual V, Banchereau J, Chaussabel D & O’Garra A (2010). An interferon-inducible neutrophil-driven blood transcriptional signature in human tuberculosis. *Nature* 466:973–977. [DOI: 10.1038/nature09247](https://doi.org/10.1038/nature09247)
 
-Gauthier M, Agniel D, THiébaut R & Hejblum BP (2019). Variance component score test for time-course gene set analysis of longitudinal RNA-seq data. *bioRxiv* 635714. [DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
+Gauthier M, Agniel D, Thiébaut R & Hejblum BP (2019). dearseq: a
+variance component score test for RNA-Seq differential analysis that
+effectively controls the false discovery rate. *bioRxiv* 635714. [DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
 
 
 Singhania A, Verma R, Graham CM, Lee J, Tran T, Richardson M, Lecine P, Leissner P, Berry MPR, Wilkinson RJ, Kaiser K, Rodrigue M, Woltmann G, Haldar P, O’Garra A, (2018). A modular transcriptional signature identifies phenotypic heterogeneity of human tuberculosis infection. _Nature communications_ 9(1):2308. [DOI: 10.1038/s41467-018-04579-w](https://doi.org/10.1038/s41467-018-04579-w)

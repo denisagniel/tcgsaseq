@@ -160,11 +160,10 @@
 #'@seealso \code{\link{sp_weights}} \code{\link{vc_test_perm}}
 #'\code{\link{vc_test_asym}} \code{\link{p.adjust}}
 #'
-#'@references Agniel D & Hejblum BP (2017). Variance component score test for
-#'time-course gene set analysis of longitudinal RNA-seq data,
-#'\emph{Biostatistics}, 18(4):589-604.
-#'\href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
-#'\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
+#'@references Gauthier M, Agniel D, Thiébaut R & Hejblum BP (2019).
+#'dearseq: a variance component score test for RNA-Seq differential analysis
+#'that effectively controls the false discovery rate, *bioRxiv* 635714.
+#'[DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
 #'
 #'@examples
 #'#rm(list=ls())

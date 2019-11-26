@@ -1,8 +1,8 @@
 Package: dearseq
 Type: Package
 Title: Differential Expression Analysis for RNA-seq data
-Version: 0.99.0
-Date: 2019-11-21
+Version: 0.99.1
+Date: 2019-11-26
 Authors@R: c(person("Denis", "Agniel", role = c("aut"),
                     email = "denis.agniel@gmail.com"),
 	           person("Boris P.", "Hejblum", role = c("aut", "cre"),
@@ -19,7 +19,10 @@ Description: Differential Expression Analysis RNA-seq data with variance
              and can deal with repeated or longitudinal data. Methods are 
              detailed in: Agniel D & Hejblum BP (2017) Variance component score 
              test for time-course gene set analysis of longitudinal RNA-seq 
-             data, Biostatistics, 18(4):589-604.
+             data, Biostatistics, 18(4):589-604. and Gauthier M, Agniel D, 
+             Thiébaut R & Hejblum BP (2019). dearseq: a variance component 
+             score test for RNA-Seq differential analysis that effectively 
+             controls the false discovery rate, *bioRxiv* 635714.
 LazyData: true
 License: GPL-2 | file LICENSE
 biocViews: BiomedicalInformatics, CellBiology, DifferentialExpression, DNASeq,

@@ -16,7 +16,7 @@ Status](https://img.shields.io/codecov/c/github/borishejblum/dearseq/master.svg)
 ## Overview
 
 `dearseq` is a package for analyzing RNA-seq data. The 2 main functions
-of the package are `dear_seq` and `tcgsa_seq`:
+of the package are `dear_seq()` and `dgsa_seq()`:
 
   - **Gene-wise Differential Analysis of RNA-seq data** can be performed
     using the function `dear_seq()`.
@@ -28,7 +28,7 @@ articles:
 
 > Gauthier M, Agniel D, Thiébaut R & Hejblum BP (2019). dearseq: a
 > variance component score test for RNA-Seq differential analysis that
-> effectively controls the false discovery rate, *bioRxiv*.
+> effectively controls the false discovery rate, *bioRxiv* 635714.
 > [DOI: 10.1101/635714](https://doi.org/10.1101/635714)
 
 > Agniel D & Hejblum BP (2017). Variance component score test for
