@@ -3,6 +3,7 @@
 # Dorr et al. 2015
 ###################
 rm(list=ls())
+library(tcgsaseq)
 
 # Data import
 # data available at : http://conservancy.umn.edu/handle/11299/177631.1
@@ -10,7 +11,7 @@ FPKMs <- as.matrix(read.delim("http://conservancy.umn.edu/bitstream/handle/11299
 clinical <- read.delim("http://conservancy.umn.edu/bitstream/handle/11299/177631.1/clinical.txt")
 
 # loading gene sets of interest
-data(PBTreproducible)
+data("PBT_gmt")
 
 # data preprocess
 FPKMs <- FPKMs[, as.character(clinical$ID)]
@@ -18,7 +19,6 @@ cs_fpkm <- colSums(FPKMs)
 TPMs <- (FPKMs/cs_fpkm)*10^6
 design <- as.matrix(clinical[, -1])
 log2TPMs <- log2(TPMs + 1)
-data("PBTrepoducible_gmt")
 
 # limma preprocessing
 library(limma)
@@ -44,7 +44,7 @@ cl <- parallel::makeCluster(parallel::detectCores()-2, outfile="")
 doParallel::registerDoParallel(cl)
 res_all_par <- foreach(gs=1:length(PBT_gmt[[1]]), .packages=c("tcgsaseq", "limma")) %dopar% {
 
-  cat(gs, "/", length(PBT_gmt[[1]]), sep="")
+  cat(gs, "/", length(PBT_gmt[[1]]),"\n", sep="")
   gs_test <- intersect(PBT_gmt[[1]][[gs]], rownames(log2TPMs))
 
   if(length(gs_test)<2){
@@ -77,7 +77,6 @@ res_all_par <- foreach(gs=1:length(PBT_gmt[[1]]), .packages=c("tcgsaseq", "limma
                                  Sigma_xi = as.matrix(diag(ncol(phi_test))))[["set_pval"]]
 
   }
-  cat(" DONE\n")
   return(list("voomRoast" = res_voomRoast, "tcgsaseq" = res_tcgsaseq))
 }
 
