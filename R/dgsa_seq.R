@@ -42,13 +42,22 @@
 #'\code{x} alone. Default is \code{TRUE} in which case conditional means are
 #'estimated conditionally on both \code{x} and \code{phi}.
 #'
-#'@param genesets either a vector of index or subscripts that defines which
+#'@param genesets Can be either:\itemize{
+#'\item a \code{vector}
+#'\item a \code{list}
+#'\item a \code{BiocSet} object
+#'}
+#'Can be a vector of index or subscripts that defines which
 #'rows of \code{y} constitute the investigated gene set (when only 1 gene
 #'set is being tested).
+#'
 #'Can also be a \code{list} of index (or \code{rownames} of \code{y}) when
 #'several gene sets are tested at once, such as the first element of a
-#'\code{\link[GSA]{gmt}} object. If \code{NULL}, then gene-wise
-#'p-values are returned.
+#'\code{\link[GSA:GSA.read.gmt]{gmt}} object. 
+#'
+#'Finally, can also be a \code{\link[BiocSet]{BiocSet}} object
+#'
+#'If \code{NULL}, then gene-wise p-values are returned.
 #'
 #'@param sample_group a vector of length \code{n} indicating whether the samples
 #'should be grouped (e.g. paired samples or longitudinal data). Coerced
@@ -535,7 +544,42 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
         if (!is.null(rownames(y_lcpm))) {
             rownames(pvals) <- rownames(y_lcpm)
         }
-    } else if (is.list(genesets)) {
+    } else {
+        if(is(genesets, "BiocSet")){
+            genesets <- BiocSet::es_elementset(genesets)
+            genesets_names <- unique(genesets$set)
+            genesets <- lapply(X  = unique(genesets$set), 
+                               FUN = function(x){
+                                   genesets[genesets$set == x,]$element
+                               }
+            )
+            names(genesets) <- genesets_names
+            
+        }
+        if (!is.list(genesets)) {
+            if (!is.vector(genesets)) {
+                stop("'genesets' argument provided but is neither a list ",
+                     ", a vector, nor a BiocSet object")
+            }
+            
+            if (is(genesets, "character")) {
+                if (is.null(rownames(y_lcpm))) {
+                    stop("Gene sets specified as character but no rownames",
+                         "available for the expression matrix")
+                }
+                gene_names_measured <- rownames(y_lcpm)
+                if ((length(intersect(genesets,
+                                      gene_names_measured))/length(x)) != 1) {
+                    message("Some transcripts in the investigated gene set ",
+                            "were not measured:\n-> automatically removing ",
+                            "those transcripts from the gene set definition")
+                    genesets <- genesets[which(genesets %in% 
+                                                   gene_names_measured)]
+                }
+            }
+            padjust_methods <- NA
+            genesets <- list(genesets)
+        }
         
         if (is(genesets[[1]], "character")) {
             if (is.null(rownames(y_lcpm))) {
@@ -621,63 +665,19 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             }, FUN.VALUE = 0.5)
         }
         
-        pvals <- data.frame(rawPval = rawPvals,
-                            adjPval = stats::p.adjust(rawPvals, padjust_methods)
-        )
+        if(!is.na(padjust_methods)){
+            pvals <- data.frame(rawPval = rawPvals,
+                                adjPval = stats::p.adjust(rawPvals, 
+                                                          padjust_methods)
+            )
+        }else{
+            pvals <- data.frame(rawPval = rawPvals, adjPval = NA)
+        }
         if (!is.null(names(genesets))) {
             rownames(pvals) <- names(genesets)
         }
         
-    } else {
-        
-        if (!is.vector(genesets)) {
-            stop("'genesets' argument provided but is neither a list ",
-                 "nor a vector")
-        }
-        
-        if (is(genesets, "character")) {
-            if (is.null(rownames(y_lcpm))) {
-                stop("Gene sets specified as character but no rownames",
-                     "available for the expression matrix")
-            }
-            gene_names_measured <- rownames(y_lcpm)
-            if ((length(intersect(genesets,
-                                  gene_names_measured))/length(x)) != 1) {
-                warning("Some transcripts in the investigated gene sets ",
-                        "were not measured:\n removing those transcripts ",
-                        "from the gene set definition...")
-                genesets <- genesets[which(genesets %in% gene_names_measured)]
-            }
-        }
-        
-        res_test <- switch(which_test,
-                           asymptotic =
-                               vc_test_asym(y = y_lcpm[genesets, ],
-                                            x = x, indiv = sample_group,
-                                            phi = phi,
-                                            w = w[genesets, ],
-                                            Sigma_xi = cov_variables2test_eff,
-                                            genewise_pvals = FALSE,
-                                            homogen_traj = homogen_traj,
-                                            na.rm = na.rm_gsaseq),
-                           permutation =
-                               vc_test_perm(y = y_lcpm[genesets, ],
-                                            x = x, indiv = sample_group,
-                                            phi = phi,
-                                            w = w[genesets, ],
-                                            Sigma_xi = cov_variables2test_eff,
-                                            n_perm = n_perm,
-                                            progressbar = progressbar,
-                                            parallel_comp = parallel_comp,
-                                            nb_cores = nb_cores,
-                                            genewise_pvals = FALSE,
-                                            homogen_traj = homogen_traj,
-                                            na.rm = na.rm_gsaseq))
-        pvals <- data.frame(rawPval = res_test$set_pval, adjPval = NA)
-        padjust_methods <- NA
-        
     }
-    
     if(is.null(genesets)){
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
                           n_perm = n_perm, pvals = pvals)

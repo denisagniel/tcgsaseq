@@ -74,13 +74,22 @@ variable(s) to be tested \code{phi} and on covariate(s) \code{x}, or on
 \code{x} alone. Default is \code{TRUE} in which case conditional means are
 estimated conditionally on both \code{x} and \code{phi}.}
 
-\item{genesets}{either a vector of index or subscripts that defines which
+\item{genesets}{Can be either:\itemize{
+\item a \code{vector}
+\item a \code{list}
+\item a \code{BiocSet} object
+}
+Can be a vector of index or subscripts that defines which
 rows of \code{y} constitute the investigated gene set (when only 1 gene
 set is being tested).
+
 Can also be a \code{list} of index (or \code{rownames} of \code{y}) when
 several gene sets are tested at once, such as the first element of a
-\code{\link[GSA]{gmt}} object. If \code{NULL}, then gene-wise
-p-values are returned.}
+\code{\link[GSA:GSA.read.gmt]{gmt}} object. 
+
+Finally, can also be a \code{\link[BiocSet]{BiocSet}} object
+
+If \code{NULL}, then gene-wise p-values are returned.}
 
 \item{sample_group}{a vector of length \code{n} indicating whether the samples
 should be grouped (e.g. paired samples or longitudinal data). Coerced

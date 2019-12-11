@@ -44,7 +44,7 @@
 #'  \code{AgeWeeks}, \code{Vernalized} and \code{Population} variables
 #'}
 #'\item{\code{baduel_gmt}:} a \code{gmt} object containing 5 gene sets of
-#'interest (see \code{\link[GSA]{GSA.read.gmt}}, which is simply a
+#'interest (see \code{\link[GSA]{GSA.read.gmt}}), which is simply a
 #'\code{list} with the 3 following components:\itemize{
 #'\item \code{genesets}: a \code{list} of \code{n} gene identifiers vectors 
 #'composing eachgene set (each gene set is represented as the vector of the 

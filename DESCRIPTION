@@ -1,6 +1,7 @@
 Package: dearseq
 Type: Package
-Title: Differential Expression Analysis for RNA-seq data through a robust variance component test
+Title: Differential Expression Analysis for RNA-seq data through a robust 
+       variance component test
 Version: 0.99.6
 Date: 2019-12-11
 Authors@R: c(person("Denis", "Agniel", role = c("aut"),
@@ -10,9 +11,10 @@ Authors@R: c(person("Denis", "Agniel", role = c("aut"),
 	           person("Marine", "Gauthier", role = c("aut"),
 	                  email = "marine.gauthier@u-bordeaux.fr"))
 Depends: R (>= 4.0.0)
-Imports: CompQuadForm, ggplot2, GSA, KernSmooth, matrixStats, methods, parallel, pbapply, stats, statmod
-Suggests: Biobase, BiocManager, edgeR, DESeq2, GEOquery, knitr, limma, readxl, rmarkdown, 
-          S4Vectors, SummarizedExperiment, testthat, covr
+Imports: CompQuadForm, ggplot2, KernSmooth, matrixStats, methods, parallel, 
+         pbapply, stats, statmod
+Suggests: Biobase, BiocManager, BiocSet, edgeR, DESeq2, GEOquery, GSA, knitr, 
+          limma, readxl, rmarkdown, S4Vectors, SummarizedExperiment, testthat, covr
 Description: Differential Expression Analysis RNA-seq data with variance 
              component score test accounting for data heteroscedasticity through
              precision weights. Perform both gene-wise and gene set analyses, 
@@ -26,8 +28,8 @@ Description: Differential Expression Analysis RNA-seq data with variance
 LazyData: true
 License: GPL-2 | file LICENSE
 biocViews: BiomedicalInformatics, CellBiology, DifferentialExpression, DNASeq,
-        GeneExpression, Genetics, GeneSetEnrichment, ImmunoOncology, Regression, 
-        RNASeq, Sequencing, SystemsBiology, TimeCourse, Transcription, 
+        GeneExpression, Genetics, GeneSetEnrichment, ImmunoOncology, KEGG,
+        Regression, RNASeq, Sequencing, SystemsBiology, TimeCourse, Transcription, 
         Transcriptomics
 BugReports: https://github.com/borishejblum/dearseq/issues
 Encoding: UTF-8

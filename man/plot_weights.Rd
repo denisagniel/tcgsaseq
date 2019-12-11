@@ -41,11 +41,13 @@ p <- 2
 y <- sapply(1:n, FUN = function(x){rnbinom(n = G, size = 0.07, mu = 200)})
 x <- sapply(1:p, FUN = function(x){rnorm(n = n, mean = n, sd = 1)})
 
-w <- sp_weights(y, x, use_phi=FALSE, na.rm = TRUE, gene_based=TRUE)
-plot_weights(w)
+if(interactive()){
+ w <- sp_weights(y, x, use_phi=FALSE, na.rm = TRUE, gene_based=TRUE)
+ plot_weights(w)
 
-vw <-  voom_weights(y, x)
-plot_weights(vw)
+ vw <-  voom_weights(y, x)
+ plot_weights(vw)
+}
 
 }
 \author{

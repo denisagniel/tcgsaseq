@@ -34,6 +34,5 @@
 #'
 #'@docType package
 #'@name dearseq
-#'@importFrom GSA GSA.read.gmt
 #'
 NULL

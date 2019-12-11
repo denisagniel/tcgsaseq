@@ -184,11 +184,13 @@ We investigates 2 gene sets that were derived in a data-driven manner By Baduel
 ```{r baduel, eval=TRUE, echo=TRUE}
 library(dearseq)
 library(SummarizedExperiment)
+library(BiocSet)
 data('baduel_5gs')
 se2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
                             colData = design)
-genes0var_ind <- which(rowVars(expr_norm_corr)==0)
-KAvsTBG <- dearseq::dgsa_seq(object = se2[-genes0var_ind, ],
+genes_non0var_ind <- which(matrixStats::rowVars(expr_norm_corr)!=0)
+
+KAvsTBG <- dearseq::dgsa_seq(object = se2[genes_non0var_ind, ],
                              covariates=c('Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
                              variables2test = 'PopulationKA',
                              genesets=baduel_gmt$genesets[c(3,5)],
@@ -197,7 +199,7 @@ KAvsTBG <- dearseq::dgsa_seq(object = se2[-genes0var_ind, ],
                              verbose = FALSE, parallel_comp = FALSE)
 KAvsTBG$pvals
 
-Cold <- dearseq::dgsa_seq(object = se2[-genes0var_ind, ],
+Cold <- dearseq::dgsa_seq(object = se2[genes_non0var_ind, ],
                           covariates = c('AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
                           variables2test = c('Vernalized', 'Vernalized_Population'),
                           genesets = baduel_gmt$genesets[c(3,5)],
