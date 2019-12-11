@@ -16,7 +16,7 @@ cache:
 # Adapt as necessary starting from here
 
 build_script:
-  - travis-tool.sh install_bioc limma edgeR DESeq2 GEOquery
+  - travis-tool.sh install_bioc Biobase BiocSet edgeR DESeq2 GEOquery limma SummarizedExperiment S4Vectors
   - travis-tool.sh install_deps
   - travis-tool.sh github_package jimhester/covr hadley/scales
 

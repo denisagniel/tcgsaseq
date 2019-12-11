@@ -87,7 +87,7 @@ Can also be a \code{list} of index (or \code{rownames} of \code{y}) when
 several gene sets are tested at once, such as the first element of a
 \code{\link[GSA:GSA.read.gmt]{gmt}} object. 
 
-Finally, can also be a \code{\link[BiocSet]{BiocSet}} object
+Finally, can also be a \code{\link[BiocSet:BiocSet-class]{BiocSet}} object
 
 If \code{NULL}, then gene-wise p-values are returned.}
 
