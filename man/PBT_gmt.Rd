@@ -6,7 +6,16 @@
 \alias{PBT}
 \title{PBT gene sets related to kidney transplant}
 \format{a \code{gmt} object containing 9 gene sets specific to kidney
-transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})}
+transplant (see \code{\link[GSA]{GSA.read.gmt}}), which is simply a
+\code{list} with the 3 following components:\itemize{
+\item \code{genesets}: a \code{list} of \code{n} gene identifiers vectors 
+composing eachgene set (each gene set is represented as the vector of the 
+gene identifiers composing it)
+\item \code{geneset.names}: a vector of length \code{n} containing the gene 
+set names (i.e. gene sets identifiers)
+\item{geneset.descriptions}: a vector of length \code{n} containing gene set 
+descriptions (e.g. textual information on their biological function)
+}}
 \source{
 \url{http://atagc.med.ualberta.ca/Research/GeneLists}
 }

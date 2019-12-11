@@ -73,7 +73,6 @@
 #'@seealso \code{\link[CompQuadForm]{davies}}
 #'
 #'@examples
-#'#rm(list=ls())
 #'set.seed(123)
 #'
 #'##generate some fake data
@@ -124,13 +123,13 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
     }
 
     if (is.null(indiv)) {
-        options(warn = -1)
+        #suppressWarnings(
         N_possible_perms <- factorial(ncol(y))
-        options(warn = 0)
+        #)
     } else {
-        options(warn = -1)
+        #suppressWarnings(
         N_possible_perms <- prod(vapply(table(indiv), factorial, FUN.VALUE = 1))
-        options(warn = 0)
+        #)
     }
 
 

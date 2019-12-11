@@ -24,17 +24,23 @@ knitr::knit_hooks$set(small.mar = function(before, options, envir) {
 
 # Overview of `dearseq`
 
-`dearseq` is an `R` package that performs **D**ifferential **E**xpression **A**nalysis of **R**NA-**seq** data, while guaranteeing a *sound control of false positives* (Gauthier *et al.*, 2019). It relies on variance component score test accounting for data heteroscedasticity through precision weights, not unlike `voom` (Law *et al.*, 2014). It can perform either 
+`dearseq` is an `R` package that performs **D**ifferential **E**xpression 
+**A**nalysis of **R**NA-**seq** data, while guaranteeing a *sound control of 
+false positives* (Gauthier *et al.*, 2019). It relies on variance component 
+score test accounting for data heteroscedasticity through precision weights, 
+not unlike `voom` (Law *et al.*, 2014). It can perform either 
 
  - **gene-wise** differential analysis, or
  - **gene set analysis**
  
-In addition, `dearseq` can deal with various and complex experimental designs such as:
+In addition, `dearseq` can deal with various and complex experimental designs 
+such as:
 
  - **multiple biological conditions**, 
  - **repeated or longitudinal measurements**
 
-More details are provided in this [*bioRxiv* preprint 635714](https://www.biorxiv.org/content/10.1101/635714v1).
+More details are provided in this 
+[*bioRxiv* preprint 635714](https://www.biorxiv.org/content/10.1101/635714v1).
 
 
 # Using `dearseq` for a gene-wise analysis 
@@ -44,12 +50,17 @@ More details are provided in this [*bioRxiv* preprint 635714](https://www.biorxi
 2 inputs are required to run `dear_seq()`:
 
  - The gene expression matrix
- - The data.frame containing the variables of interested to be tested (e.g. the group factor)
+ - The data.frame containing the variables of interested to be tested (e.g. 
+ the group factor)
 
-A third optional input is a data.frame containing the covariates that will be adjusted on (such as age for instance).
+Both can be supplied in the formed of a `SummarizedExperiment` object for 
+instance.
+A third optional input is the covariates that will be adjusted on (such as 
+age for instance).
+
+
 
 ## An example analysis
-
 
 Tuberculosis (TB) is a disease caused by a bacterium called Mycobacterium tuberculosis. Bacteria typically infect the lungs, but they can also affect other parts of the body. Tuberculosis can remain in a quiescent state in the body. It is called latent tuberculosis infection (LTBI). It is an infection without clinical signs, bacteriological and radiological disease.
 
@@ -69,14 +80,6 @@ Data from *Singhania et al.* inverstigating active TB are publicly available on 
 
 
 #### Design data matrix
-```{r GEOquery, message=FALSE, echo=FALSE, eval=TRUE}
-if (!requireNamespace("GEOquery", quietly = TRUE)) {
-    if (!requireNamespace("BiocManager", quietly = TRUE)) {
-        install.packages("BiocManager")
-    }
-    BiocManager::install("GEOquery")
-}
-```
 
 ```{r import, message=FALSE, results='hide'}
 library(GEOquery)
@@ -86,25 +89,18 @@ get_info <- function(i){
     name <- GEOquery::Meta(GSMList(GSE107991_metadata)[[i]])$source_name_ch1
     name <- gsub("Active_TB", "ActiveTB", name)
     name <- gsub("Test_set", "TestSet", name)
-    unlist(strsplit(name, split="_"))
+    c(unlist(strsplit(name, split="_")), 
+             GEOquery::Meta(GSMList(GSE107991_metadata)[[i]])$title)
 }
 
-infos <- vapply(1:length(GSMList(GSE107991_metadata)), FUN=get_info,
-                FUN.VALUE = c("a", "b", "c", "d"))
-infos_df <- cbind.data.frame("SampleID" = names(GSMList(GSE107991_metadata)), t(infos))
+infos <- vapply(X = 1:length(GSMList(GSE107991_metadata)), 
+                FUN = get_info,
+                FUN.VALUE = c("a", "b", "c", "d", "e"))
+infos_df <- cbind.data.frame("SampleID" = names(GSMList(GSE107991_metadata)), 
+                             t(infos))
 rownames(infos_df) <- names(GEOquery::GSMList(GSE107991_metadata))
-colnames(infos_df)[-1] <- c("Cohort", "Location", "Set", "Status")
-
-group_London_TB <- which(infos_df$Status=="ActiveTB") # 21
-group_London_LTBI <- which(infos_df$Status=="LTBI") # 21
-group_London_Control <- which(infos_df$Status=="Control") # 12
-
-group <- rep(NA,length(infos_df$Status[-group_London_LTBI]))
-group[which(infos_df$Status[-group_London_LTBI]=="ActiveTB")] <- rep(1,length(which(infos_df$Status[-group_London_LTBI]=="ActiveTB")))
-group[which(infos_df$Status[-group_London_LTBI]=="Control")] <- rep(0,length(which(infos_df$Status[-group_London_LTBI]=="Control")))
+colnames(infos_df)[-1] <- c("Cohort", "Location", "Set", "Status", "SampleTitle")
 ```
-
-**NB:** We excluded the LTBI patients to focus on the comparison between Active TB patients and Control patients.
 
 
 #### Gene expression matrix
@@ -115,13 +111,16 @@ could already be normalized, or not (e.g. raw counts or pseudo-counts straight
 from the alignment). In the latter case, the gene expression is 
 normalized then into log(counts) per million (i.e. *log-cpm*). 
 
-The gene expression matrix (called `London`) is including in the package `dearseq`. It was extracted from one of the GEO supplementary files (namely the "GSE107991_edgeR_normalized_Berry_London.xlsx" file). 
+The gene expression matrix (called `London`) is including in the package `dearseq`. 
+It was extracted from one of the GEO supplementary files (namely the 
+"GSE107991_edgeR_normalized_Berry_London.xlsx" file). 
 
 **NB:** These expression data have already been already normalized using `edgeR`
 
 ```{r London-download, message=FALSE, results='hide'}
 library(readxl)
-GEOquery::getGEOSuppFiles('GSE107991', filter_regex="edgeR_normalized_Berry_London")
+GEOquery::getGEOSuppFiles('GSE107991', 
+                          filter_regex="edgeR_normalized_Berry_London")
 London <- readxl::read_excel("GSE107991/GSE107991_edgeR_normalized_Berry_London.xlsx")
 genes <- London$Genes
 London <- as.matrix(London[, -c(1:3)])
@@ -147,92 +146,68 @@ The main arguments to the `dear_seq()` function are:
 
 We use the permutation test because of the relatively small sample size ($n=33$).
 
-```{r LR_ST_echo, eval=FALSE, echo=TRUE}
+```{r LR_ST_echo, eval=TRUE, echo=TRUE, message=FALSE}
 library(dearseq)
 library(SummarizedExperiment)
-# Remember the Latent TB samples are excluded 
-col_data <- data.frame(model.matrix(~group))
-rownames(col_data) <- colnames(London[,-group_London_LTBI])
-se <- SummarizedExperiment(assays = London[,-group_London_LTBI], 
+col_data <- data.frame("Status" = infos_df$Status)
+col_data$Status <- stats::relevel(col_data$Status, ref="Control")
+rownames(col_data) <- infos_df$SampleTitle
+se <- SummarizedExperiment(assays = London, 
                             colData = col_data)
-res_dearseq <- dearseq::dear_seq(object = se, 
-                                 covariates = "X.Intercept.",
-                                 variables2test = "group",
-                                 which_test='asymptotic', doPlot = FALSE,
+
+res_dearseq <- dearseq::dear_seq(object = se[, se$Status != "LTBI"],
+                                 variables2test = "Status",
+                                 which_test='asymptotic',
                                  preprocessed=TRUE)
 ```
-```{r LR_ST_eval, eval=TRUE, echo=FALSE}
-library(SummarizedExperiment)
-col_data <- data.frame(model.matrix(~group))
-rownames(col_data) <- colnames(London[,-group_London_LTBI])
-se <- SummarizedExperiment::SummarizedExperiment(assays = London[,-group_London_LTBI], 
-                            colData = col_data)
-res_dearseq <- dearseq::dear_seq(object = se, 
-                                 covariates = "X.Intercept.",
-                                 variables2test = "group",
-                                 which_test='asymptotic', doPlot = FALSE,
-                                 preprocessed=TRUE, parallel_comp = FALSE)
-```
+
 
 `res_dearseq` is a list containing: 
 
  - the input values for `which_test`, `nperm` and `preprocessed`
- - the gene-wise p-values (raw and adjusted - default is correction for multiple testing with the Benjamini-Hochberg procedure)
+ - the gene-wise p-values (raw and adjusted - default is correction for multiple 
+ testing with the Benjamini-Hochberg procedure)
 
+**NB:** We excluded the LTBI patients to focus on the comparison between Active 
+TB versus Control patients.
 
 # Using `dearseq` for gene-set analysis
 
-Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) studying Arabidopsis Arenosa physiology, that is included in the dearseq package. 
+Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) 
+studying Arabidopsis Arenosa physiology, that is included in the `dearseq` 
+package. 
 
-We investigates 2 gene sets that were derived in a data-driven manner By Baduel *et al.* (2016).
+We investigates 2 gene sets that were derived in a data-driven manner By Baduel 
+*et al.* (2016).
 
 
-```{r baduel_echo, eval=FALSE, echo=TRUE}
-data('baduel_5gs')
-se2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
-                             colData = design)
-KAvsTBG <- dearseq::dgsa_seq(object = se2,
-                             covariates=c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
-                             variables2test = 'PopulationKA',
-                             genesets=baduel_gmt$genesets[c(3,5)],
-                             which_test = 'permutation', which_weights = 'loclin',
-                             n_perm=1000, preprocessed = TRUE, doPlot = FALSE, 
-                             verbose = FALSE)
-KAvsTBG$pvals
-
-Cold <- dearseq::dgsa_seq(object = se2,
-                          covariates = c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
-                          variables2test = c('Vernalized', 'Vernalized_Population'),
-                          genesets = baduel_gmt$genesets[c(3,5)],
-                          which_test = 'permutation', which_weights = 'loclin',
-                          n_perm = 1000, preprocessed = TRUE, doPlot = FALSE, 
-                          verbose = FALSE)
-Cold$pvals
-```
-
-```{r baduel_eval, eval=TRUE, echo=FALSE}
+```{r baduel, eval=TRUE, echo=TRUE}
 library(dearseq)
 library(SummarizedExperiment)
 data('baduel_5gs')
+se2 <- SummarizedExperiment(assay = log2(expr_norm_corr+1), 
+                            colData = design)
+genes0var_ind <- which(rowVars(expr_norm_corr)==0)
+KAvsTBG <- dearseq::dgsa_seq(object = se2[-genes0var_ind, ],
+                             covariates=c('Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
+                             variables2test = 'PopulationKA',
+                             genesets=baduel_gmt$genesets[c(3,5)],
+                             which_test = 'permutation', which_weights = 'loclin',
+                             n_perm=1000, preprocessed = TRUE,
+                             verbose = FALSE, parallel_comp = FALSE)
+KAvsTBG$pvals
 
-se2 <- SummarizedExperiment::SummarizedExperiment(assay = log2(expr_norm_corr+1), 
-                             colData = design)
-KAvsTBG <- dearseq::dgsa_seq(object = se2,
-                    covariates=c('Intercept', 'Vernalized', 'AgeWeeks', 'Vernalized_Population', 'AgeWeeks_Population'),
-                    variables2test = 'PopulationKA',
-                    genesets=baduel_gmt$genesets[c(3,5)],
-                    which_test = 'permutation', which_weights = 'loclin',
-                    n_perm=1000, preprocessed = TRUE, doPlot = FALSE, 
-                    verbose = FALSE, parallel_comp = FALSE)
-
-Cold <- dearseq::dgsa_seq(object = se2,
-                 covariates = c('Intercept', 'AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
-                 variables2test = c('Vernalized', 'Vernalized_Population'),
-                 genesets = baduel_gmt$genesets[c(3,5)],
-                 which_test = 'permutation', which_weights = 'loclin',
-                 n_perm = 1000, preprocessed = TRUE, doPlot = FALSE, 
-                 verbose = FALSE, parallel_comp = FALSE)
+Cold <- dearseq::dgsa_seq(object = se2[-genes0var_ind, ],
+                          covariates = c('AgeWeeks', 'PopulationKA', 'AgeWeeks_Population'),
+                          variables2test = c('Vernalized', 'Vernalized_Population'),
+                          genesets = baduel_gmt$genesets[c(3,5)],
+                          which_test = 'permutation', which_weights = 'loclin',
+                          n_perm = 1000, preprocessed = TRUE, 
+                          verbose = FALSE, parallel_comp = FALSE)
+Cold$pvals
 ```
+
+
 
 
 # Bibliography
@@ -257,7 +232,7 @@ Singhania A, Verma R, Graham CM, Lee J, Tran T, Richardson M, Lecine P, Leissner
 ## `GEOquery` package
 
 In case the data you want to analyze is publicly available through [Gene Expression Omnibus (GEO)](https://www.ncbi.nlm.nih.gov/geo/), you can access it with the `GEOquery` package, that can be installed with the following commands:
-```{r dl_GEOquery, warning=FALSE, message=FALSE, eval=FALSE, echo=TRUE}
+```{r dl_GEOquery, eval=FALSE, echo=TRUE}
 if (!requireNamespace("GEOquery", quietly = TRUE)) {
     if (!requireNamespace("BiocManager", quietly = TRUE)){
         install.packages("BiocManager")
@@ -270,7 +245,7 @@ if (!requireNamespace("GEOquery", quietly = TRUE)) {
 ## `readxl`
 
 The `readxl` package allows to easily imports data from Excel format and can be similarly installed with the following commands:
-```{r dl_readxl, message=FALSE, echo=TRUE, eval=FALSE}
+```{r dl_readxl, echo=TRUE, eval=FALSE}
 if (!requireNamespace("readxl", quietly = TRUE)) {
     install.packages("readxl")
 }

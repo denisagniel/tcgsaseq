@@ -87,7 +87,6 @@ asymptotic approximation for small sample sizes. We rely on exact p-values
 following Phipson and Smyth, 2010 (see References).
 }
 \examples{
-#rm(list=ls())
 set.seed(123)
 
 ##generate some fake data

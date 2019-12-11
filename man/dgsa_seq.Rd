@@ -7,7 +7,7 @@
 dgsa_seq(
   exprmat = NULL,
   object = NULL,
-  covariates,
+  covariates = NULL,
   variables2test,
   weights_var2test_condi = TRUE,
   genesets,
@@ -20,7 +20,6 @@ dgsa_seq(
   parallel_comp = TRUE,
   nb_cores = parallel::detectCores() - 1,
   preprocessed = FALSE,
-  doPlot = TRUE,
   gene_based_weights = TRUE,
   bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
@@ -57,7 +56,8 @@ Usually, its first column is the intercept (full of \code{1}s).
 \item If \code{object} is specified: then \code{covariates} must be a
 character vector of length \code{p} containing the colnames of the
 design matrix given in \code{object}.
-}}
+} If \code{covariates} is \code{NULL} (the default), then it is just the 
+intercept.}
 
 \item{variables2test}{\itemize{
 \item If \code{exprmat} is specified as a matrix:
@@ -79,7 +79,7 @@ rows of \code{y} constitute the investigated gene set (when only 1 gene
 set is being tested).
 Can also be a \code{list} of index (or \code{rownames} of \code{y}) when
 several gene sets are tested at once, such as the first element of a
-\code{\link[GSA:GSA.read.gmt]{gmt}} object. If \code{NULL}, then gene-wise
+\code{\link[GSA]{gmt}} object. If \code{NULL}, then gene-wise
 p-values are returned.}
 
 \item{sample_group}{a vector of length \code{n} indicating whether the samples
@@ -120,9 +120,6 @@ Default is \code{parallel::detectCores() - 1}.}
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
-
-\item{doPlot}{a logical flag indicating whether the mean-variance plot should
-be drawn. Default is \code{FALSE}.}
 
 \item{gene_based_weights}{a logical flag used for \code{'loclin'} weights,
 indicating whether to estimate weights at the gene-level, or rather at the
@@ -205,7 +202,6 @@ Wrapper function for performing gene set analysis of (potentially
 longitudinal) RNA-seq data
 }
 \examples{
-#rm(list=ls())
 
 nsims <- 2 #100
 res_quant <- list()

@@ -8,7 +8,7 @@ test}
 dear_seq(
   exprmat = NULL,
   object = NULL,
-  covariates,
+  covariates = NULL,
   variables2test,
   sample_group = NULL,
   weights_var2test_condi = TRUE,
@@ -20,7 +20,6 @@ dear_seq(
   parallel_comp = TRUE,
   nb_cores = parallel::detectCores() - 1,
   preprocessed = FALSE,
-  doPlot = TRUE,
   gene_based_weights = FALSE,
   bw = "nrd",
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
@@ -56,7 +55,8 @@ Usually, its first column is the intercept (full of \code{1}s).
 \item If \code{object} is specified: then \code{covariates} must be a
 character vector of length \code{p} containing the colnames of the
 design matrix given in \code{object}.
-}}
+} If \code{covariates} is \code{NULL} (the default), then it is just the 
+intercept.}
 
 \item{variables2test}{\itemize{
 \item If \code{exprmat} is specified as a matrix:
@@ -112,9 +112,6 @@ Default is \code{parallel::detectCores() - 1}.}
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
-
-\item{doPlot}{a logical flag indicating whether the mean-variance plot should
-be drawn. Default is \code{FALSE}.}
 
 \item{gene_based_weights}{a logical flag used for \code{'loclin'} weights,
 indicating whether to estimate weights at the gene-level, or rather at the
@@ -193,7 +190,6 @@ A list with the following elements:\itemize{
 Wrapper function for gene-by-gene association testing of RNA-seq data
 }
 \examples{
-#rm(list=ls())
 nsims <- 2 #100
 res <- numeric(nsims)
 for(i in 1:nsims){

@@ -24,7 +24,8 @@
 #'\item If \code{object} is specified: then \code{covariates} must be a
 #'character vector of length \code{p} containing the colnames of the
 #'design matrix given in \code{object}.
-#'}
+#'} If \code{covariates} is \code{NULL} (the default), then it is just the 
+#'intercept.
 #'
 #'@param variables2test \itemize{
 #'\item If \code{exprmat} is specified as a matrix:
@@ -46,7 +47,7 @@
 #'set is being tested).
 #'Can also be a \code{list} of index (or \code{rownames} of \code{y}) when
 #'several gene sets are tested at once, such as the first element of a
-#'\code{\link[GSA:GSA.read.gmt]{gmt}} object. If \code{NULL}, then gene-wise
+#'\code{\link[GSA]{gmt}} object. If \code{NULL}, then gene-wise
 #'p-values are returned.
 #'
 #'@param sample_group a vector of length \code{n} indicating whether the samples
@@ -87,9 +88,6 @@
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 #'which case \code{y} is assumed to contain raw counts and is normalized into
 #'log(counts) per million.
-#'
-#'@param doPlot a logical flag indicating whether the mean-variance plot should
-#'be drawn. Default is \code{FALSE}.
 #'
 #'@param gene_based_weights a logical flag used for \code{'loclin'} weights,
 #'indicating whether to estimate weights at the gene-level, or rather at the
@@ -179,11 +177,11 @@
 #'Precision weights unlock linear model analysis tools for RNA-seq read counts.
 #'\emph{Genome Biology}, 15(2), R29.
 #'
-#'@importFrom stats p.adjust
+#'@importFrom stats p.adjust as.formula model.matrix
+#'@importFrom matrixStats rowVars
 #'@importFrom methods is
 #'
 #'@examples
-#'#rm(list=ls())
 #'
 #'nsims <- 2 #100
 #'res_quant <- list()
@@ -241,7 +239,7 @@
 #'}
 #'@export
 dgsa_seq <- function(exprmat = NULL, object = NULL,
-                     covariates,
+                     covariates = NULL,
                      variables2test,
                      weights_var2test_condi = TRUE,
                      genesets,
@@ -252,7 +250,6 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                      n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
                      nb_cores = parallel::detectCores() - 1,
                      preprocessed = FALSE,
-                     doPlot = TRUE,
                      gene_based_weights = TRUE,
                      bw = "nrd",
                      kernel = c("gaussian", "epanechnikov", "rectangular",
@@ -267,24 +264,25 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                      homogen_traj = FALSE,
                      na.rm_gsaseq = TRUE,
                      verbose = TRUE) {
-
+    
     if(!is.null(object) & !is.null(exprmat)){
         stop("only one of 'object' or 'exprmat' should be specified")
     }
     if(is.null(object) & is.null(exprmat)){
         stop("One of either 'object' or 'exprmat' should be specified")
     }
+    stopifnot(!is.null(variables2test))
+    
     if(!is.null(object)){
-
-        stopifnot(is.character(covariates))
+        
+        stopifnot(is.character(covariates) | is.null(covariates))
         stopifnot(is.character(variables2test))
-
+        
         if(is(object, "DGEList")){
             stopifnot(!is.null(object$samples))
             stopifnot(nrow(object$samples)==ncol(object$counts))
             y <- object$counts
-            x <- as.data.frame(object$samples[, covariates, drop=FALSE])
-            phi <- as.data.frame(object$samples[, variables2test, drop=FALSE])
+            design_df <- as.data.frame(object$samples[, c(covariates, variables2test), drop=FALSE])
         }else if(is(object, "DESeqDataSet")){
             if(!requireNamespace("DESeq2", quietly = TRUE)){
                 stop("DESeq2 package required but is not available")
@@ -296,8 +294,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             stopifnot(nrow(SummarizedExperiment::colData(object)) ==
                           DESeq2::counts(object))
             y <- DESeq2::counts(object)
-            x <- as.data.frame(SummarizedExperiment::colData(object)[, covariates, drop=FALSE])
-            phi <- as.data.frame(SummarizedExperiment::colData(object)[, variables2test, drop=FALSE])
+            design_df <- as.data.frame(SummarizedExperiment::colData(object)[, c(covariates, variables2test), drop=FALSE])
         }else if(is(object, "ExpressionSet")){
             if(!requireNamespace("Biobase",quietly=TRUE)){
                 stop("Biobase package required but not available")
@@ -306,46 +303,64 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             stopifnot(nrow(Biobase::phenoData(object)) ==
                           ncol(Biobase::exprs(object)))
             y <- Biobase::exprs(object)
-            x <- as.data.frame(Biobase::phenoData(object)[, covariates, drop=FALSE])
-            phi <- as.data.frame(Biobase::phenoData(object)[, variables2test, drop=FALSE])
+            design_df <- as.data.frame(Biobase::phenoData(object)[, c(covariates, variables2test), drop=FALSE])
         }else if(is(object, "SummarizedExperiment")){
             #Note: DESeqDataSet are SummarizedExperiments
             if(!requireNamespace("SummarizedExperiment", quietly = TRUE)){
                 stop("SummarizedExperiment package required but is not available")
             }
             y <- SummarizedExperiment::assay(object)
-            x <- as.data.frame(SummarizedExperiment::colData(object)[, covariates, drop=FALSE])
-            phi <- as.data.frame(SummarizedExperiment::colData(object)[, variables2test, drop=FALSE])
+            design_df <- as.data.frame(SummarizedExperiment::colData(object)[, c(covariates, variables2test), drop=FALSE])
         }else{
             stop("'object' is neither a 'DGEList', nor a 'DESeqDataSet',",
                  "nor an 'ExpressionSet'.\n",
                  "Consider specifying 'exprmat' as a matrix instead...")
         }
+        
+        variables2test_formula <- stats::as.formula(paste0("~ 1 + ", 
+                                                           variables2test, 
+                                                           collapse=" + "))
+        if(is.null(covariates)){
+            covariates_formula <- stats::as.formula("~1")
+        }else{
+            covariates_formula <- stats::as.formula(paste0("~ 1 + ", 
+                                                           covariates, 
+                                                           collapse=" + "))
+        }
+        
+        x <- stats::model.matrix(covariates_formula, 
+                                 data = droplevels(design_df))
+        phi <- stats::model.matrix(variables2test_formula, 
+                                   data = droplevels(design_df))[, -1, 
+                                                                 drop=FALSE]
     }else{
+        if(is.null(covariates)){
+            covariates <- matrix(1, ncol=1, nrow=nrow(variables2test))
+        }
         y <- exprmat
         x <- covariates
         phi <- variables2test
     }
-
+    
     stopifnot(is.matrix(y))
     stopifnot(is.matrix(x) | is.data.frame(x))
     stopifnot(is.matrix(phi) | is.data.frame(phi))
-
+    
     if (sum(is.na(y)) > 1 & na.rm_gsaseq) {
-        warning("\n\n!!!!!\n'y' contains", sum(is.na(y)), "NA values. ",
+        warning("'y' contains", sum(is.na(y)), "NA values. ",
                 "\nCurrently they are ignored in the computations but ",
                 "you should think carefully about where do those NA/NaN ",
                 "come from...\nIf you don't want to ignore those NA/NaN ",
                 "values, set the 'na.rm_gsaseq' argument to 'FALSE' ",
-                "(this may lead to errors).\n!!!!!\n")
+                "(this may lead to errors).")
     }
-
+    
     if(is.null(cov_variables2test_eff)){
         cov_variables2test_eff <- diag(ncol(phi))
     }
-
+    
     # checking for 0 variance genes
-    v_g <- apply(X = y, MARGIN = 1, FUN = stats::var)
+    v_g <- matrixStats::rowVars(y)
     if(sum(v_g==0) > 0){
         warning("Removing ", sum(v_g==0), " genes with 0 variance from ",
                 "the testing procedure.\n",
@@ -353,7 +368,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 "beforehand...")
         y <- y[v_g>0, ]
     }
-
+    
     # normalization if needed
     if (!preprocessed) {
         R <- colSums(y, na.rm = TRUE)
@@ -363,67 +378,66 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
     } else {
         y_lcpm <- y
     }
-    rm(y)
-
+    
     if (is.data.frame(x)) {
         message("'x' is a data.frame -> converted to a matrix: ",
                 "\n all variables (including factors) are converted ",
                 "to numeric...")
         x <- as.matrix(as.data.frame(lapply(x, as.numeric)))
     }
-
+    
     if (is.data.frame(phi)) {
         message("'phi' is a data.frame -> converted to a matrix: ",
                 "\n all variables (including factors) are ",
                 "converted to numeric... ")
         phi <- as.matrix(as.data.frame(lapply(phi, as.numeric)))
     }
-
+    
     if (det(crossprod(cbind(x, phi))) == 0) {
         stop("crossprod(cbind(x, phi)) cannot be inversed. 'x' and ",
              "'phi' are likely colinear...")
     }
-
+    
     if (length(padjust_methods) > 1) {
         padjust_methods <- padjust_methods[1]
     }
     stopifnot(padjust_methods %in% c("BH", "BY", "holm", "hochberg",
                                      "hommel", "bonferroni"))
-
+    
     if (length(which_weights) > 1) {
         which_weights <- which_weights[1]
     }
     stopifnot(which_weights %in% c("loclin", "voom", "none"))
-
+    
     if (length(which_test) > 1) {
         which_test <- which_test[1]
     }
     stopifnot(which_test %in% c("asymptotic", "permutation"))
-
-
+    
+    
     if (which_test == "asymptotic") {
         n_perm <- NA
-
+        
         if (nrow(x) < 10)
             warning("Less than 10 samples: asymptotics likely not ",
                     "reached\nYou should probably run permutation test ",
                     "instead...")
     }
-
-
-
+    
+    
+    
     if (which_test == "permutation") {
         if (is.null(sample_group)) {
-            options(warn = -1)
+            #suppressWarnings(
             N_possible_perms <- factorial(ncol(y_lcpm))
-            options(warn = 0)
+            #)
         } else {
-            options(warn = -1)
+            # suppressWarnings(
             N_possible_perms <- prod(vapply(table(sample_group), factorial,
                                             FUN.VALUE = 1))
-            options(warn = 0)
+            #)
         }
-
+        
         if (n_perm > N_possible_perms) {
             warning("The number of permutations requested 'n_perm' is ",
                     n_perm, "which is larger than the total number of ",
@@ -433,37 +447,43 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             n_perm <- N_possible_perms
         }
     }
-
-
-
+    
+    
+    
     # Computing the weights
     if (which_weights != "none" & verbose) {
         message("Computing the weights... ")
     }
-    w <- switch(which_weights,
-                loclin = sp_weights(y = y_lcpm, x = x, phi = phi,
-                                    use_phi = weights_var2test_condi,
-                                    preprocessed = TRUE, doPlot = doPlot,
-                                    gene_based = gene_based_weights,
-                                    bw = bw, kernel = kernel, exact = exact,
-                                    transform = transform, verbose = verbose,
-                                    na.rm = na.rm_gsaseq),
-                voom = voom_weights(y = y_lcpm, x = if(weights_var2test_condi) {
-                    cbind(x, phi)
-                } else {
-                    x
-                }, preprocessed = TRUE, doPlot = doPlot,
-                lowess_span = lowess_span,
-                R = R),
-                none = matrix(1, ncol = ncol(y_lcpm), nrow = nrow(y_lcpm),
-                              dimnames = list(rownames(y_lcpm),
-                                              colnames(y_lcpm))))
+    w_full <- switch(which_weights,
+                     loclin = sp_weights(y = y_lcpm, x = x, phi = phi,
+                                         use_phi = weights_var2test_condi,
+                                         preprocessed = TRUE,
+                                         gene_based = gene_based_weights,
+                                         bw = bw, kernel = kernel, 
+                                         exact = exact, transform = transform, 
+                                         verbose = verbose,
+                                         na.rm = na.rm_gsaseq),
+                     voom = voom_weights(y = y_lcpm, 
+                                         x = if(weights_var2test_condi) {
+                                             cbind(x, phi)
+                                         } else {
+                                             x
+                                         }, preprocessed = TRUE,
+                                         lowess_span = lowess_span,
+                                         R = R),
+                     none = list(
+                         "weights" = matrix(1, ncol = ncol(y_lcpm), 
+                                            nrow = nrow(y_lcpm),
+                                            dimnames = list(rownames(y_lcpm),
+                                                            colnames(y_lcpm))),
+                         "plot_utilities" = list("method" = "none"))
+    )
     if (which_weights != "none" & verbose) {
         message("Done!\n")
     }
-
-
-
+    w <- w_full$weights
+    
+    
     if (is.null(genesets)) {
         if (verbose) {
             message("'genesets' argument not provided => only gene-wise ",
@@ -483,7 +503,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             if (is.null(sample_group)) {
                 sample_group <- rep(1, nrow(x))
             }
-
+            
             # constructing residuals
             if (na.rm_gsaseq) {
                 y_lcpm0 <- y_lcpm
@@ -494,7 +514,6 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 y_lcpm_res <- y_lcpm - t(x %*% solve(crossprod(x)) %*% t(x) %*%
                                              t(y_lcpm))
             }
-            rm(y_lcpm0)
             x_res <- matrix(1, nrow = nrow(x), ncol = 1)
             perm_result <- vc_test_perm(y = y_lcpm_res, x = x_res,
                                         indiv = sample_group, phi = phi, w = w,
@@ -508,16 +527,16 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                                         na.rm = na.rm_gsaseq)
             rawPvals <- perm_result$gene_pvals
         }
-
+        
         pvals <- data.frame(rawPval = rawPvals,
                             adjPval = stats::p.adjust(rawPvals, padjust_methods)
         )
-
+        
         if (!is.null(rownames(y_lcpm))) {
             rownames(pvals) <- rownames(y_lcpm)
         }
     } else if (is.list(genesets)) {
-
+        
         if (is(genesets[[1]], "character")) {
             if (is.null(rownames(y_lcpm))) {
                 stop("Gene sets specified as character but no rownames ",
@@ -536,15 +555,16 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 })
             }
         }
-
+        
         if (which_test == "asymptotic") {
             if (is.null(sample_group)) {
                 sample_group <- seq_len(nrow(x))
             }
             rawPvals <- vapply(seq_along(genesets), FUN = function(i_gs) {
                 gs <- genesets[[i_gs]]
-                e <- try(y_lcpm[gs, 1, drop = FALSE], silent = TRUE)
-                if (inherits(e, "try-error") | length(e) < 1) {
+                e <- tryCatch(y_lcpm[gs, 1, drop = FALSE], 
+                              error=function(cond){return(NULL)})
+                if (length(e) < 1) {
                     warning("Gene set ", i_gs, " contains 0 measured ",
                             "transcript: associated p-value cannot ",
                             "be computed")
@@ -564,7 +584,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
             if (is.null(sample_group)) {
                 sample_group <- rep(1, nrow(x))
             }
-
+            
             if (na.rm_gsaseq) {
                 y_lcpm0 <- y_lcpm
                 y_lcpm0[is.na(y_lcpm0)] <- 0
@@ -574,18 +594,19 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 y_lcpm_res <- y_lcpm - t(x %*% solve(crossprod(x)) %*% t(x) %*%
                                              t(y_lcpm))
             }
-            rm(y_lcpm0)
-
+            
             x_res <- matrix(1, nrow = nrow(x), ncol = 1)
             rawPvals <- vapply(seq_along(genesets), FUN = function(i_gs) {
                 gs <- genesets[[i_gs]]
-                e <- try(y_lcpm[gs, 1, drop = FALSE], silent = TRUE)
-                if (inherits(e, "try-error") | length(e) < 1) {
+                e <- tryCatch(y_lcpm[gs, 1, drop = FALSE], 
+                              error=function(cond){return(NULL)})
+                if (length(e) < 1) {
                     warning("Gene set ", i_gs, " contains 0 measured ",
                             "transcript: associated p-value cannot be computed")
                     NA
                 } else {
-                    vc_test_perm(y = y_lcpm[gs, ], x = x, indiv = sample_group,
+                    vc_test_perm(y = y_lcpm[gs, , drop = FALSE], x = x, 
+                                 indiv = sample_group,
                                  phi = phi, w = w[gs, , drop = FALSE],
                                  Sigma_xi = cov_variables2test_eff,
                                  n_perm = n_perm,
@@ -599,21 +620,21 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 }
             }, FUN.VALUE = 0.5)
         }
-
+        
         pvals <- data.frame(rawPval = rawPvals,
                             adjPval = stats::p.adjust(rawPvals, padjust_methods)
         )
         if (!is.null(names(genesets))) {
             rownames(pvals) <- names(genesets)
         }
-
+        
     } else {
-
+        
         if (!is.vector(genesets)) {
             stop("'genesets' argument provided but is neither a list ",
                  "nor a vector")
         }
-
+        
         if (is(genesets, "character")) {
             if (is.null(rownames(y_lcpm))) {
                 stop("Gene sets specified as character but no rownames",
@@ -628,7 +649,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                 genesets <- genesets[which(genesets %in% gene_names_measured)]
             }
         }
-
+        
         res_test <- switch(which_test,
                            asymptotic =
                                vc_test_asym(y = y_lcpm[genesets, ],
@@ -654,9 +675,9 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                                             na.rm = na.rm_gsaseq))
         pvals <- data.frame(rawPval = res_test$set_pval, adjPval = NA)
         padjust_methods <- NA
-
+        
     }
-
+    
     if(is.null(genesets)){
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
                           n_perm = n_perm, pvals = pvals)
@@ -664,7 +685,7 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
                           n_perm = n_perm, genesets = genesets, pvals = pvals)
     }
-
+    
     return(ans_final)
-
+    
 }

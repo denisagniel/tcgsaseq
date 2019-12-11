@@ -45,7 +45,6 @@ mixture of \eqn{\chi^{2}}s using Davies method from
 \code{\link[CompQuadForm]{davies}}
 }
 \examples{
-#rm(list=ls())
 set.seed(123)
 
 ##generate some fake data

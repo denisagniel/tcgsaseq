@@ -51,9 +51,8 @@
 #'
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
-#'@importFrom stats cov
+#'
 #'@examples
-#'#rm(list=ls())
 #'set.seed(123)
 #'
 #'##generate some fake data
@@ -81,14 +80,15 @@
 #'quantile(asymTestRes$gene_pvals)
 #'
 #'@importFrom CompQuadForm davies
-#'@importFrom stats pchisq var
+#'@importFrom stats pchisq cov
+#'@importFrom matrixStats colVars
 #'
 #'@export
 vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
                          Sigma_xi = diag(ncol(phi)),
                          genewise_pvals = FALSE, homogen_traj = FALSE,
                          na.rm = FALSE) {
-
+    
     if (homogen_traj) {
         score_list <- vc_score_h(y = y, x = x, indiv = factor(indiv), phi = phi,
                                  w = w, Sigma_xi = Sigma_xi, na_rm = na.rm)
@@ -96,22 +96,21 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         score_list <- vc_score(y = y, x = x, indiv = factor(indiv), phi = phi,
                                w = w, Sigma_xi = Sigma_xi, na_rm = na.rm)
     }
-
+    
     nindiv <- nrow(score_list$q_ext)
     ng <- nrow(y)
     nphi <- ncol(phi)
-
+    
     if (ng * nindiv < 1) {
         stop("no gene measured/no sample included ...")
     }
-
+    
     if (genewise_pvals) {
         gene_scores_obs <- score_list$gene_scores_unscaled
         if (nindiv == 1) {
             pv <- stats::pchisq(gene_scores_obs, df = 1, lower.tail = FALSE)
         } else if (nphi == 1) {
-            gene_lambda <- apply(X = score_list$q_ext, MARGIN = 2,
-                                 FUN = stats::var)
+            gene_lambda <- matrixStats::colVars(score_list$q_ext)
             if (ng == 1) {
                 pv <- stats::pchisq(gene_scores_obs/gene_lambda, df = 1,
                                     lower.tail = FALSE)
@@ -127,48 +126,52 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
             gene_inds <- lapply(seq_len(ng), function(x) {
                 x + (ng) * (seq_len(nphi) - 1)
             })
-
+            
             gene_lambda <- lapply(gene_inds, function(x) {
                 Sig_q_gene <- cov(score_list$q_ext[, x, drop = FALSE])
-                lam <- try(svd(Sig_q_gene)$d)
-                if (inherits(lam, "try-error")) {
-                    lam <- try(svd(round(Sig_q_gene, 6))$d)
-                    if (inherits(lam, "try-error")) {
-                        warning("Error in svd decomposition for at least one ",
-                                "gene")
-                        lam <- NA
-                    }
+                lam <- tryCatch(svd(Sig_q_gene)$d, 
+                                error=function(cond){return(NULL)}
+                )
+                if (is.null(lam)){
+                    lam <- tryCatch(svd(Sig_q_gene)$d, 
+                                    error=function(cond){
+                                        warning("Error in svd decomposition for at least one ",
+                                                "gene")
+                                        return(NA)
+                                    })
                 }
                 return(lam)
             })
-
+            
             pv <- unlist(mapply(FUN = CompQuadForm::davies, q = gene_scores_obs,
                                 lambda = gene_lambda, lim = 15000,
                                 acc = 5e-04)["Qq", ])
         }
-
+        
         names(pv) <- rownames(y)
         ans <- list(gene_scores_obs = gene_scores_obs, gene_pvals = pv)
-
+        
     } else {
-
+        
         if (nindiv == 1) {
             Sig_q <- matrix(1, ng, ng)
         } else {
             Sig_q <- cov(score_list$q_ext)
         }
-
-        lam <- try(svd(Sig_q)$d)
-        if (inherits(lam, "try-error")) {
-            lam <- try(svd(round(Sig_q, 6))$d)
-            if (inherits(lam, "try-error")) {
-                stop("Error in svd decomposition")
-            }
+        
+        lam <- tryCatch(svd(Sig_q)$d, 
+                        error=function(cond){return(NULL)}
+        )
+        if (is.null(lam)) {
+            lam <- tryCatch(svd(round(Sig_q, 6))$d, 
+                            error=function(cond){
+                                stop("Error in svd decomposition")
+                            })
         }
-
+        
         acc=0.0001 #default value
         dv <- CompQuadForm::davies(score_list$score, lam, acc = acc)
-
+        
         comp=1 #reducing the acc value if the calculated pvalue is negative
         while ((dv$Qq<=0 | dv$Qq==1) & comp<10){
             acc=acc/2
@@ -180,7 +183,7 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
             message("accuracy in davies at 1.5*10^(-7) still giving <0 ",
                     "probability, probability set to 0")
         }
-
+        
         if(dv$ifault == 1){# accuracy error
             dv <- CompQuadForm::davies(score_list$score, lam, acc = 0.001)
             if(dv$ifault == 1){
@@ -194,7 +197,7 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         }
         ans <- list(set_score_obs = score_list$score, set_pval = dv$Qq)
     }
-
+    
     return(ans)
 }
 

@@ -10,7 +10,6 @@ sp_weights(
   phi = NULL,
   use_phi = TRUE,
   preprocessed = FALSE,
-  doPlot = FALSE,
   gene_based = FALSE,
   bw = c("nrd", "ucv", "SJ", "nrd0", "bcv"),
   kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
@@ -40,9 +39,6 @@ conditionally on both \code{x} and \code{phi}.}
 already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 which case \code{y} is assumed to contain raw counts and is normalized into
 log(counts) per million.}
-
-\item{doPlot}{a logical flag indicating whether the mean-variance plot should
-be drawn. Default is \code{FALSE}.}
 
 \item{gene_based}{a logical flag indicating whether to estimate weights at the
 gene-level. Default is \code{FALSE}, when weights will be estimated at the
@@ -77,14 +73,27 @@ printed during the computation. Default is \code{TRUE}.}
 \code{NaN}) be omitted from the calculations? Default is \code{FALSE}.}
 }
 \value{
-a \code{n x G} matrix containing the computed precision weights.
+a list containing the following components:\itemize{
+\item \code{weights}: a matrix \code{n x G} containing the computed precision 
+weights 
+\item \code{plot_utilities}: a list containing the following elements:\itemize{
+     \item\code{reverse_trans}: a function encoding the reverse function used 
+     for smoothing the observations before computing the weights
+     \item\code{method}: the weight computation method (\code{"loclin"})
+     \item\code{smth}: the vector of the smoothed values computed 
+     \item\code{gene_based}: a logical indicating whether the computed 
+     weights are based on average at the gene level or on individual 
+     observations
+     \item\code{mu}: the transformed observed counts or averages
+     \item\code{v}: the observed variability estimates
+}
+}
 }
 \description{
 Computes precision weights that account for heteroscedasticity in RNA-seq
 count data based on non-parametric local linear regression estimates.
 }
 \examples{
-#rm(list = ls())
 set.seed(123)
 
 G <- 10000
@@ -94,9 +103,12 @@ y <- sapply(1:n, FUN = function(x){rnbinom(n = G, size = 0.07, mu = 200)})
 
 x <- sapply(1:p, FUN = function(x){rnorm(n = n, mean = n, sd = 1)})
 
-sp_weights(y, x, use_phi=FALSE, na.rm = TRUE)
+w <- sp_weights(y, x, use_phi=FALSE, na.rm = TRUE)
 
 }
 \seealso{
 \code{\link[stats]{bandwidth}} \code{\link{density}}
+}
+\author{
+Boris Hejblum
 }

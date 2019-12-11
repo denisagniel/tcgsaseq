@@ -24,7 +24,8 @@
 #'\item If \code{object} is specified: then \code{covariates} must be a
 #'character vector of length \code{p} containing the colnames of the
 #'design matrix given in \code{object}.
-#'}
+#'} If \code{covariates} is \code{NULL} (the default), then it is just the 
+#'intercept.
 #'
 #'@param variables2test \itemize{
 #'\item If \code{exprmat} is specified as a matrix:
@@ -80,9 +81,6 @@
 #'already been preprocessed (e.g. log2 transformed). Default is \code{FALSE}, in
 #'which case \code{y} is assumed to contain raw counts and is normalized into
 #'log(counts) per million.
-#'
-#'@param doPlot a logical flag indicating whether the mean-variance plot should
-#'be drawn. Default is \code{FALSE}.
 #'
 #'@param gene_based_weights a logical flag used for \code{'loclin'} weights,
 #'indicating whether to estimate weights at the gene-level, or rather at the
@@ -166,7 +164,6 @@
 #'[DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
 #'
 #'@examples
-#'#rm(list=ls())
 #'nsims <- 2 #100
 #'res <- numeric(nsims)
 #'for(i in 1:nsims){
@@ -211,7 +208,7 @@
 #'}
 #'@export
 dear_seq <- function(exprmat = NULL, object = NULL,
-                     covariates,
+                     covariates =NULL,
                      variables2test,
                      sample_group = NULL,
                      weights_var2test_condi = TRUE,
@@ -221,7 +218,6 @@ dear_seq <- function(exprmat = NULL, object = NULL,
                      n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
                      nb_cores = parallel::detectCores() - 1,
                      preprocessed = FALSE,
-                     doPlot = TRUE,
                      gene_based_weights = FALSE,
                      bw = "nrd",
                      kernel = c("gaussian", "epanechnikov", "rectangular",
@@ -248,7 +244,6 @@ dear_seq <- function(exprmat = NULL, object = NULL,
                  n_perm = n_perm, progressbar = progressbar,
                  parallel_comp = parallel_comp, nb_cores = nb_cores,
                  preprocessed = preprocessed,
-                 doPlot = doPlot,
                  gene_based_weights = gene_based_weights,
                  bw = bw,
                  kernel = kernel,

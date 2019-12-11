@@ -32,7 +32,17 @@ the following variables:\itemize{
  \code{AgeWeeks}, \code{Vernalized} and \code{Population} variables
 }
 \item{\code{baduel_gmt}:} a \code{gmt} object containing 5 gene sets of
-interest (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
+interest (see \code{\link[GSA]{GSA.read.gmt}}, which is simply a
+\code{list} with the 3 following components:\itemize{
+\item \code{genesets}: a \code{list} of \code{n} gene identifiers vectors 
+composing eachgene set (each gene set is represented as the vector of the 
+gene identifiers composing it)
+\item \code{geneset.names}: a vector of length \code{n} containing the gene 
+set names (i.e. gene sets identifiers)
+\item{geneset.descriptions}: a vector of length \code{n} containing gene set 
+descriptions (e.g. textual information on their biological function)
+}
+
 \item{\code{expr_norm_corr}:} a numeric matrix containing the normalized batch
 corrected expression for the 2454 genes included in either of the 5 gene sets
 of interests
@@ -49,7 +59,6 @@ Arenosa physiology.
 }
 \examples{
 if(interactive()){
-rm(list=ls())
 data('baduel_5gs')
 
 set.seed(54321)
@@ -61,7 +70,7 @@ KAvsTBG <- dgsa_seq(exprmat=log2(expr_norm_corr+1),
                          as.matrix(design[, c('PopulationKA'), drop=FALSE]),
                      genesets=baduel_gmt$genesets[c(3,5)],
                      which_test = 'permutation', which_weights = 'loclin',
-                     n_perm=1000, preprocessed = TRUE, doPlot = TRUE)
+                     n_perm=1000, preprocessed = TRUE)
 
 set.seed(54321)
 Cold <- dgsa_seq(exprmat=log2(expr_norm_corr+1),
@@ -72,7 +81,7 @@ Cold <- dgsa_seq(exprmat=log2(expr_norm_corr+1),
                  'Vernalized_Population')]),
                  genesets=baduel_gmt$genesets[c(3,5)],
                  which_test = 'permutation', which_weights = 'loclin',
-                 n_perm=1000, preprocessed = TRUE, doPlot = TRUE)
+                 n_perm=1000, preprocessed = TRUE)
 }
 
 

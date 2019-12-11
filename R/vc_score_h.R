@@ -40,7 +40,6 @@
 #'
 #'
 #'@examples
-#'rm(list=ls())
 #'set.seed(123)
 #'
 #'##generate some fake data
