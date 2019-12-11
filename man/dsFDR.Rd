@@ -4,8 +4,7 @@
 \alias{dsFDR}
 \title{Estimating the False Discovery Rate}
 \usage{
-dsFDR(gene_scores_perm, gene_scores_obs, use_median = TRUE,
-  doPlot = FALSE)
+dsFDR(gene_scores_perm, gene_scores_obs, use_median = TRUE, doPlot = FALSE)
 }
 \arguments{
 \item{gene_scores_perm}{a numeric matrix of size \code{G x n_perm} containing the permuted gene-wise scores
@@ -44,7 +43,7 @@ summary(qvals)
 qvals <- qvals[!is.na(qvals)]
 eFDR_5pct <- sum(qvals[-(1:G1)]<0.05)/sum(qvals < 0.05)
 eTDR_5pct <- sum(qvals[1:G1]<0.05)/sum(qvals < 0.05)
-cat("FDR:", eFDR_5pct, " TDR:", eTDR_5pct, "\\n")
+cat("FDR:", eFDR_5pct, " TDR:", eTDR_5pct, "\n")
 plot(y = sapply(seq(0, 1, by=0.001), function(x){sum(qvals[-(1:G1)] < x)/sum(qvals < x)}),
     x = seq(0, 1, by=0.001),
     type = "l", xlab = "Nominal FDR level", ylab = "Empirical FDR", col = "red", lwd = 2,
@@ -57,7 +56,7 @@ nperm <- 1000
 G1 <- 0.3*G
 G0 <- G-G1
 for(i in 1:100){
-cat(i, "/100\\n", sep="")
+cat(i, "/100\n", sep="")
 gene_scores_obs <- c(rchisq(G1, df=1), rchisq(G0, df=1))
 gene_scores_perm <- matrix(rchisq(G*nperm, df=1), ncol=nperm, nrow=G)
 qvals <- dsFDR(gene_scores_perm, gene_scores_obs, use_median = TRUE, doPlot = FALSE)

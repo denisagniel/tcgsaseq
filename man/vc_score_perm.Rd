@@ -4,9 +4,19 @@
 \alias{vc_score_perm}
 \title{Computes variance component test statistic and its permuted distribution}
 \usage{
-vc_score_perm(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
-  na_rm = FALSE, n_perm = 1000, progressbar = TRUE,
-  parallel_comp = TRUE, nb_cores = parallel::detectCores() - 1)
+vc_score_perm(
+  y,
+  x,
+  indiv,
+  phi,
+  w,
+  Sigma_xi = diag(ncol(phi)),
+  na_rm = FALSE,
+  n_perm = 1000,
+  progressbar = TRUE,
+  parallel_comp = TRUE,
+  nb_cores = parallel::detectCores() - 1
+)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw RNA-seq counts for g

@@ -4,10 +4,19 @@
 \alias{data_sim_voomlike}
 \title{Data simulation function}
 \usage{
-data_sim_voomlike(seed = NULL, maxGSsize = 400, minGSsize = 30,
-  beta = 0, do_gs = TRUE, longitudinal = TRUE,
-  mixed_hypothesis = FALSE, n = 18, nindiv = 6, ntime = 3,
-  propH1 = 0.1)
+data_sim_voomlike(
+  seed = NULL,
+  maxGSsize = 400,
+  minGSsize = 30,
+  beta = 0,
+  do_gs = TRUE,
+  longitudinal = TRUE,
+  mixed_hypothesis = FALSE,
+  n = 18,
+  nindiv = 6,
+  ntime = 3,
+  propH1 = 0.1
+)
 }
 \description{
 Adapted from the supplementary material from Law \emph{et al}.

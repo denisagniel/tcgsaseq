@@ -330,7 +330,7 @@ sp_weights <- function(y, x, phi, use_phi=TRUE, preprocessed = FALSE, doPlot = F
       ggp <- ggp +
         ylim(range(lse)) +
         xlim(range(reverse_trans(mu_x))) +
-        ggtitle(subtitle = paste(length(inds), "subsampled points"))
+        labs(subtitle = paste(length(inds), "subsampled points"))
     }
     print(ggp)
   }

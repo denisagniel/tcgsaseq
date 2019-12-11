@@ -4,8 +4,15 @@
 \alias{nb_sim_fn}
 \title{Computing negative binomial simulations results}
 \usage{
-nb_sim_fn(n = 250, n_t = 5, beta = 2, nGenes = 1000, re_sd = 1,
-  gene_sd = 1, type)
+nb_sim_fn(
+  n = 250,
+  n_t = 5,
+  beta = 2,
+  nGenes = 1000,
+  re_sd = 1,
+  gene_sd = 1,
+  type
+)
 }
 \description{
 Computing negative binomial simulations results

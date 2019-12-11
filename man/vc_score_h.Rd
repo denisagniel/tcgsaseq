@@ -4,8 +4,7 @@
 \alias{vc_score_h}
 \title{Computes variance component test statistic for homogeneous trajectory}
 \usage{
-vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)),
-  na_rm = FALSE)
+vc_score_h(y, x, indiv, phi, w, Sigma_xi = diag(ncol(phi)), na_rm = FALSE)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g

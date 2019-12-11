@@ -5,11 +5,25 @@
 \alias{nonlin_sim_fn}
 \title{Computing nonlinear simulations results}
 \usage{
-nonlin_sim_fn(n = 250, n_t = 5, beta = 2, nGenes = 1000,
-  rho = 0.5, re_sd = 1, type)
+nonlin_sim_fn(
+  n = 250,
+  n_t = 5,
+  beta = 2,
+  nGenes = 1000,
+  rho = 0.5,
+  re_sd = 1,
+  type
+)
 
-nonlin_sim_fn(n = 250, n_t = 5, beta = 2, nGenes = 1000,
-  rho = 0.5, re_sd = 1, type)
+nonlin_sim_fn(
+  n = 250,
+  n_t = 5,
+  beta = 2,
+  nGenes = 1000,
+  rho = 0.5,
+  re_sd = 1,
+  type
+)
 }
 \description{
 Computing nonlinear simulations results

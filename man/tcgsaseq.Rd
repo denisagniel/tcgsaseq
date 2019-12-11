@@ -3,7 +3,6 @@
 \docType{package}
 \name{tcgsaseq}
 \alias{tcgsaseq}
-\alias{tcgsaseq-package}
 \title{tcgsaseq: a package to perform Time-course Gene Set Analysis and General Gene-Wise Analysis of RNA-seq data}
 \description{
 Analysis of RNA-seq data with variance component score

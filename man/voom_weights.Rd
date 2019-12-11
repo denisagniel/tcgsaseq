@@ -4,8 +4,14 @@
 \alias{voom_weights}
 \title{Precision weights accounting for heteroscedasticity in RNA-seq count data}
 \usage{
-voom_weights(y, x, preprocessed = FALSE, doPlot = FALSE,
-  lowess_span = 0.5, R = NULL)
+voom_weights(
+  y,
+  x,
+  preprocessed = FALSE,
+  doPlot = FALSE,
+  lowess_span = 0.5,
+  R = NULL
+)
 }
 \arguments{
 \item{y}{a matrix of size \code{G x n} containing the raw RNA-seq counts or

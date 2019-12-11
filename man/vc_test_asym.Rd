@@ -4,9 +4,17 @@
 \alias{vc_test_asym}
 \title{Computes variance component test statistic for longitudinal}
 \usage{
-vc_test_asym(y, x, indiv = rep(1, nrow(x)), phi, w,
-  Sigma_xi = diag(ncol(phi)), genewise_pvals = FALSE,
-  homogen_traj = FALSE, na.rm = FALSE)
+vc_test_asym(
+  y,
+  x,
+  indiv = rep(1, nrow(x)),
+  phi,
+  w,
+  Sigma_xi = diag(ncol(phi)),
+  genewise_pvals = FALSE,
+  homogen_traj = FALSE,
+  na.rm = FALSE
+)
 }
 \arguments{
 \item{y}{a numeric matrix of dim \code{g x n} containing the raw or normalized RNA-seq counts for g

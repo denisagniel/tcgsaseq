@@ -4,17 +4,35 @@
 \alias{tcgsa_seq}
 \title{Time-course Gene Set Analysis}
 \usage{
-tcgsa_seq(y, x, phi, weights_phi_condi = TRUE, genesets, indiv = NULL,
-  Sigma_xi = diag(ncol(phi)), which_test = c("permutation",
-  "asymptotic"), which_weights = c("loclin", "voom", "none"),
-  n_perm = 1000, progressbar = TRUE, parallel_comp = TRUE,
-  nb_cores = parallel::detectCores() - 1, preprocessed = FALSE,
-  doPlot = TRUE, gene_based_weights = TRUE, bw = "nrd",
-  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular",
-  "biweight", "tricube", "cosine", "optcosine"), exact = FALSE,
-  transform = TRUE, padjust_methods = c("BH", "BY", "holm", "hochberg",
-  "hommel", "bonferroni"), lowess_span = 0.5, R = NULL,
-  homogen_traj = FALSE, na.rm_tcgsaseq = TRUE, verbose = TRUE)
+tcgsa_seq(
+  y,
+  x,
+  phi,
+  weights_phi_condi = TRUE,
+  genesets,
+  indiv = NULL,
+  Sigma_xi = diag(ncol(phi)),
+  which_test = c("permutation", "asymptotic"),
+  which_weights = c("loclin", "voom", "none"),
+  n_perm = 1000,
+  progressbar = TRUE,
+  parallel_comp = TRUE,
+  nb_cores = parallel::detectCores() - 1,
+  preprocessed = FALSE,
+  doPlot = TRUE,
+  gene_based_weights = TRUE,
+  bw = "nrd",
+  kernel = c("gaussian", "epanechnikov", "rectangular", "triangular", "biweight",
+    "tricube", "cosine", "optcosine"),
+  exact = FALSE,
+  transform = TRUE,
+  padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
+  lowess_span = 0.5,
+  R = NULL,
+  homogen_traj = FALSE,
+  na.rm_tcgsaseq = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{y}{a numeric matrix of size \code{G x n} containing the raw RNA-seq counts or
