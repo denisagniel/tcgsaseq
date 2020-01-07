@@ -39,12 +39,17 @@ articles:
 
 ## Installation
 
-The easiest way to get `dearseq` is to install its development version
-from [GitHub](https://github.com/borishejblum/dearseq):
+***`dearseq` is currently [under
+review](https://github.com/Bioconductor/Contributions/issues/1307) to be
+included in [Bioconductor](http://www.bioconductor.org)***
+
+Meanwhile, the easiest way to get `dearseq` is to install its
+development version from the `dev` branch on
+[GitHub](https://github.com/borishejblum/dearseq):
 
 ``` r
 #install.packages("devtools")
-devtools::install_github("borishejblum/dearseq")
+devtools::install_github("borishejblum/dearseq", ref="dev")
 ```
 
 – Marine Gauthier, Denis Agniel & Boris Hejblum
