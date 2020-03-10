@@ -164,7 +164,7 @@
 #'[DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
 #'
 #'@examples
-#number of runs
+#'#number of runs
 #'nsims <- 2 #100 
 #'res <- numeric(nsims)
 
