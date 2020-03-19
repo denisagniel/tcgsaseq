@@ -97,7 +97,7 @@ infos <- vapply(X = 1:length(GSMList(GSE107991_metadata)),
                 FUN = get_info,
                 FUN.VALUE = c("a", "b", "c", "d", "e"))
 infos_df <- cbind.data.frame("SampleID" = names(GSMList(GSE107991_metadata)), 
-                             t(infos))
+                             t(infos), stringsAsFactors=TRUE)
 rownames(infos_df) <- names(GEOquery::GSMList(GSE107991_metadata))
 colnames(infos_df)[-1] <- c("Cohort", "Location", "Set", "Status", "SampleTitle")
 ```
