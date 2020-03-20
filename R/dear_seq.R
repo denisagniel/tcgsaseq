@@ -164,6 +164,9 @@
 #'[DOI: 10.1101/635714v1](https://www.biorxiv.org/content/10.1101/635714v1).
 #'
 #'@examples
+#'
+#'#Monte-Carlo estimation of the proportion of DE genes over `nsims` simulations under the null
+#'
 #'#number of runs
 #'nsims <- 2 #100 
 #'res <- numeric(nsims)
@@ -206,19 +209,26 @@
 #'  message(i)
 #'}
 #'
-#'#Monte-Carlo estimation of the proportion of DE genes over n simulations
+#'#results
 #'mean(res)
 #'
 #'if(interactive()){
 #'b0 <- 1
 #'#under the null:
 #'b1 <- 0
+#'
+#'#create the matrix of gene expression
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
+#'
+#'#run test
+#'#asymptotic test with preprocessed grouped data
 #'res_genes <- dear_seq(exprmat=y, covariates=x, variables2test=t,
 #'                    sample_group=rep(1:ni, each=nr),
 #'                    which_weights='none', preprocessed=TRUE)
+#'
+#'#results
 #'summary(res_genes$pvals)
 #'}
 #'@export
