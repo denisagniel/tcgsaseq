@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `dearseq`
+# `dearseq` <a><img src='man/figures/logo.svg' align="right" height="139" /></a>
 
 <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/dearseq)](https://cran.r-project.org/package=dearseq) -->
 
