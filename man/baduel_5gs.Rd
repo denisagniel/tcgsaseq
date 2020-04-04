@@ -8,7 +8,8 @@
 \alias{design}
 \alias{expr_norm_corr}
 \title{Small portion of RNA-seq data from plant physiology study.}
-\format{3 objects\itemize{
+\format{
+3 objects\itemize{
 \item{\code{design}:} a design matrix for the 48 measured samples, containing
 the following variables:\itemize{
  \item \code{SampleName} corresponding column names from
@@ -46,7 +47,8 @@ descriptions (e.g. textual information on their biological function)
 \item{\code{expr_norm_corr}:} a numeric matrix containing the normalized batch
 corrected expression for the 2454 genes included in either of the 5 gene sets
 of interests
-}}
+}
+}
 \source{
 \url{http://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410}
 }

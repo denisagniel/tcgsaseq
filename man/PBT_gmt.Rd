@@ -5,7 +5,8 @@
 \alias{PBT_gmt}
 \alias{PBT}
 \title{PBT gene sets related to kidney transplant}
-\format{a \code{gmt} object containing 9 gene sets specific to kidney
+\format{
+a \code{gmt} object containing 9 gene sets specific to kidney
 transplant (see \code{\link[GSA]{GSA.read.gmt}}), which is simply a
 \code{list} with the 3 following components:\itemize{
 \item \code{genesets}: a \code{list} of \code{n} gene identifiers vectors 
@@ -15,7 +16,8 @@ gene identifiers composing it)
 set names (i.e. gene sets identifiers)
 \item{geneset.descriptions}: a vector of length \code{n} containing gene set 
 descriptions (e.g. textual information on their biological function)
-}}
+}
+}
 \source{
 \url{http://atagc.med.ualberta.ca/Research/GeneLists}
 }
