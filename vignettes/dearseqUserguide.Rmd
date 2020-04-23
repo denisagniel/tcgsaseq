@@ -173,6 +173,39 @@ res_dearseq <- dearseq::dear_seq(object = se[, se$Status != "LTBI"],
 **NB:** We excluded the LTBI patients to focus on the comparison between Active 
 TB versus Control patients.
 
+### Using gene expression matrix of raw counts
+
+If the gene expression could not already be normalized, the gene expression is
+normalized then into log(counts) per million (i.e. *log-cpm*). We set `preprocessed` equal to FALSE, the default parameter to normalize the raw counts.
+
+The matrix of raw counts (Raw\_counts\_Berry\_London) contains $58,051$ genes and $54$ samples. As described in Singhania *et al.*, only genes expressed with counts per million (CPM) $> 2$ in at least five samples were considered. The filtering is carried out with `edgeR`. It results in a matrix of raw counts containing $14,150$ genes and $54$ samples (London\_raw). Of note, many filtering and normalization methods may be considered and the user must be cautious applying them.
+
+```{r London_raw, eval=TRUE, echo=TRUE, warning = FALSE, message=FALSE, results='hide'}
+library(readxl)
+library(edgeR)
+GEOquery::getGEOSuppFiles('GSE107991', 
+                          filter_regex="Raw_counts_Berry_London")
+London_raw<- readxl::read_excel("GSE107991/GSE107991_Raw_counts_Berry_London.xlsx")
+genes_raw <- London_raw$Genes
+London_raw <- as.matrix(London_raw[,-c(1:3)])
+
+se_raw <- SummarizedExperiment(assays = London_raw, 
+                            colData = col_data)
+
+group <- ifelse(se_raw$Status=="ActiveTB",1,0)
+dgList <- DGEList(counts = London_raw, group = group)
+cpm <- cpm(dgList)
+countCheck <- cpm > 2
+keep <- which(rowSums(countCheck) >= 5)
+London_raw <- London_raw[keep,]
+
+res_dearseq <- dearseq::dear_seq(object = se_raw[, se_raw$Status != "LTBI"],
+                                 variables2test = "Status",
+                                 which_test='permutation',
+                                 preprocessed=FALSE)
+```
+
+
 # Using `dearseq` for gene-set analysis
 
 Here we will use a subsample of the RNA-seq data from Baduel *et al.* (2016) 
