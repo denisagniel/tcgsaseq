@@ -39,17 +39,16 @@ articles:
 
 ## Installation
 
-***`dearseq` is currently [under
-review](https://github.com/Bioconductor/Contributions/issues/1307) to be
-included in [Bioconductor](http://www.bioconductor.org)***
+***`dearseq` is available from
+[Bioconductor](http://www.bioconductor.org)***
 
 Meanwhile, the easiest way to get `dearseq` is to install its
 development version from the `dev` branch on
 [GitHub](https://github.com/borishejblum/dearseq):
 
 ``` r
-#install.packages("devtools")
-devtools::install_github("borishejblum/dearseq", ref="dev")
+#install.packages("BiocManager")
+BiocManager::install("dearseq")
 ```
 
 – Marine Gauthier, Denis Agniel & Boris Hejblum

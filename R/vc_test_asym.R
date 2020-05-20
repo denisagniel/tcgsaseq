@@ -169,18 +169,18 @@ vc_test_asym <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
                             })
         }
         
-        acc=0.0001 #default value
+        acc <- 0.0001 #default value
         dv <- CompQuadForm::davies(score_list$score, lam, acc = acc)
         
-        comp=1 #reducing the acc value if the calculated pvalue is negative
-        while ((dv$Qq<=0 | dv$Qq==1) & comp<10){
-            acc=acc/2
-            dv <- CompQuadForm::davies(score_list$score, lam,acc=acc)
-            comp=comp+1
+        comp <- 1 #reducing the acc value if the calculated pvalue is negative
+        while ((dv$Qq <= 0 | dv$Qq == 1) & acc >= 1.5*10^-7){
+            acc <- acc/2
+            dv <- CompQuadForm::davies(q = score_list$score, 
+                                       lambda = lam, acc = acc)
         }
         if (dv$Qq<0){
             dv$Qq=0
-            message("accuracy in davies at 1.5*10^(-7) still giving <0 ",
+            message("accuracy in davies at ", acc, "still giving <0 ",
                     "probability, probability set to 0")
         }
         

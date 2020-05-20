@@ -680,10 +680,17 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
     }
     if(is.null(genesets)){
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
-                          n_perm = n_perm, pvals = pvals)
+                          n_perm = n_perm, pvals = pvals, precision_weights = w
+        )
     }else{
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
-                          n_perm = n_perm, genesets = genesets, pvals = pvals)
+                          n_perm = n_perm, genesets = genesets, pvals = pvals, 
+                          precision_weights = lapply(genesets, 
+                                                     FUN = function(gs){tryCatch(w[gs, , drop = FALSE], 
+                                                                                 error=function(cond){return(NA)})
+                                                     }
+                          )
+        )
     }
     
     return(ans_final)
