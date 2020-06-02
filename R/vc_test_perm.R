@@ -107,7 +107,7 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
                          n_perm = 1000, progressbar = TRUE,
                          parallel_comp = TRUE,
                          nb_cores = parallel::detectCores() - 1,
-                         genewise_pvals = FALSE,
+                         genewise_pvals = FALSE, plot = FALSE,
                          homogen_traj = FALSE, na.rm = FALSE) {
 
     n_samples <- ncol(y)
@@ -175,17 +175,17 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         }
         
         
-        if (plot) {
-            t <- c(1:length(pvals_e))
-            s <- (t/length(pvals_e))*0.05
-            df_plot_perm <- data.frame("y"=sort(pvals_e),"x"=c(1:length(pvals_e)))
-            ggplot()+ scale_y_log10()+
-                geom_point(data=df_plot_perm,aes(x=x,y=y,color=viridis(4)[1]),size=0.5)+
-                geom_line(data=df_plot_perm,aes(y=s,x=x,color=viridis(4)[2]),size=0.5) +
-                geom_line(data=df_plot_perm, aes(y=0.05,x=x,color="red"),size=0.5) +
-                scale_color_manual(name = "", labels = c("B-H limit","p-values","5% threshold"), values = c(viridis(4)[c(1,2)],"red")) +
-                xlab("rank") + ylab("log10 scale") + theme_bw() + xlim(0, length(df_plot_perm$y))
-        }
+#        if (plot) {
+#            t <- c(1:length(pvals_e))
+#            s <- (t/length(pvals_e))*0.05
+#            df_plot_perm <- data.frame("y"=sort(pvals_e),"x"=c(1:length(pvals_e)))
+#            ggplot()+ scale_y_log10()+
+#                geom_point(data=df_plot_perm,aes(x=x,y=y,color=viridis(4)[1]),size=0.5)+
+#                geom_line(data=df_plot_perm,aes(y=s,x=x,color=viridis(4)[2]),size=0.5) +
+#                geom_line(data=df_plot_perm, aes(y=0.05,x=x,color="red"),size=0.5) +
+#                scale_color_manual(name = "", labels = c("B-H limit","p-values","5% threshold"), values = c(viridis(4)[c(1,2)],"red")) +
+#                xlab("rank") + ylab("log10 scale") + theme_bw() + xlim(0, length(df_plot_perm$y))
+#        }
         
         
         
