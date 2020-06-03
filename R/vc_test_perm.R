@@ -71,6 +71,7 @@
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}
+#'@importFrom viridisLite viridis
 #'
 #'@examples
 #'set.seed(123)
