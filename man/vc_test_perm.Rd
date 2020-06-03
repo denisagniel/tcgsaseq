@@ -16,6 +16,7 @@ vc_test_perm(
   parallel_comp = TRUE,
   nb_cores = parallel::detectCores() - 1,
   genewise_pvals = FALSE,
+  plot = FALSE,
   homogen_traj = FALSE,
   na.rm = FALSE
 )
