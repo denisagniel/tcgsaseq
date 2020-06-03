@@ -59,6 +59,9 @@ Default is \code{parallel::detectCores() - 1}.}
 should be returned. Default is \code{FALSE} in which case gene-set p-value is
 computed and returned instead.}
 
+\item{plot}{a logical flag indicating whether a plot of the p-values should
+be drawn. Default is \code{FALSE} in which case no plot is displayed.}
+
 \item{homogen_traj}{a logical flag indicating whether trajectories should be
 considered homogeneous. Default is \code{FALSE} in which case trajectories are
 not only tested for trend, but also for heterogeneity.}
