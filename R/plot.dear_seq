@@ -9,7 +9,6 @@
 #'@return a plot of sorted gene-wise p-values
 #'@export
 
-
 plot.dear_seq <- function(pvals, ...){
   t <- c(1:length(pvals))
   s <- (t/length(pvals))*0.05
