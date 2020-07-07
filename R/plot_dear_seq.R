@@ -7,6 +7,7 @@
 #'each gene
 #'
 #'@return a plot of sorted gene-wise p-values
+#'@import viridisLite
 #'@export
 
 plot_dear_seq <- function(pvals, ...){
