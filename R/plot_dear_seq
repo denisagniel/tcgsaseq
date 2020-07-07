@@ -9,7 +9,7 @@
 #'@return a plot of sorted gene-wise p-values
 #'@export
 
-plot.dear_seq <- function(pvals, ...){
+plot_dear_seq <- function(pvals, ...){
   t <- c(1:length(pvals))
   s <- (t/length(pvals))*0.05
   df_plot_perm <- data.frame("y" = sort(pvals), "x" = c(1:length(pvals)))
