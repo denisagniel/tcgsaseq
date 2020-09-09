@@ -11,9 +11,10 @@ Status](https://ci.appveyor.com/api/projects/status/github/denisagniel/tcgsaseq?
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/denisagniel/tcgsaseq/master.svg)](https://codecov.io/github/denisagniel/tcgsaseq?branch=master)
 [![Downloads](https://cranlogs.r-pkg.org/badges/tcgsaseq?color=blue)](https://www.r-pkg.org/pkg/tcgsaseq)
-<img src="man/figures/lifecycle-soft-deprecated.svg" width="25%" />
 
-## WARNING: deprecation
+<img src="man/figures/lifecycle-soft-deprecated.svg" width="17%" />
+
+## WARNING: soft-deprecation
 
 `tcgsaseq` capabilities and features have been incorporated into the
 [`Bioconductor` package
