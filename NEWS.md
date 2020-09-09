@@ -1,5 +1,9 @@
 # News about the `tcgsaseq` R package
 
+### Main changes in Version 2.0.1 (2020-09-09)
+ * renaming `varseq()` function into `varcompseq` (following trademark infringement notification from Golden Helix, Inc)
+ * indicating soft-deprecation of `tcgsaseq`in favor of the `dearseq` Bioconductor package
+
 ### Main changes in Version 2.0.0 (2019-08-02):
  * `transform = TRUE` is now the default
  * `loc-lin` weights are now computed on unconditional (transformed) counts. They should be more robust this way to outlier genes
@@ -36,10 +40,6 @@ changes the column names of the `$pvals` output when `which_test = permutations`
 * `WARNING` instead of `ERROR` when a gene set with no measured genes is tested
 * `NA` support through `na.rm_...` logical arguments
 * bug fix for row.names error in weights computation for gene-wise analysis
-
-### Main changes in Version 1.6.3 (2020-09-09)
-* renaming `varseq()` function into `varcompseq` (following trademark 
-infringement notification from Golden Helix, Inc)
 
 
 ### Main changes in Version 1.6.2 (2017-08-04)
