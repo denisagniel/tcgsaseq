@@ -5,7 +5,9 @@
 \alias{PBT_gmt}
 \alias{PBT}
 \title{PBT gene sets related to kidney transplant}
-\format{a \code{gmt} object containing 9 gene sets specific to kidney transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})}
+\format{
+a \code{gmt} object containing 9 gene sets specific to kidney transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
+}
 \source{
 \url{http://atagc.med.ualberta.ca/Research/GeneLists}
 }

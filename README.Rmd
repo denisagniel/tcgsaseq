@@ -19,13 +19,22 @@ knitr::opts_chunk$set(
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/denisagniel/tcgsaseq?branch=master&svg=true)](https://ci.appveyor.com/project/denisagniel/tcgsaseq)
 [![Coverage Status](https://img.shields.io/codecov/c/github/denisagniel/tcgsaseq/master.svg)](https://codecov.io/github/denisagniel/tcgsaseq?branch=master)
 [![Downloads](https://cranlogs.r-pkg.org/badges/tcgsaseq?color=blue)](https://www.r-pkg.org/pkg/tcgsaseq)
+<img src="man/figures/lifecycle-soft-deprecated.svg" width="25%" />
+
+## WARNING: deprecation
+
+`tcgsaseq` capabilities and features have been incorporated into the [`Bioconductor` package `dearseq`](https://bioconductor.org/packages/dearseq/).
+
+`tcgsaseq` will be kept as the legacy companion package of the 2017 Agniel & Hejblum [*Biostatistics*](https://academic.oup.com/biostatistics/article-abstract/18/4/589/3065599) article, but will not be further developped or extended.
+
+If you are interested in using tcgsaseq, you should probably rather look into the newer and more comprehensive  `dearseq` package.
 
 
 ## Overview
 
-`tcgsaseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `varseq` and `tcgsa_seq`: 
+`tcgsaseq` is a package for analyzing RNA-seq data. The 2 main functions of the package are `varcompseq` and `tcgsa_seq`: 
 
-* **Gene-wise Differential Analysis of RNA-seq data** can be performed using the function `varseq`. 
+* **Gene-wise Differential Analysis of RNA-seq data** can be performed using the function `varcompseq`. 
 * **Gene Set Analysis of RNA-seq data** can be performed using the function `tcgsa_seq`. 
 
 The method implemented in this package is detailed in the following article:

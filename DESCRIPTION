@@ -21,7 +21,8 @@ Imports:
     pbapply,
     stats,
     statmod,
-    utils
+    utils,
+    lifecycle
 Suggests:
     limma,
     edgeR,
@@ -40,4 +41,5 @@ LazyData: true
 License: GPL-2 | file LICENSE
 BugReports: https://github.com/denisagniel/tcgsaseq/issues
 Encoding: UTF-8
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
+RdMacros: lifecycle

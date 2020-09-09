@@ -37,6 +37,10 @@ changes the column names of the `$pvals` output when `which_test = permutations`
 * `NA` support through `na.rm_...` logical arguments
 * bug fix for row.names error in weights computation for gene-wise analysis
 
+### Main changes in Version 1.6.3 (2020-09-09)
+* renaming `varseq()` function into `varcompseq` (following trademark 
+infringement notification from Golden Helix, Inc)
+
 
 ### Main changes in Version 1.6.2 (2017-08-04)
 * bug fix to the log2-cpm transformation computation (for `preprocessed = FALSE`)

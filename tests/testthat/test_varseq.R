@@ -1,5 +1,5 @@
 library(tcgsaseq)
-context("Gene Set Analysis with varseq wrapper")
+context("Gene Set Analysis with varcompseq wrapper")
 
-test_that("varseq and tcgsaseq_seq give the same results", {
+test_that("varcompseq and tcgsa_seq give the same results", {
 })

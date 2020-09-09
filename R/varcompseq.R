@@ -95,7 +95,7 @@
 #'@param homogen_traj a logical flag indicating whether trajectories should be considered homogeneous.
 #'Default is \code{FALSE} in which case trajectories are not only tested for trend, but also for heterogeneity.
 #'
-#'@param na.rm_varseq logical: should missing values in \code{y} (including
+#'@param na.rm_varcompseq logical: should missing values in \code{y} (including
 #'\code{NA} and \code{NaN}) be omitted from the calculations?
 #'Default is \code{FALSE}.
 #'
@@ -145,7 +145,7 @@
 #'x <- matrix(1, ncol=1, nrow=r)
 #'
 #'#run test
-#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
+#'res_genes <- varcompseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
 #'                    which_test="asymptotic",
 #'                    which_weights="none", preprocessed=TRUE)
 #'mean(res_genes$pvals[, "rawPval"]>0.05)
@@ -161,12 +161,12 @@
 #'y.tilde <- b0 + b1*t + rnorm(r, sd = sigma)
 #'y <- t(matrix(rnorm(n*r, sd = sqrt(sigma*abs(y.tilde))), ncol=n, nrow=r) +
 #'       matrix(rep(y.tilde, n), ncol=n, nrow=r))
-#'res_genes <- varseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
+#'res_genes <- varcompseq(exprmat=y, covariates=x, variables2test=t, sample_group=rep(1:ni, each=nr),
 #'                    which_weights="none", preprocessed=TRUE)
 #'summary(res_genes$pvals)
 #'}
 #'@export
-varseq <- function(exprmat, covariates, variables2test,
+varcompseq <- function(exprmat, covariates, variables2test,
                    sample_group = NULL, weights_var2test_condi = TRUE,
                    cov_variables2test_eff = diag(ncol(variables2test)),
                    which_test = c("permutation", "asymptotic"),
@@ -179,7 +179,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    exact = FALSE, transform = TRUE,
                    padjust_methods = c("BH", "BY", "holm", "hochberg", "hommel", "bonferroni"),
                    lowess_span = 0.5,
-                   na.rm_varseq = TRUE,
+                   na.rm_varcompseq = TRUE,
                    homogen_traj = FALSE){
 
   return(tcgsa_seq(y = exprmat, x = covariates, phi = variables2test,
@@ -198,7 +198,7 @@ varseq <- function(exprmat, covariates, variables2test,
                    padjust_methods = padjust_methods,
                    lowess_span = lowess_span,
                    homogen_traj = homogen_traj,
-                   na.rm_tcgsaseq = na.rm_varseq,
+                   na.rm_tcgsaseq = na.rm_varcompseq,
                    verbose = FALSE))
 
 }

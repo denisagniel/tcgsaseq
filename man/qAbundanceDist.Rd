@@ -4,7 +4,9 @@
 \name{qAbundanceDist}
 \alias{qAbundanceDist}
 \title{Gene abundance proportion distribution of RNA-seq data.}
-\format{A function: \code{qAbundanceDist}.}
+\format{
+A function: \code{qAbundanceDist}.
+}
 \source{
 \url{http://bioinf.wehi.edu.au/voom/}
 }

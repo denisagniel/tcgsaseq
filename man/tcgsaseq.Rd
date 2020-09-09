@@ -16,7 +16,7 @@ Version: \tab 2.0.0\cr
 Date: \tab 2019-08-02\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
-The two main functions of the \code{tcgsaseq} package are \code{\link{varseq}} and \code{\link{tcgsa_seq}}.
+The two main functions of the \code{tcgsaseq} package are \code{\link{varcompseq}} and \code{\link{tcgsa_seq}}.
 }
 \references{
 Agniel D & Hejblum BP (2017). Variance component score test for
