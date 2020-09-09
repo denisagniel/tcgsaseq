@@ -8,8 +8,8 @@
 Status](https://travis-ci.org/denisagniel/tcgsaseq.svg?branch=master)](https://travis-ci.org/denisagniel/tcgsaseq)
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/denisagniel/tcgsaseq?branch=master&svg=true)](https://ci.appveyor.com/project/denisagniel/tcgsaseq)
-[![Coverage
-Status](https://img.shields.io/codecov/c/github/denisagniel/tcgsaseq/master.svg)](https://codecov.io/github/denisagniel/tcgsaseq?branch=master)
+[![Codecov test
+coverage](https://codecov.io/gh/denisagniel/tcgsaseq/branch/master/graph/badge.svg)](https://codecov.io/gh/denisagniel/tcgsaseq?branch=master)
 [![Downloads](https://cranlogs.r-pkg.org/badges/tcgsaseq?color=blue)](https://www.r-pkg.org/pkg/tcgsaseq)
 
 <img src="man/figures/lifecycle-soft-deprecated.svg" width="17%" />
@@ -18,7 +18,7 @@ Status](https://img.shields.io/codecov/c/github/denisagniel/tcgsaseq/master.svg)
 
 `tcgsaseq` capabilities and features have been incorporated into the
 [`Bioconductor` package
-`dearseq`](https://bioconductor.org/packages/dearseq/).
+`dearseq`](https://bioconductor.org/packages/release/bioc/html/dearseq.html).
 
 `tcgsaseq` will be kept as the legacy companion package of the 2017
 Agniel & Hejblum

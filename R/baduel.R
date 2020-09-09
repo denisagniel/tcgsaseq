@@ -67,7 +67,7 @@
 #' }
 #'
 #'
-#' @source \url{http://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410}
+#' @source \url{https://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410}
 #'
 #' @keywords datasets
 #' @docType data

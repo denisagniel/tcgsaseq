@@ -36,7 +36,7 @@ for the 2454 genes included in either of the 5 gene sets of interests
 }
 }
 \source{
-\url{http://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410}
+\url{https://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410}
 }
 \usage{
 data(baduel_5gs)

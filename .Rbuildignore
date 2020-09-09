@@ -9,3 +9,4 @@ ReproducibleForBiostat.R
 ^codecov\.yml$
 revdep
 vignettes
+^CRAN-RELEASE$
