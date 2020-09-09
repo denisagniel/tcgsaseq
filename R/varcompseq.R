@@ -38,7 +38,7 @@
 #'
 #'@param n_perm the number of perturbations. Default is \code{1000}.
 
-#'@param progressbar logical indicating wether a progressBar should be displayed
+#'@param progressbar logical indicating whether a progress bar should be displayed
 #'when computing permutations (only in interactive mode).
 #'
 #'@param parallel_comp a logical flag indicating whether parallel computation

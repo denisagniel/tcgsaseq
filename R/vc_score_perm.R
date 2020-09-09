@@ -29,7 +29,7 @@
 #'
 #'@param n_perm the number of permutation to perform. Default is \code{1000}.
 #'
-#'@param progressbar logical indicating wether a progressBar should be displayed
+#'@param progressbar logical indicating whether a progress bar should be displayed
 #'when computing permutations (only in interactive mode).
 #'
 #'@param parallel_comp a logical flag indicating whether parallel computation
@@ -45,7 +45,7 @@
 #'   \item \code{score}: an approximation of the observed set score
 #'   \item \code{scores_perm}: a vector containing the permuted set scores
 #'   \item \code{gene_scores_unscaled}: approximation of the individual gene scores
-#'   \item \code{gene_scores_unscaled_perm}: a list of approximationq of the permuted individual gene scores
+#'   \item \code{gene_scores_unscaled_perm}: a list of approximation of the permuted individual gene scores
 #' }
 #'
 #'@seealso \code{\link[CompQuadForm]{davies}}

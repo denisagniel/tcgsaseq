@@ -68,7 +68,7 @@ See \code{\link{sp_weights}} and \code{\link{voom_weights}} for details.}
 
 \item{n_perm}{the number of perturbations. Default is \code{1000}.}
 
-\item{progressbar}{logical indicating wether a progressBar should be displayed
+\item{progressbar}{logical indicating whether a progress bar should be displayed
 when computing permutations (only in interactive mode).}
 
 \item{parallel_comp}{a logical flag indicating whether parallel computation
