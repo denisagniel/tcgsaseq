@@ -9,7 +9,7 @@
 a \code{gmt} object containing 9 gene sets specific to kidney transplant (see \code{\link[GSA:GSA.read.gmt]{GSA.read.gmt}})
 }
 \source{
-\url{http://atagc.med.ualberta.ca/Research/GeneLists}
+\url{https://www.ualberta.ca/medicine/institutes-centres-groups/atagc/research/gene-lists.html}
 }
 \usage{
 data(PBT_gmt)

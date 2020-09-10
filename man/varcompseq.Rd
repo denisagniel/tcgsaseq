@@ -196,7 +196,7 @@ summary(res_genes$pvals)
 Agniel D & Hejblum BP (2017). Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
 18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
-\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
+\href{https://arxiv.org/abs/1605.02351/}{arXiv:1605.02351}.
 }
 \seealso{
 \code{\link{sp_weights}} \code{\link{vc_test_perm}} \code{\link{vc_test_asym}} \code{\link{p.adjust}}

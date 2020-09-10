@@ -36,7 +36,7 @@ for the 2454 genes included in either of the 5 gene sets of interests
 }
 }
 \source{
-\url{https://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410}
+\url{https://www.ncbi.nlm.nih.gov/bioproject/PRJNA312410/}
 }
 \usage{
 data(baduel_5gs)
@@ -77,6 +77,6 @@ Arenosa. \emph{Plant Physiology}, 171(1):437-51. \href{https://doi.org/10.1104/p
 Agniel D & Hejblum BP (2017). Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
 18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
-\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
+\href{https://arxiv.org/abs/1605.02351/}{arXiv:1605.02351}.
 }
 \keyword{datasets}
