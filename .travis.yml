@@ -54,3 +54,4 @@ r_check_args: "--as-cran --timings"
 
 after_success:
   - Rscript -e 'covr::codecov()'
+  - Rscript -e 'covr::coveralls()'
