@@ -213,7 +213,7 @@ summary(res_genes$pvals$FDR)
 Agniel D & Hejblum BP (2017). Variance component score test for
 time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
 18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
-\href{https://arxiv.org/abs/1605.02351/}{arXiv:1605.02351}.
+\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 
 Law, C. W., Chen, Y., Shi, W., & Smyth, G. K. (2014). voom: Precision
 weights unlock linear model analysis tools for RNA-seq read counts. \emph{Genome

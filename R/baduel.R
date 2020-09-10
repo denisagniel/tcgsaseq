@@ -15,7 +15,7 @@
 #'@references Agniel D & Hejblum BP (2017). Variance component score test for
 #'time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
 #'18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
-#'\href{https://arxiv.org/abs/1605.02351/}{arXiv:1605.02351}.
+#'\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 #'
 #'@format 3 objects\itemize{
 #'\item{\code{design}:} a design matrix for the 48 measured samples, containing the following variables:\itemize{
