@@ -12,7 +12,7 @@ test accounting for data heteroscedasticity through precision weights.
 \tabular{ll}{
 Package: \tab tcgsaseq\cr
 Type: \tab Package\cr
-Version: \tab 2.0.3\cr
+Version: \tab 2.0.4\cr
 Date: \tab 2020-09-10\cr
 License:\tab \href{http://www.gnu.org/licenses/gpl-2.0.txt}{GPL-2}\cr
 }
