@@ -27,7 +27,7 @@
 #' PBT_gmt
 #'
 #'
-#' @source \url{http://atagc.med.ualberta.ca/Research/GeneLists}
+#' @source \url{https://www.ualberta.ca/medicine/institutes-centres-groups/atagc/research/gene-lists.html}
 #'
 #' @keywords datasets
 #' @docType data
