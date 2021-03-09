@@ -8,6 +8,11 @@
 }
 \arguments{
 \item{x}{an object of class \code{dear_seq}}
+
+\item{signif_threshold}{a value between \code{0} and {1} specifying the 
+nominal significance threshold. Default is \code{0.05}.}
+
+\item{...}{further arguments}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object

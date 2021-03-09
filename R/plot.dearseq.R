@@ -2,6 +2,11 @@
 #'
 #'@param x an object of class \code{dear_seq}
 #'
+#'@param signif_threshold a value between \code{0} and {1} specifying the 
+#'nominal significance threshold. Default is \code{0.05}.
+#'
+#'@param ... further arguments
+#'
 #'
 #'@author Boris Hejblum
 #'

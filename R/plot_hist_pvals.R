@@ -2,7 +2,10 @@
 #'
 #'Display the histogram of raw p-values for diagnostic plots
 #'
-#'@param x a vector of raw p-values
+#'@param pvals a vector of raw p-values
+#'
+#'@param binwidth a value specifying the width of the histogram bins. 
+#'Default is \code{0.02}.
 #'
 #'@author Boris Hejblum
 #'
@@ -18,7 +21,7 @@ plot_hist_pvals <- function(pvals, binwidth = 0.02){
   df2plot <- cbind.data.frame("Rawpvals" = pvals)
   
   ggp <- ggplot(df2plot) + 
-    geom_histogram(aes(x = Rawpvals), color="white", binwidth = binwidth) +
+    geom_histogram(aes_string(x = "Rawpvals"), color="white", binwidth = binwidth) +
     xlab("Raw p-values") +
     theme_bw() +
     ggtitle("Histogram of raw p-values", subtitle = "before multiple testing correction")

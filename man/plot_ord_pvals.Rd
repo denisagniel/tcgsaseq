@@ -4,11 +4,14 @@
 \alias{plot_ord_pvals}
 \title{Plot of gene-wise p-values}
 \usage{
-plot_ord_pvals(pvals, signif_threshold = 0.05, ...)
+plot_ord_pvals(pvals, signif_threshold = 0.05)
 }
 \arguments{
 \item{pvals}{a vector of length \code{n} containing the raw p-values for
 each gene}
+
+\item{signif_threshold}{a value between \code{0} and {1} specifying the 
+nominal significance threshold. Default is \code{0.05}.}
 }
 \value{
 a plot of sorted gene-wise p-values

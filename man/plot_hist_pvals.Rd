@@ -7,7 +7,10 @@
 plot_hist_pvals(pvals, binwidth = 0.02)
 }
 \arguments{
-\item{x}{a vector of raw p-values}
+\item{pvals}{a vector of raw p-values}
+
+\item{binwidth}{a value specifying the width of the histogram bins. 
+Default is \code{0.02}.}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object

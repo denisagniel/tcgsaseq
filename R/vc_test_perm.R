@@ -107,7 +107,7 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
                          n_perm = 1000, progressbar = TRUE,
                          parallel_comp = TRUE,
                          nb_cores = parallel::detectCores() - 1,
-                         genewise_pvals = FALSE, plot = FALSE,
+                         genewise_pvals = FALSE,
                          homogen_traj = FALSE, na.rm = FALSE) {
 
     n_samples <- ncol(y)
@@ -156,6 +156,7 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
         nperm_sup_obs_threshold <- nperm_sup_obs
         
         while((min(pvals_e)!=(0.05/length(pvals_e)))&(length(ind_threshold)>1)&(n_perm_threshold<=64000)){
+            message(paste("Performing", n_perm_threshold, "permutations for", ind_threshold,  "genes"))
             score_list_res <- vc_score_2use(y = y[ind_threshold,], x = x, indiv = indiv_fact, phi = phi,
                                             w = w[ind_threshold,], Sigma_xi = Sigma_xi, na_rm = na.rm,
                                             n_perm = n_perm_threshold,
