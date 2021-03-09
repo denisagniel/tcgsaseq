@@ -20,7 +20,10 @@ plot.dearseq <- function(x, signif_threshold = 0.05, ...){
   
   p1 <- plot_hist_pvals(x$pvals$rawPval)
   p2 <- plot_ord_pvals(x$pvals$rawPval, signif_threshold = signif_threshold)
-  p3 <- plot_weights(x$weight_object)
-  
-  return((p1 + p2) / p3)
+  pf <- p1 +p2
+  if(x$weight_object$plot_utilities$method != "none"){
+    p3 <- plot_weights(x$weight_object)
+    pf <- (p1 + p2) / p3
+  }
+  return(pf)
 }

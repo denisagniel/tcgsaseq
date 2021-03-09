@@ -21,12 +21,13 @@ plot_ord_pvals <- function(pvals, signif_threshold = 0.05){
   t <- c(1:nrow(df_plot))
   s <- (t/length(pvals))*signif_threshold
   
-  ggp <- ggplot(data = df_plot, aes_string(x = "x")) + 
+  ggp <- 
+    ggplot(data = df_plot, aes_string(x = "x")) + 
     scale_y_log10() + annotation_logticks(sides = "l") +
     geom_ribbon(aes(ymin = min(.data$y), ymax = s), fill = viridis(4)[3], alpha = 0.1) +
-    geom_point(aes_string(y = "y", color = "p-values"), size = 0.5, alpha=0.4) +
-    geom_line(aes_string(y = "s", color = "B-H significance\nthreshold"), size = 0.5) +
-    geom_line(aes_string(y = "signif_threshold", color = paste0(signif_threshold*100, "%")), linetype = 4) +
+    geom_point(aes(y = .data$y, color = "p-values"), size = 0.5, alpha=0.4) +
+    geom_line(aes(y = s, color = "B-H significance\nthreshold"), size = 0.5) +
+    geom_line(aes(y = signif_threshold, color = paste0(signif_threshold*100, "%")), linetype = 4) +
     scale_color_manual(name = "", breaks = c("p-values", "B-H significance\nthreshold", paste0(signif_threshold*100, "%")),
                        values = c("black", viridis(4)[3], "red")) +
     guides(color = guide_legend(override.aes = list(linetype = c(0,1,4), pch = c(1,NA,NA), size = 1, alpha = 1))) +
