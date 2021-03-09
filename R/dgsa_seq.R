@@ -680,7 +680,8 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
     }
     if(is.null(genesets)){
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
-                          n_perm = n_perm, pvals = pvals, precision_weights = w
+                          n_perm = n_perm, pvals = pvals, precision_weights = w, 
+                          weight_object =w_full
         )
     }else{
         ans_final <- list(which_test = which_test, preprocessed = preprocessed,
@@ -689,10 +690,12 @@ dgsa_seq <- function(exprmat = NULL, object = NULL,
                                                      FUN = function(gs){tryCatch(w[gs, , drop = FALSE], 
                                                                                  error=function(cond){return(NA)})
                                                      }
-                          )
+                          ), 
+                          weight_object = w_full
         )
     }
     
+    class(ans_final) <- "dearseq"
     return(ans_final)
     
 }
