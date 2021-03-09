@@ -189,7 +189,7 @@ vc_test_perm <- function(y, x, indiv = rep(1, nrow(x)), phi, w,
             n_perm_threshold <- n_perm_threshold*2
             
         }
-        
+        names(pvals_e) <- names(gene_scores_obs)
         
         ans <- list(gene_scores_obs = gene_scores_obs, gene_pvals = pvals_e)
     } else {

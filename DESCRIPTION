@@ -2,7 +2,7 @@ Package: dearseq
 Type: Package
 Title: Differential Expression Analysis for RNA-seq data through a robust 
        variance component test
-Version: 1.1.0
+Version: 1.3.0
 Date: 2021-03-09
 Authors@R: c(person("Denis", "Agniel", role = c("aut"),
                     email = "denis.agniel@gmail.com"),
