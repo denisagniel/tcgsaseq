@@ -10,3 +10,4 @@ ReproducibleForBiostat.R
 revdep
 vignettes
 ^CRAN-RELEASE$
+^\.github$

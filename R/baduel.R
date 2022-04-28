@@ -10,11 +10,11 @@
 #'
 #'@references Baduel P, Arnold B, Weisman CM, Hunter B & Bomblies K (2016).
 #'Habitat-Associated Life History and Stress-Tolerance Variation in Arabidopsis
-#'Arenosa. \emph{Plant Physiology}, 171(1):437-51. \href{https://doi.org/10.1104/pp.15.01875}{10.1104/pp.15.01875}.
+#'Arenosa. \emph{Plant Physiology}, 171(1):437-51. \doi{10.1104/pp.15.01875}.
 
 #'@references Agniel D & Hejblum BP (2017). Variance component score test for
 #'time-course gene set analysis of longitudinal RNA-seq data, \emph{Biostatistics},
-#'18(4):589-604. \href{https://doi.org/10.1093/biostatistics/kxx005}{10.1093/biostatistics/kxx005}.
+#'18(4):589-604. \doi{10.1093/biostatistics/kxx005}.
 #'\href{https://arxiv.org/abs/1605.02351}{arXiv:1605.02351}.
 #'
 #'@format 3 objects\itemize{
